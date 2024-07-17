@@ -1,7 +1,8 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import LeftMenu from "./leftMenu";
+import React, { useState } from 'react';
+import Header from './header';
+import Sidebar from './sideBar';
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -12,9 +13,11 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <div className="relative flex h-screen bg-basic_1">
-      <LeftMenu isSidebarOpen={isSidebarOpen} onClose={closeSidebar} />
       <div className="flex flex-col flex-1">
-        <div className="flex-1 overflow-y-auto bg-basic_1 mt-14">
+        <Header />
+        <Sidebar />
+        {/* <div className="flex-1 overflow-y-auto bg-basic_1 mt-14"> */}
+        <div className="">
           <main>{children}</main>
         </div>
       </div>
