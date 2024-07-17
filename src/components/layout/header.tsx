@@ -28,7 +28,7 @@ const Header: React.FC = () => {
   };
 
   return (
-    <header className="w-full p-4 bg-header_bg shadow">
+    <header className="fixed w-full p-4 bg-header_bg shadow z-10">
       <div className="container mx-auto flex justify-center items-center relative">
         <nav className="flex space-x-6 relative" ref={navRef}>
           {MENU_ITEMS.map((item, index) => (
@@ -36,14 +36,14 @@ const Header: React.FC = () => {
               key={item.name}
               onClick={() => handleNavigation(item.path, index)}
               className={`flex flex-col items-center cursor-pointer ${
-                activeIndex === index ? 'text-blue-600' : 'text-gray-600'
+                activeIndex === index ? 'text-blue_2' : 'text-gray-600'
               }`}
             >
               <item.icon className="text-2xl" />
             </div>
           ))}
           <div
-            className="absolute bottom-0 h-1 bg-blue-600 rounded-tl rounded-tr transition-all duration-300"
+            className="absolute bottom-0 h-1 bg-blue_2 rounded-tl rounded-tr transition-all duration-300"
             style={{
               width: `${barWidth}px`,
               left: `${barLeft - 24}px`,
