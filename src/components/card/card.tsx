@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import OptionModal from '../modal/optionModal';
+import Modal from '../modal/modal';
 
 interface CardProps {
   id: string;
@@ -34,6 +35,7 @@ const getStatusColors = (status: string) => {
 const Card: React.FC<CardProps> = ({ id, size, tags, status }) => {
   const { bg1, bg2 } = getStatusColors(status);
   const [showOptions, setShowOptions] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
   const items = [
@@ -48,12 +50,22 @@ const Card: React.FC<CardProps> = ({ id, size, tags, status }) => {
 
   const handleGetInfo = () => {
     console.log('정보 가져오기 클릭됨');
-    setShowOptions(false); // 옵션 선택 후 닫기
+    setShowOptions(false);
   };
 
   const handleDelete = () => {
     console.log('삭제하기 클릭됨');
-    setShowOptions(false); // 옵션 선택 후 닫기
+    setShowModal(true);
+    setShowOptions(false);
+  };
+
+  const handleConfirmDelete = () => {
+    console.log('삭제가 확인되었습니다.');
+    setShowModal(false);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
   };
 
   useEffect(() => {
@@ -73,7 +85,7 @@ const Card: React.FC<CardProps> = ({ id, size, tags, status }) => {
   return (
     <div
       ref={cardRef}
-      className="relative flex items-start px-3 pt-1 pb-3 bg-grey_1 shadow rounded-lg mb-4"
+      className="relative flex items-start px-3 pt-1 pb-3 bg-grey_0 shadow rounded-lg mb-4"
     >
       <div
         className="absolute left-0 top-0 bottom-0 w-2.5 rounded-l-lg"
@@ -110,6 +122,11 @@ const Card: React.FC<CardProps> = ({ id, size, tags, status }) => {
           </div>
         ))}
       </div>
+      <Modal
+        isOpen={showModal}
+        onClose={handleCloseModal}
+        onConfirm={handleConfirmDelete}
+      />
     </div>
   );
 };
