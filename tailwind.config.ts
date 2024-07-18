@@ -16,7 +16,7 @@ const config: Config = {
         header_bg: '#E3E6EA',
         grey_1: '#F4F4F4',
         grey_2: '#D2D2D2',
-        grey_3: '',
+        grey_3: '#999999',
         grey_4: '#7F7F7F',
         blue_1: '#d2d1f6',
         blue_2: '#4C48FF',
