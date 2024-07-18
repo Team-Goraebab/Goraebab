@@ -3,12 +3,22 @@
 import React from 'react';
 
 interface ModalProps {
+  question?: string;
+  confirmText?: string;
+  closeText?: string;
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void;
 }
 
-const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onConfirm }) => {
+const Modal: React.FC<ModalProps> = ({
+  question,
+  confirmText,
+  closeText,
+  isOpen,
+  onClose,
+  onConfirm,
+}) => {
   if (!isOpen) return null;
 
   return (
@@ -19,20 +29,20 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onConfirm }) => {
       />
       <div className="bg-white rounded-lg p-4 md:p-5 z-10 shadow-lg w-[90%] max-w-xs sm:max-w-[360px] md:max-w-sm lg:max-w-[400px] xl:max-w-[400px] 2xl:max-w-[400px]">
         <p className="mb-4 md:mb-6 2xl:mb-8 mt-3 md:mt-4 2xl:mt-6 text-center font-bold text-base md:text-lg 2xl:text-2xl">
-          정말로 삭제하시겠습니까?
+          {question || '정말로 삭제하시겠습니까?'}
         </p>
         <div className="flex justify-center space-x-3 md:space-x-5">
           <button
             className="w-24 sm:w-28 md:w-32 2xl:w-40 py-2 2xl:py-3 bg-red_1 text-red_2 rounded-lg font-bold text-sm md:text-base 2xl:text-xl"
             onClick={onConfirm}
           >
-            삭제
+            {confirmText || '삭제'}
           </button>
           <button
             className="w-24 sm:w-28 md:w-32 2xl:w-40 py-2 2xl:py-3 bg-grey_1 text-grey_6 rounded-lg font-bold text-sm md:text-base 2xl:text-xl"
             onClick={onClose}
           >
-            취소
+            {closeText || '취소'}
           </button>
         </div>
       </div>
