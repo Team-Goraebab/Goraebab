@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import OptionModal from '../modal/optionModal';
 
 interface CardProps {
   id: string;
@@ -32,6 +33,8 @@ const getStatusColors = (status: string) => {
 
 const Card: React.FC<CardProps> = ({ id, size, tags, status }) => {
   const { bg1, bg2 } = getStatusColors(status);
+  const [showOptions, setShowOptions] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
 
   const items = [
     { label: 'ID', value: id },
@@ -39,15 +42,59 @@ const Card: React.FC<CardProps> = ({ id, size, tags, status }) => {
     { label: 'TAGS', value: tags },
   ];
 
+  const handleOptionClick = () => {
+    setShowOptions(!showOptions);
+  };
+
+  const handleGetInfo = () => {
+    console.log('정보 가져오기 클릭됨');
+    setShowOptions(false); // 옵션 선택 후 닫기
+  };
+
+  const handleDelete = () => {
+    console.log('삭제하기 클릭됨');
+    setShowOptions(false); // 옵션 선택 후 닫기
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (cardRef.current && !cardRef.current.contains(event.target as Node)) {
+        setShowOptions(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [cardRef]);
+
   return (
-    <div className="flex items-start px-3 pt-1 pb-3 bg-grey_1 shadow rounded-lg relative mb-4">
+    <div
+      ref={cardRef}
+      className="relative flex items-start px-3 pt-1 pb-3 bg-grey_1 shadow rounded-lg mb-4"
+    >
       <div
         className="absolute left-0 top-0 bottom-0 w-2.5 rounded-l-lg"
         style={{ backgroundColor: bg2 }}
       />
       <div className="ml-4 flex flex-col w-full">
-        <div className="flex justify-end text-grey_4 text-sm mb-3">
-          <span className="font-semibold text-xs">•••</span>
+        <div className="flex justify-end text-grey_4 text-sm mb-3 relative">
+          <span
+            className="font-semibold text-xs cursor-pointer"
+            onClick={handleOptionClick}
+          >
+            •••
+          </span>
+          {showOptions && (
+            <div className="absolute top-4 left-16">
+              <OptionModal
+                onTopHandler={handleGetInfo}
+                onBottomHandler={handleDelete}
+              />
+            </div>
+          )}
         </div>
         {items.map((item, index) => (
           <div key={index} className="flex items-center mt-[5px] space-x-3.5">
