@@ -12,6 +12,11 @@ interface CardProps {
   status: string;
 }
 
+/**
+ *
+ * @param status card의 상태 값
+ * @returns status에 따른 색상을 반환
+ */
 const getStatusColors = (status: string) => {
   switch (status) {
     case 'primary':
@@ -52,7 +57,9 @@ const Card: React.FC<CardProps> = ({ id, size, tags, status }) => {
             >
               {item.label}
             </span>
-            <span className="font-semibold text-xs">{item.value}</span>
+            <span className="font-semibold text-xs truncate max-w-[150px]">
+              {item.value}
+            </span>
           </div>
         ))}
       </div>
