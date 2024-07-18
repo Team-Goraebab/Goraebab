@@ -14,10 +14,12 @@ const config: Config = {
         accent: '#ffad1f',
         danger: '#e0245e',
         header_bg: '#E3E6EA',
-        grey_1: '#F4F4F4',
+        grey_0: '#F4F4F4',
+        grey_1: '#E3E6EA',
         grey_2: '#D2D2D2',
         grey_3: '#999999',
         grey_4: '#7F7F7F',
+        grey_6: '#4E4E4E',
         blue_1: '#d2d1f6',
         blue_2: '#4C48FF',
         red_1: '#f6d4d6',
@@ -30,6 +32,13 @@ const config: Config = {
         'gradient-conic':
           'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
       },
+      // screens: {
+      //   sm: 640px 이상
+      //   md: 768px 이상
+      //   lg: 1024px 이상
+      //   xl: 1280px 이상
+      //   2xl: 1536px 이상
+      //   },
     },
   },
   plugins: [],
