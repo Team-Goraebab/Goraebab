@@ -8,8 +8,8 @@ import { FaBox, FaImages, FaNetworkWired, FaDatabase } from 'react-icons/fa';
 // ];
 
 export const MENU_ITEMS = [
-  { name: 'Container', path: '/', icon: FaBox },
-  { name: 'Image', path: '/', icon: FaImages },
-  { name: 'Network', path: '/', icon: FaNetworkWired },
-  { name: 'Volume', path: '/', icon: FaDatabase },
+  { id: 1, name: 'Container', path: '/', icon: FaBox },
+  { id: 2, name: 'Image', path: '/', icon: FaImages },
+  { id: 3, name: 'Network', path: '/', icon: FaNetworkWired },
+  { id: 4, name: 'Volume', path: '/', icon: FaDatabase },
 ];
