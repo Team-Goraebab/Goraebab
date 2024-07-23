@@ -11,10 +11,10 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <div className="relative flex h-screen bg-basic_1">
+      <Header />
       <Sidebar />
-      <div className="flex flex-col flex-1 relative">
-        <Header />
-        <div className="flex-1 overflow-y-auto bg-basic_1 mt-14 p-4 ml-[300px] relative bg-grey_0">
+      <div className="flex flex-col flex-1 ml-[300px] mt-[56px]">
+        <div className="flex-1 overflow-y-auto bg-basic_1 p-4 bg-grey_0">
           <main className={`relative ${isHandMode ? 'hand-mode' : ''}`}>
             {children}
           </main>
