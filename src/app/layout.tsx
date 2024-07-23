@@ -23,9 +23,9 @@ export default function RootLayout({
   const pathname = usePathname();
   const router = useRouter();
 
-  if (pathname === '/') {
-    router.push('/container');
-  }
+  // if (pathname === '/') {
+  //   router.push('/container');
+  // }
 
   return (
     <html lang="en">

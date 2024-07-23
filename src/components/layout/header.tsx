@@ -36,7 +36,7 @@ const Header: React.FC = () => {
           {MENU_ITEMS.map((item, index) => (
             <div
               key={item.name}
-              // onClick={() => handleNavigation(item.path, index)}
+              onClick={() => handleNavigation(item.path, index)}
               className={`flex flex-col items-center cursor-pointer ${
                 activeIndex === index ? 'text-blue_2' : 'text-gray-600'
               }`}
