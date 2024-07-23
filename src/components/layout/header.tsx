@@ -1,18 +1,21 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { MENU_ITEMS } from '../../../data/menu';
+import { useMenuStore } from '../../../store/store';
 
 const Header: React.FC = () => {
-  const [activeIndex, setActiveIndex] = useState(0);
+  const { activeId, setActiveId } = useMenuStore();
+  console.log('선택한 header menu ::', activeId);
   const router = useRouter();
   const navRef = useRef<HTMLDivElement>(null);
-  const [barWidth, setBarWidth] = useState(0);
-  const [barLeft, setBarLeft] = useState(0);
+  const [barWidth, setBarWidth] = React.useState(0);
+  const [barLeft, setBarLeft] = React.useState(0);
 
   useEffect(() => {
     if (navRef.current) {
+      const activeIndex = MENU_ITEMS.findIndex((item) => item.id === activeId);
       const activeItem = navRef.current.children[activeIndex];
       if (activeItem) {
         setBarWidth(activeItem.clientWidth);
@@ -22,10 +25,10 @@ const Header: React.FC = () => {
         );
       }
     }
-  }, [activeIndex]);
+  }, [activeId]);
 
-  const handleNavigation = (path: string, index: number) => {
-    setActiveIndex(index);
+  const handleNavigation = (path: string, id: number) => {
+    setActiveId(id);
     router.push(path);
   };
 
@@ -33,12 +36,12 @@ const Header: React.FC = () => {
     <header className="fixed w-full p-4 bg-header_bg shadow z-10">
       <div className="container mx-auto flex justify-center items-center relative">
         <nav className="flex space-x-6 relative" ref={navRef}>
-          {MENU_ITEMS.map((item, index) => (
+          {MENU_ITEMS.map((item) => (
             <div
-              key={item.name}
-              onClick={() => handleNavigation(item.path, index)}
+              key={item.id}
+              onClick={() => handleNavigation(item.path, item.id)}
               className={`flex flex-col items-center cursor-pointer ${
-                activeIndex === index ? 'text-blue_2' : 'text-gray-600'
+                activeId === item.id ? 'text-blue_2' : 'text-gray-600'
               }`}
             >
               <item.icon className="text-2xl" />
