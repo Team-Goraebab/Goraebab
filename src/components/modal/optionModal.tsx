@@ -9,12 +9,12 @@ interface OptionModalProps {
   onBottomHandler: () => void;
 }
 
-const OptionModal: React.FC<OptionModalProps> = ({
+const OptionModal = ({
   topTitle,
   bottomTitle,
   onTopHandler,
   onBottomHandler,
-}) => {
+}: OptionModalProps) => {
   return (
     <div className="flex flex-col z-50 items-center border border-grey_3 rounded-md w-40 absolute bg-white shadow-lg">
       <button
