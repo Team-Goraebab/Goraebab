@@ -5,7 +5,7 @@ interface BtnProps {
   color?: string;
 }
 
-const Button: React.FC<BtnProps> = ({ title, color }) => {
+const Button = ({ title, color }: BtnProps) => {
   return (
     <button
       className={`mt-4 p-2 w-full text-white rounded font-bold ${
