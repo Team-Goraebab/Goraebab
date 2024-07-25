@@ -1,17 +1,17 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { MENU_ITEMS } from '../../../data/menu';
-import { useMenuStore } from '../../../store/store';
+import { MENU_ITEMS } from '@/data/menu';
+import { useMenuStore } from '@/store/store';
 
-const Header: React.FC = () => {
+const Header = () => {
   const { activeId, setActiveId } = useMenuStore();
   console.log('선택한 header menu ::', activeId);
   const router = useRouter();
   const navRef = useRef<HTMLDivElement>(null);
-  const [barWidth, setBarWidth] = React.useState(0);
-  const [barLeft, setBarLeft] = React.useState(0);
+  const [barWidth, setBarWidth] = useState(0);
+  const [barLeft, setBarLeft] = useState(0);
 
   useEffect(() => {
     if (navRef.current) {
