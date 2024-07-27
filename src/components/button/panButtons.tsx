@@ -7,7 +7,7 @@ interface PanBtnProps {
   setIsHandMode: (isHandMode: boolean) => void;
 }
 
-const PanButtons: React.FC<PanBtnProps> = ({ setIsHandMode }) => {
+const PanButtons = ({ setIsHandMode }: PanBtnProps) => {
   const [isHandMode, setIsHandModeLocal] = useState(false);
 
   useEffect(() => {
@@ -24,7 +24,7 @@ const PanButtons: React.FC<PanBtnProps> = ({ setIsHandMode }) => {
     return () => {
       window.removeEventListener('mousemove', handlePan);
     };
-  }, [isHandMode, setIsHandMode]);
+  }, [isHandMode]);
 
   useEffect(() => {
     const mainElement = document.querySelector('main');

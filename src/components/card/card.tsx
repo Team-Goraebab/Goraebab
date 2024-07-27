@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import OptionModal from '../modal/optionModal';
-import Modal from '../modal/modal';
+import { Modal, OptionModal } from '@/components';
 
 interface CardProps {
   id: string;
@@ -32,7 +31,7 @@ const getStatusColors = (status: string) => {
   }
 };
 
-const Card: React.FC<CardProps> = ({ id, size, tags, status }) => {
+const Card = ({ id, size, tags, status }: CardProps) => {
   const { bg1, bg2 } = getStatusColors(status);
   const [showOptions, setShowOptions] = useState(false);
   const [showModal, setShowModal] = useState(false);

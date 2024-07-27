@@ -1,4 +1,3 @@
-import { FC } from 'react';
 import { FaHome } from 'react-icons/fa';
 
 type HostCardProps = {
@@ -11,7 +10,7 @@ type HostCardProps = {
   status?: boolean;
 };
 
-const HostCard: FC<HostCardProps> = ({ hostNm, ip, status = true }) => {
+const HostCard = ({ hostNm, ip, status = true }: HostCardProps) => {
   const borderColor = status ? 'border-blue_2' : 'border-red_2';
   const bgColor = status ? 'bg-blue_1' : 'bg-red_1';
   const textColor = status ? 'text-blue_2' : 'text-red_2';

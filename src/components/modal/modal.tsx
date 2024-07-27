@@ -11,14 +11,14 @@ interface ModalProps {
   onConfirm: () => void;
 }
 
-const Modal: React.FC<ModalProps> = ({
+const Modal = ({
   question,
   confirmText,
   closeText,
   isOpen,
   onClose,
   onConfirm,
-}) => {
+}: ModalProps) => {
   if (!isOpen) return null;
 
   return (

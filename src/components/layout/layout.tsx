@@ -1,17 +1,14 @@
 'use client';
 
 import React, { useState } from 'react';
-import Header from './header';
-import Sidebar from './sideBar';
-import ZoomButtons from '../button/zoomButtons';
-import PanButtons from '../button/panButtons';
+import { Header, PanButtons, Sidebar, ZoomButtons } from '@/components';
 import {
   IMAGE_CARD_DATA,
   CONTAINER_CARD_DATA,
   NETWORK_CARD_DATA,
   VOLUME_CARD_DATA,
-} from '../../../data/mock';
-import { useMenuStore } from '../../../store/store';
+} from '@/data/mock';
+import { useMenuStore } from '@/store/store';
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   const { activeId } = useMenuStore();
