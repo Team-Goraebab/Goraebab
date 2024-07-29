@@ -13,7 +13,6 @@ const config: Config = {
         secondary: '#FF4853',
         accent: '#ffad1f',
         danger: '#e0245e',
-        header_bg: '#E3E6EA',
         grey_0: '#F4F4F4',
         grey_1: '#E3E6EA',
         grey_2: '#D2D2D2',
