@@ -9,6 +9,7 @@ interface CardProps {
    * primary
    * secondary
    * accent
+   * success
    */
   status: string;
 }
@@ -26,6 +27,8 @@ const getStatusColors = (status: string) => {
       return { bg1: '#f6d4d6', bg2: '#FF4853' };
     case 'accent':
       return { bg1: '#f6e3d1', bg2: '#FFA048' };
+    case 'success':
+      return { bg1: '#d1f6e2', bg2: '#25BD6B' };
     default:
       return { bg1: '#d1d1d1', bg2: '#7F7F7F' };
   }
