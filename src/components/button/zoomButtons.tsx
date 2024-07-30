@@ -86,7 +86,7 @@ const ZoomButtons = () => {
   }, [isShiftPressed]);
 
   return (
-    <div className="fixed bottom-4 left-[300px] transform translate-x-4 w-[130px] h-[50px] p-3 bg-white rounded-lg shadow-lg flex items-center justify-between z-50">
+    <div className="fixed bottom-4 left-[300px] transform translate-x-4 w-[130px] h-[50px] p-3 bg-white rounded-lg shadow-lg flex items-center justify-between">
       <button onClick={handleZoomOut}>
         <FaSearchMinus size={20} />
       </button>
