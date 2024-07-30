@@ -25,6 +25,8 @@ const config: Config = {
         red_2: '#FF4853',
         yellow_1: '#f6e3d1',
         yellow_2: '#FFA048',
+        green_1: '#d1f6e2',
+        green_2: '#25BD6B',
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
