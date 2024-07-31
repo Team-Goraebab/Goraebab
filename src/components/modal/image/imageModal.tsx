@@ -49,8 +49,8 @@ const ImageModal = ({ isOpen, onClose }: ModalProps) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="relative bg-white p-6 rounded-lg w-11/12 max-w-4xl mx-4 md:mx-0 h-4/5 flex flex-col shadow-lg">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+      <div className="relative bg-white p-6 rounded-lg w-full max-w-4xl mx-4 md:mx-0 h-full md:h-4/5 flex flex-col shadow-lg overflow-hidden">
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl focus:outline-none"
@@ -85,7 +85,7 @@ const ImageModal = ({ isOpen, onClose }: ModalProps) => {
             Docker Hub
           </button>
         </div>
-        <div className="flex-grow flex items-center justify-center">
+        <div className="flex-grow flex items-center justify-center overflow-auto">
           {renderTabContent()}
         </div>
         <div className="flex justify-end mt-4">
