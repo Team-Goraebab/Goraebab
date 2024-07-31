@@ -1,6 +1,6 @@
 'use client';
 
-import ImageModal from '@/components/modal/image/imageModal';
+import { ImageModal } from '@/components';
 import { useState } from 'react';
 
 const ImagePage = () => {
