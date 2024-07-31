@@ -7,15 +7,30 @@ interface ModalProps {
   onClose: () => void;
 }
 
-const Modal = ({ isOpen, onClose }: ModalProps) => {
+const ImageModal = ({ isOpen, onClose }: ModalProps) => {
   const [activeTab, setActiveTab] = useState('local');
+  const [file, setFile] = useState<File | null>(null);
 
   if (!isOpen) return null;
+
+  const handleFileChange = (file: File | null) => {
+    if (file) {
+      const fileSizeMB = file.size / (1024 * 1024);
+      if (fileSizeMB > 150) {
+        alert('파일 용량이 150MB를 초과했습니다.');
+        setFile(null);
+      } else {
+        setFile(file);
+      }
+    } else {
+      setFile(null);
+    }
+  };
 
   const renderTabContent = () => {
     switch (activeTab) {
       case 'local':
-        return <LocalPathContent />;
+        return <LocalPathContent onFileChange={handleFileChange} file={file} />;
       case 'docker':
         return <DockerHubContent />;
       default:
@@ -25,61 +40,52 @@ const Modal = ({ isOpen, onClose }: ModalProps) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="relative bg-white p-6 rounded-lg w-11/12 max-w-4xl mx-4 md:mx-0 h-4/5 flex flex-col">
+      <div className="relative bg-white p-6 rounded-lg w-11/12 max-w-4xl mx-4 md:mx-0 h-4/5 flex flex-col shadow-lg">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl"
+          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl focus:outline-none"
         >
           &times;
         </button>
-        <h2 className="text-lg md:text-xl lg:text-2xl xl:text-2xl 2xl:text-2xl font-bold mt-4 mb-4 text-start">
-          <span className="text-blue_2">
-            이미지
-            <span className="text-black">를 불러올 방식을 선택하세요.</span>
-          </span>
+        <h2 className="text-lg md:text-xl lg:text-2xl font-bold mb-4 text-center">
+          <span className="text-blue-500">이미지</span>
+          <span className="text-black">를 불러올 방식을 선택하세요.</span>
         </h2>
-        <div className="flex justify-start mb-4">
+        <div className="flex justify-center mb-4">
           <button
             onClick={() => setActiveTab('local')}
-            className={`flex items-center p-2 mr-2 ${
+            className={`flex items-center px-4 py-2 mr-2 ${
               activeTab === 'local'
-                ? 'bg-blue_2 text-white'
-                : 'bg-gray-200 text-black'
-            } rounded`}
+                ? 'bg-blue-500 text-white'
+                : 'bg-gray-200 text-black hover:bg-gray-300'
+            } rounded shadow`}
           >
             <FaFolderOpen className="mr-2" />
             Local Path
           </button>
           <button
             onClick={() => setActiveTab('docker')}
-            className={`flex items-center p-2 ${
+            className={`flex items-center px-4 py-2 ${
               activeTab === 'docker'
-                ? 'bg-blue_2 text-white'
-                : 'bg-gray-200 text-black'
-            } rounded`}
+                ? 'bg-blue-500 text-white'
+                : 'bg-gray-200 text-black hover:bg-gray-300'
+            } rounded shadow`}
           >
             <FaDocker className="mr-2" />
             Docker Hub
           </button>
         </div>
-        <div className="flex-grow flex">{renderTabContent()}</div>
-        <div className="flex justify-between mt-4">
-          <div>
-            {activeTab === 'local' && (
-              <button className="p-2 bg-gray-200 text-black rounded">
-                파일 찾기
-              </button>
-            )}
-          </div>
-          <div>
-            <button className="p-2 bg-blue_2 text-white rounded">
-              저장하기
-            </button>
-          </div>
+        <div className="flex-grow flex items-center justify-center">
+          {renderTabContent()}
+        </div>
+        <div className="flex justify-end mt-4">
+          <button className="p-2 bg-blue-500 text-white rounded shadow hover:bg-blue-600 focus:outline-none">
+            저장하기
+          </button>
         </div>
       </div>
     </div>
   );
 };
 
-export default Modal;
+export default ImageModal;
