@@ -6,10 +6,7 @@ interface LocalPathContentProps {
   file: File | null;
 }
 
-const LocalPathContent: React.FC<LocalPathContentProps> = ({
-  onFileChange,
-  file,
-}) => {
+const LocalPathContent = ({ onFileChange, file }: LocalPathContentProps) => {
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
