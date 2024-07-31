@@ -27,6 +27,16 @@ const ImageModal = ({ isOpen, onClose }: ModalProps) => {
     }
   };
 
+  const handleSave = () => {
+    if (file) {
+      // 이미지 저장 로직
+      console.log('이미지 저장:', file.name);
+      // 업로드 후 추가 작업 (예: 컨테이너 실행)
+    } else {
+      alert('이미지를 선택하세요.');
+    }
+  };
+
   const renderTabContent = () => {
     switch (activeTab) {
       case 'local':
@@ -79,7 +89,10 @@ const ImageModal = ({ isOpen, onClose }: ModalProps) => {
           {renderTabContent()}
         </div>
         <div className="flex justify-end mt-4">
-          <button className="p-2 bg-blue-500 text-white rounded shadow hover:bg-blue-600 focus:outline-none">
+          <button
+            onClick={handleSave}
+            className="p-2 bg-blue-500 text-white rounded shadow hover:bg-blue-600 focus:outline-none"
+          >
             저장하기
           </button>
         </div>
