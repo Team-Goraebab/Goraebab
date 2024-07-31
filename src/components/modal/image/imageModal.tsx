@@ -1,4 +1,5 @@
-import React from 'react';
+import { DockerHubContent, LocalPathContent } from '@/components';
+import React, { useState } from 'react';
 import { FaFolderOpen, FaDocker } from 'react-icons/fa';
 
 interface ModalProps {
@@ -6,52 +7,74 @@ interface ModalProps {
   onClose: () => void;
 }
 
-const Modal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
+const Modal = ({ isOpen, onClose }: ModalProps) => {
+  const [activeTab, setActiveTab] = useState('local');
+
   if (!isOpen) return null;
+
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'local':
+        return <LocalPathContent />;
+      case 'docker':
+        return <DockerHubContent />;
+      default:
+        return null;
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="relative bg-white p-6 rounded-lg w-11/12 max-w-4xl mx-4 md:mx-0 h-4/5">
+      <div className="relative bg-white p-6 rounded-lg w-11/12 max-w-4xl mx-4 md:mx-0 h-4/5 flex flex-col">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-grey_4 hover:text-grey_4 text-2xl"
+          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl"
         >
           &times;
         </button>
-        <h2 className="text-lg md:text-xl lg:text-2xl xl:text-2xl 2xl:text-2xl font-bold mt-4 text-center">
+        <h2 className="text-lg md:text-xl lg:text-2xl xl:text-2xl 2xl:text-2xl font-bold mt-4 mb-4 text-start">
           <span className="text-blue_2">
             이미지
             <span className="text-black">를 불러올 방식을 선택하세요.</span>
           </span>
         </h2>
-        <p className="text-center text-base md:text-lg lg:text-xl xl:text-xl 2xl:text-xl text-black mb-6">
-          Please choose a method to upload the image.
-        </p>
-        <div
-          className="flex justify-around gap-6"
-          style={{ height: 'calc(100% - 6.3rem)' }}
-        >
-          <div className="flex flex-col border justify-center border-grey_3 rounded-lg p-6 text-center cursor-pointer hover:border-grey_4 w-1/2 h-full">
-            <div className="flex flex-col items-center">
-              <FaFolderOpen className="text-grey_4 mb-4 w-10 h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 xl:w-14 xl:h-14 2xl:w-14 2xl:h-14" />
-              <p className="font-bold text-base md:text-lg lg:text-xl xl:text-xl 2xl:text-xl text-grey_4">
-                Local Path
-              </p>
-              <p className="text-xs md:text-sm lg:text-base xl:text-base 2xl:text-base text-grey_4 mt-2 font-regular">
-                내 컴퓨터에서 도커 이미지를 가져옵니다.
-              </p>
-            </div>
+        <div className="flex justify-start mb-4">
+          <button
+            onClick={() => setActiveTab('local')}
+            className={`flex items-center p-2 mr-2 ${
+              activeTab === 'local'
+                ? 'bg-blue_2 text-white'
+                : 'bg-gray-200 text-black'
+            } rounded`}
+          >
+            <FaFolderOpen className="mr-2" />
+            Local Path
+          </button>
+          <button
+            onClick={() => setActiveTab('docker')}
+            className={`flex items-center p-2 ${
+              activeTab === 'docker'
+                ? 'bg-blue_2 text-white'
+                : 'bg-gray-200 text-black'
+            } rounded`}
+          >
+            <FaDocker className="mr-2" />
+            Docker Hub
+          </button>
+        </div>
+        <div className="flex-grow flex">{renderTabContent()}</div>
+        <div className="flex justify-between mt-4">
+          <div>
+            {activeTab === 'local' && (
+              <button className="p-2 bg-gray-200 text-black rounded">
+                파일 찾기
+              </button>
+            )}
           </div>
-          <div className="flex flex-col border justify-center border-grey_3 rounded-lg p-6 text-center cursor-pointer hover:border-grey_4 w-1/2 h-full">
-            <div className="flex flex-col items-center">
-              <FaDocker className="text-grey_4 mb-4 w-10 h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 xl:w-14 xl:h-14 2xl:w-14 2xl:h-14" />
-              <p className="font-bold text-base md:text-lg lg:text-xl xl:text-xl 2xl:text-xl text-grey_4">
-                Docker Hub
-              </p>
-              <p className="text-xs md:text-sm lg:text-base xl:text-base 2xl:text-base text-grey_4 mt-2 font-regular">
-                도커 허브에서 이미지를 가져옵니다.
-              </p>
-            </div>
+          <div>
+            <button className="p-2 bg-blue_2 text-white rounded">
+              저장하기
+            </button>
           </div>
         </div>
       </div>
