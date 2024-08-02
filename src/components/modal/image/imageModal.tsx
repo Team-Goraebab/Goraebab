@@ -1,21 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import { FaFolderOpen, FaDocker } from 'react-icons/fa';
+import { FaFolderOpen, FaDocker, FaTag, FaFileSignature } from 'react-icons/fa';
 import { useSnackbar } from 'notistack';
 import { DockerHubContent, LocalPathContent } from '@/components';
+import { v4 as uuidv4 } from 'uuid';
+import { showSnackbar } from '@/utils/toastUtils';
 
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onSave: (id: string, name: string, tags: string, file: File) => void;
 }
 
-const ImageModal = ({ isOpen, onClose }: ModalProps) => {
+const ImageModal = ({ isOpen, onClose, onSave }: ModalProps) => {
   const [activeTab, setActiveTab] = useState('local');
   const [file, setFile] = useState<File | null>(null);
+  const [name, setName] = useState('');
+  const [tags, setTags] = useState('');
   const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
     if (!isOpen) {
       setFile(null);
+      setName('');
+      setTags('');
     }
   }, [isOpen]);
 
@@ -25,7 +32,12 @@ const ImageModal = ({ isOpen, onClose }: ModalProps) => {
     if (file) {
       const fileSizeMB = file.size / (1024 * 1024);
       if (fileSizeMB > 150) {
-        alert('파일 용량이 150MB를 초과했습니다.');
+        showSnackbar(
+          enqueueSnackbar,
+          '파일 용량이 150MB를 초과했습니다.',
+          'error',
+          '#FF4853'
+        );
         setFile(null);
       } else {
         setFile(file);
@@ -35,29 +47,46 @@ const ImageModal = ({ isOpen, onClose }: ModalProps) => {
     }
   };
 
-  const handleCloseBtn = () => {
-    onClose();
-    setActiveTab('local');
+  // 유효성 검사
+  const validateInputs = () => {
+    if (!file) {
+      showSnackbar(
+        enqueueSnackbar,
+        '이미지를 선택해주세요.',
+        'error',
+        '#FF4853'
+      );
+      return false;
+    }
+    if (!name) {
+      showSnackbar(enqueueSnackbar, '이름을 입력해주세요.', 'error', '#FF4853');
+      return false;
+    }
+    if (!tags) {
+      showSnackbar(enqueueSnackbar, '태그를 입력해주세요.', 'error', '#FF4853');
+      return false;
+    }
+    return true;
   };
 
   const handleSave = () => {
-    if (file) {
-      // 이미지 저장 로직
-      console.log('이미지 저장:', file.name);
+    if (validateInputs()) {
+      const id = uuidv4();
+      if (file) {
+        onSave(id, name, tags, file);
+      }
       onClose();
+      // 값 초기화
       setActiveTab('local');
-      enqueueSnackbar(`${file.name}을 저장했습니다`, {
-        variant: 'success',
-        autoHideDuration: 2000,
-        anchorOrigin: {
-          vertical: 'top',
-          horizontal: 'right',
-        },
-        style: { backgroundColor: '#4C48FF' },
-      });
-      // 업로드 후 추가 작업
-    } else {
-      alert('이미지를 선택하세요.');
+      setName('');
+      setTags('');
+      // 성공 토스트 메시지
+      showSnackbar(
+        enqueueSnackbar,
+        `${file?.name}을 저장했습니다`,
+        'success',
+        '#4C48FF'
+      );
     }
   };
 
@@ -76,6 +105,11 @@ const ImageModal = ({ isOpen, onClose }: ModalProps) => {
       default:
         return null;
     }
+  };
+
+  const handleCloseBtn = () => {
+    onClose();
+    setActiveTab('local');
   };
 
   return (
@@ -118,7 +152,29 @@ const ImageModal = ({ isOpen, onClose }: ModalProps) => {
         <div className="flex-grow flex items-center justify-center overflow-auto">
           {renderTabContent()}
         </div>
-        <div className="flex justify-end mt-4">
+        <div className="mt-2 space-y-2">
+          <div className="relative">
+            <FaFileSignature className="absolute top-3 left-3 text-gray-400" />
+            <input
+              type="text"
+              placeholder="이름"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full pl-10 p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <div className="relative">
+            <FaTag className="absolute top-3 left-3 text-gray-400" />
+            <input
+              type="text"
+              placeholder="태그 (쉼표로 구분)"
+              value={tags}
+              onChange={(e) => setTags(e.target.value)}
+              className="w-full pl-10 p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+        </div>
+        <div className="flex justify-end mt-2">
           <button
             onClick={handleSave}
             className="p-2 bg-blue-500 text-white rounded shadow hover:bg-blue-600 focus:outline-none"
