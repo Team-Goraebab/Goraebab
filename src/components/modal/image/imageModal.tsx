@@ -1,6 +1,7 @@
-import { DockerHubContent, LocalPathContent } from '@/components';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaFolderOpen, FaDocker } from 'react-icons/fa';
+import { useSnackbar } from 'notistack';
+import { DockerHubContent, LocalPathContent } from '@/components';
 
 interface ModalProps {
   isOpen: boolean;
@@ -10,6 +11,13 @@ interface ModalProps {
 const ImageModal = ({ isOpen, onClose }: ModalProps) => {
   const [activeTab, setActiveTab] = useState('local');
   const [file, setFile] = useState<File | null>(null);
+  const { enqueueSnackbar } = useSnackbar();
+
+  useEffect(() => {
+    if (!isOpen) {
+      setFile(null);
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -27,11 +35,27 @@ const ImageModal = ({ isOpen, onClose }: ModalProps) => {
     }
   };
 
+  const handleCloseBtn = () => {
+    onClose();
+    setActiveTab('local');
+  };
+
   const handleSave = () => {
     if (file) {
       // 이미지 저장 로직
       console.log('이미지 저장:', file.name);
-      // 업로드 후 추가 작업 (예: 컨테이너 실행)
+      onClose();
+      setActiveTab('local');
+      enqueueSnackbar(`${file.name}을 저장했습니다`, {
+        variant: 'success',
+        autoHideDuration: 2000,
+        anchorOrigin: {
+          vertical: 'top',
+          horizontal: 'right',
+        },
+        style: { backgroundColor: '#4C48FF' },
+      });
+      // 업로드 후 추가 작업
     } else {
       alert('이미지를 선택하세요.');
     }
@@ -40,7 +64,13 @@ const ImageModal = ({ isOpen, onClose }: ModalProps) => {
   const renderTabContent = () => {
     switch (activeTab) {
       case 'local':
-        return <LocalPathContent onFileChange={handleFileChange} file={file} />;
+        return (
+          <LocalPathContent
+            onFileChange={handleFileChange}
+            file={file}
+            onClose={onClose}
+          />
+        );
       case 'docker':
         return <DockerHubContent />;
       default:
@@ -52,7 +82,7 @@ const ImageModal = ({ isOpen, onClose }: ModalProps) => {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
       <div className="relative bg-white p-6 rounded-lg w-full max-w-4xl mx-4 md:mx-0 h-full md:h-4/5 flex flex-col shadow-lg overflow-hidden">
         <button
-          onClick={onClose}
+          onClick={handleCloseBtn}
           className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl focus:outline-none"
         >
           &times;
