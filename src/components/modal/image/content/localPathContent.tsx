@@ -1,12 +1,23 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { FaFolderOpen } from 'react-icons/fa';
 
 interface LocalPathContentProps {
   onFileChange: (file: File | null) => void;
   file: File | null;
+  onClose: () => void;
 }
 
-const LocalPathContent = ({ onFileChange, file }: LocalPathContentProps) => {
+const LocalPathContent = ({
+  onFileChange,
+  file,
+  onClose,
+}: LocalPathContentProps) => {
+  useEffect(() => {
+    if (!file) {
+      onFileChange(null);
+    }
+  }, [onClose, file, onFileChange]);
+
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
