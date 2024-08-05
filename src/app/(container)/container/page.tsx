@@ -2,37 +2,20 @@
 
 import React from 'react';
 import { CardContainer, ConnectBar, HostCard } from '@/components';
+import { HOST_DATA, NETWORK_DATA } from '@/data/mock';
 
-type Container = {
-  name: string;
-  ip: string;
-  status: 'running' | 'stopped';
-};
-
-type Network = {
-  networkIp: string;
-  containers: Container[];
-};
-
-type Host = {
-  hostNm?: string;
-  ip: string;
-  status?: boolean;
-};
-
-type CardProps = {
-  host: Host;
-  network: Network;
-};
-
-const ContainerPage = ({ host, network }: CardProps) => {
+const ContainerPage = () => {
   return (
     <div className="flex space-x-0">
-      <HostCard hostNm={host.hostNm} ip={host.ip} status={host.status} />
+      <HostCard
+        hostNm={HOST_DATA.hostNm}
+        ip={HOST_DATA.ip}
+        status={HOST_DATA.status}
+      />
       <ConnectBar />
       <CardContainer
-        networkIp={network.networkIp}
-        containers={network.containers}
+        networkIp={NETWORK_DATA.networkIp}
+        containers={NETWORK_DATA.containers}
       />
     </div>
   );

@@ -1,17 +1,17 @@
 import React from 'react';
 
-type Container = {
+interface Container {
   name: string;
   ip: string;
-  status: 'running' | 'stopped';
-};
+  status: string;
+}
 
-type CardContainerkProps = {
+export interface CardContainerProps {
   networkIp: string;
   containers: Container[];
-};
+}
 
-const CardContainer = ({ networkIp, containers }: CardContainerkProps) => {
+const CardContainer = ({ networkIp, containers }: CardContainerProps) => {
   return (
     <div className="flex flex-col items-center p-[10px] border bg-white border-grey_3 rounded-lg shadow-lg w-[450px]">
       <div className="w-full text-center bg-blue_1 text-blue_2 border-2 border-blue_2 p-2 rounded-md mb-3 text-sm font-semibold">

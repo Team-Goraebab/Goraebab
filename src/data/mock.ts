@@ -1,5 +1,3 @@
-import { Network } from '@/app/page';
-
 export const IMAGE_CARD_DATA = [
   {
     id: 'sha-image',
@@ -84,7 +82,7 @@ export const HOST_DATA = {
   status: true,
 };
 
-export const NETWORK_DATA: Network = {
+export const NETWORK_DATA = {
   networkIp: '172.17.0.1',
   containers: [
     { name: 'naver-backend', ip: '172.17.0.2', status: 'running' },
