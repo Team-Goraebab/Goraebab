@@ -89,6 +89,11 @@ export const NETWORK_DATA: Network = {
   containers: [
     { name: 'naver-backend', ip: '172.17.0.2', status: 'running' },
     { name: 'naver-frontend', ip: '172.17.0.3', status: 'stopped' },
+    { name: 'naver-frontend', ip: '172.17.0.3', status: 'running' },
+    { name: 'naver-frontend', ip: '172.17.0.3', status: 'stopped' },
+    { name: 'naver-frontend', ip: '172.17.0.3', status: 'running' },
+    { name: 'naver-frontend', ip: '172.17.0.3', status: 'stopped' },
+    { name: 'naver-frontend', ip: '172.17.0.3', status: 'stopped' },
     { name: 'naver-frontend', ip: '172.17.0.3', status: 'stopped' },
   ],
 };
