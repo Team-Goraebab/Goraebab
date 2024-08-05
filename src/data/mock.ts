@@ -1,3 +1,5 @@
+import { Network } from '@/app/page';
+
 export const IMAGE_CARD_DATA = [
   {
     id: 'sha-image',
@@ -75,3 +77,18 @@ export const VOLUME_CARD_DATA = [
     status: 'primary',
   },
 ];
+
+export const HOST_DATA = {
+  hostNm: 'Host Name',
+  ip: '12.34.56.67',
+  status: true,
+};
+
+export const NETWORK_DATA: Network = {
+  networkIp: '172.17.0.1',
+  containers: [
+    { name: 'naver-backend', ip: '172.17.0.2', status: 'running' },
+    { name: 'naver-frontend', ip: '172.17.0.3', status: 'stopped' },
+    { name: 'naver-frontend', ip: '172.17.0.3', status: 'stopped' },
+  ],
+};
