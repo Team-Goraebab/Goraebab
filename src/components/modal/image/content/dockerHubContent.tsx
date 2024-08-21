@@ -1,6 +1,6 @@
+import { getDockerHubImages } from '@/services/api';
 import React, { useState } from 'react';
 import { FaStar, FaDownload } from 'react-icons/fa';
-import fetchDockerHubImages from './fetchDockerHubImages';
 
 const DockerHubContent: React.FC = () => {
   const [query, setQuery] = useState('');
@@ -9,7 +9,7 @@ const DockerHubContent: React.FC = () => {
 
   const handleSearch = async () => {
     setLoading(true);
-    const results = await fetchDockerHubImages(query);
+    const results = await getDockerHubImages(query);
     setImages(results);
     setLoading(false);
   };
