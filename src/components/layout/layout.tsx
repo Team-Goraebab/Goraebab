@@ -51,7 +51,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
             </main>
             <div className="flex flex-col">
               {/* <ZoomButtons /> */}
-              <Sidebar data={cardData} progress={30} />
+              <Sidebar progress={30} />
               <PanButtons />
               <AddHostButton />
               <SaveButton />

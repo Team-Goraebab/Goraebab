@@ -14,11 +14,10 @@ import ImageCard from '../card/imageCard';
 import ContainerCard from '../card/containerCard';
 
 interface SidebarProps {
-  data: any[];
   progress: number;
 }
 
-const Sidebar = ({ data, progress }: SidebarProps) => {
+const Sidebar = ({ progress }: SidebarProps) => {
   const { selectedHostId } = selectedHostStore();
   const { activeId } = useMenuStore();
 
@@ -43,6 +42,10 @@ const Sidebar = ({ data, progress }: SidebarProps) => {
     setImageData((prevImages) => [...prevImages, newImage]);
   };
 
+  // 컨테이너 아이디 === 1
+  // 이미지 아이디 === 2
+  // 네트워크 아이디 === 3
+  // 볼륨 아이디 === 4
   return (
     <div className="fixed top-0 left-0 w-[300px] h-full flex flex-col bg-white p-4 border-r-2 border-grey_2 pt-20">
       <div className="flex-grow overflow-y-auto scrollbar-hide">
