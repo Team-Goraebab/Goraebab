@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Modal, OptionModal } from '@/components';
 import { useSnackbar } from 'notistack';
-import { selectedHostStore } from '@/store/seletedHostStore';
 
 interface VolumeProps {
   id: string;
