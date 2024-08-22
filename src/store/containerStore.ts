@@ -13,6 +13,7 @@ interface Container {
   networkId?: string; // 연결된 네트워크 ID
 }
 
+// 컨테이너 정보를 저장하는 store
 interface ContainerStore {
   containers: Container[];
   addContainer: (container: Container) => void;

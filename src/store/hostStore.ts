@@ -34,6 +34,7 @@ interface HostStore {
   deleteNetwork: (hostId: string, networkId: string) => void;
 }
 
+// 호스트 정보를 저장하는 store
 export const useHostStore = create<HostStore>((set) => ({
   hosts: [],
   networks: [],

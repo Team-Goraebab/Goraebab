@@ -14,6 +14,7 @@ interface VolumeStore {
   addVolume: (volume: Volume) => void;
 }
 
+// 볼륨 정보를 저장하는 stores
 export const useVolumeStore = create<VolumeStore>((set) => ({
   volumes: [],
   addVolume: (volume) =>

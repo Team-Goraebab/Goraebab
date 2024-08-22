@@ -11,6 +11,7 @@ interface SelectedHostStore {
   deleteConnectedBridgeId: (hostId: string, networkName: string) => void;
 }
 
+// 선택한 호스트를 저장하는 store
 export const selectedHostStore = create<SelectedHostStore>((set) => ({
   selectedHostId: null,
   connectedBridgeIds: {},

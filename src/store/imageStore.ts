@@ -13,6 +13,7 @@ interface ImageStore {
   addImage: (image: Image) => void;
 }
 
+// 이미지 정보를 저장하는 store
 export const useImageStore = create<ImageStore>((set) => ({
   images: [],
   addImage: (image) =>
