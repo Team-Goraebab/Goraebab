@@ -6,6 +6,7 @@ import { useStore } from '@/store/cardStore';
 import { v4 as uuidv4 } from 'uuid';
 import { useSnackbar } from 'notistack';
 import { showSnackbar } from '@/utils/toastUtils';
+import { useImageStore } from '@/store/imageStore';
 interface CardProps {
   id: string;
   name?: string;
@@ -23,7 +24,7 @@ interface CardProps {
    * accent
    * success
    */
-  status: string;
+  status?: string;
 }
 
 interface CardDataProps {
@@ -53,6 +54,7 @@ const getStatusColors = (status: string) => {
 
 const ImageCard = ({ data, selectedHostId }: CardDataProps) => {
   const { enqueueSnackbar } = useSnackbar();
+  const removeImage = useImageStore((state) => state.removeImage);
 
   const id = uuidv4();
   const { bg1, bg2 } = getStatusColors(data.status || 'primary');
@@ -73,6 +75,7 @@ const ImageCard = ({ data, selectedHostId }: CardDataProps) => {
 
   const handleGetInfo = () => {
     console.log('정보 가져오기 클릭됨');
+    console.log(data);
     setShowOptions(false);
   };
 
@@ -98,13 +101,18 @@ const ImageCard = ({ data, selectedHostId }: CardDataProps) => {
   };
 
   const handleDelete = () => {
-    console.log('삭제하기 클릭됨');
     setShowModal(true);
     setShowOptions(false);
   };
 
   const handleConfirmDelete = () => {
-    console.log('삭제가 확인되었습니다.');
+    removeImage(data.id);
+    showSnackbar(
+      enqueueSnackbar,
+      '이미지가 삭제되었습니다.',
+      'success',
+      '#25BD6B'
+    );
     setShowModal(false);
   };
 
@@ -136,7 +144,10 @@ const ImageCard = ({ data, selectedHostId }: CardDataProps) => {
         style={{ backgroundColor: bg2 }}
       />
       <div className="ml-4 flex flex-col w-full">
-        <div className="flex justify-end text-grey_4 text-sm mb-3 relative">
+        <div className="flex justify-between text-grey_4 text-sm mt-2 mb-3 relative">
+          <span className={"font-pretendard font-bold text-black"}>
+            {data.name}
+          </span>
           <span
             className="font-semibold text-xs cursor-pointer"
             onClick={handleOptionClick}

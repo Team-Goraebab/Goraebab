@@ -12,6 +12,7 @@ import AddImageButton from '../button/addImageButton';
 import { useMenuStore } from '@/store/menuStore';
 import ImageCard from '../card/imageCard';
 import ContainerCard from '../card/containerCard';
+import { useImageStore } from '@/store/imageStore';
 
 interface SidebarProps {
   progress: number;
@@ -20,6 +21,7 @@ interface SidebarProps {
 const Sidebar = ({ progress }: SidebarProps) => {
   const { selectedHostId } = selectedHostStore();
   const { activeId } = useMenuStore();
+  const images = useImageStore((state) => state.images);
 
   const [networkData, setNetworkData] = useState<any[]>([]);
   const [volumeData, setVolumeData] = useState<any[]>([]);
@@ -60,21 +62,21 @@ const Sidebar = ({ progress }: SidebarProps) => {
                 />
               ))
             ) : (
-              <p>컨테이너를 추가하세요</p>
+              <p className={"font-pretendard font-light"}>컨테이너를 추가하세요</p>
             )}
           </>
         ) : activeId === 2 ? (
           <>
-            {imageData.length > 0 ? (
-              imageData.map((image, index) => (
+            {images.length > 0 ? (
+              images.map((image) => (
                 <ImageCard
-                  key={index}
+                  key={image.id}
                   data={image}
                   selectedHostId={selectedHostId}
                 />
               ))
             ) : (
-              <p>이미지를 추가하세요</p>
+              <p className={"font-pretendard font-light"}>이미지를 추가하세요</p>
             )}
           </>
         ) : activeId === 3 ? (
@@ -88,7 +90,7 @@ const Sidebar = ({ progress }: SidebarProps) => {
                 />
               ))
             ) : (
-              <p>네트워크 데이터를 추가하세요</p>
+              <p className={"font-pretendard font-light"}>네트워크 데이터를 추가하세요</p>
             )}
           </>
         ) : activeId === 4 ? (
@@ -102,7 +104,7 @@ const Sidebar = ({ progress }: SidebarProps) => {
                 />
               ))
             ) : (
-              <p>볼륨 데이터를 추가하세요</p>
+              <p className={"font-pretendard font-light"}>볼륨 데이터를 추가하세요</p>
             )}
           </>
         ) : (
