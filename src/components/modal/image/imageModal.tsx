@@ -1,11 +1,11 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { FaFolderOpen, FaDocker, FaTag, FaFileSignature } from 'react-icons/fa';
+import { FaFolderOpen, FaDocker, FaTag, FaFileSignature, FaTrash } from 'react-icons/fa';
 import { useSnackbar } from 'notistack';
-import { DockerHubContent, LocalPathContent } from '@/components';
 import { v4 as uuidv4 } from 'uuid';
 import { showSnackbar } from '@/utils/toastUtils';
+import { DockerHubContent } from '@/components';
 
 interface ModalProps {
   isOpen: boolean;
@@ -40,8 +40,30 @@ const ImageModal = ({ isOpen, onClose, onSave }: ModalProps) => {
 
   if (!isOpen) return null;
 
-  const handleFileChange = (file: File | null) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0] || null;
+    handleFileSelection(selectedFile);
+  };
+
+  const handleFileSelection = (file: File | null) => {
     if (file) {
+      const validExtensions = ['.tar', '.tar.gz', '.tar.bz2', '.tar.xz'];
+      const fileExtension = file.name.slice(file.name.lastIndexOf('.')).toLowerCase();
+
+      const isValidExtension = validExtensions.some((ext) => file.name.toLowerCase().endsWith(ext));
+
+      if (!isValidExtension) {
+        showSnackbar(
+          enqueueSnackbar,
+          'tar, tar.gz, tar.bz2, tar.xz 파일만 업로드 가능합니다.',
+          'error',
+          '#FF4853'
+        );
+        setFile(null);
+        setSize(''); // 파일 크기 초기화
+        return;
+      }
+
       const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2); // 파일 크기 계산
       if (parseFloat(fileSizeMB) > 150) {
         showSnackbar(
@@ -60,6 +82,11 @@ const ImageModal = ({ isOpen, onClose, onSave }: ModalProps) => {
       setFile(null);
       setSize(''); // 파일 크기 초기화
     }
+  };
+
+  const handleDeleteFile = () => {
+    setFile(null);
+    setSize('');
   };
 
   // 유효성 검사
@@ -102,11 +129,40 @@ const ImageModal = ({ isOpen, onClose, onSave }: ModalProps) => {
     switch (activeTab) {
       case 'local':
         return (
-          <LocalPathContent
-            onFileChange={handleFileChange}
-            file={file}
-            onClose={onClose}
-          />
+          <div
+            onDrop={(e) => {
+              e.preventDefault();
+              const droppedFile = e.dataTransfer.files[0];
+              handleFileSelection(droppedFile);
+            }}
+            onDragOver={(e) => e.preventDefault()}
+            className="flex flex-col justify-start w-full h-full border-2 border-dashed border-gray-300 rounded-md p-4 cursor-pointer"
+          >
+            {file ? (
+              <div className="mt-4 p-4 bg-gray-100 rounded w-full relative">
+                <p className="font-pretendard font-bold text-blue-500">{file.name}</p>
+                <p className="font-pretendard font-light text-gray-500 text-sm">{size} MB</p>
+                <button
+                  onClick={handleDeleteFile}
+                  className="absolute flex flex-row gap-2 items-center px-4 top-5 right-4 p-2 bg-red-500 text-white rounded-lg hover:bg-red-600 focus:outline-none"
+                >
+                  <FaTrash />
+                  삭제
+                </button>
+              </div>
+            ) : (
+              <label className="flex flex-col items-center justify-center w-full h-full text-gray-400 cursor-pointer">
+                <FaFolderOpen size={40} className="mb-2" />
+                <span>여기에 파일을 드롭하거나 클릭하여 선택하세요</span>
+                <input
+                  type="file"
+                  onChange={handleFileChange}
+                  accept=".tar,.tar.gz,.tar.bz2,.tar.xz"
+                  className="hidden"
+                />
+              </label>
+            )}
+          </div>
         );
       case 'docker':
         return <DockerHubContent />;
@@ -130,8 +186,8 @@ const ImageModal = ({ isOpen, onClose, onSave }: ModalProps) => {
           &times;
         </button>
         <h2 className="text-lg md:text-xl lg:text-2xl font-bold mb-4 text-center">
-          <span className="text-blue-500">이미지</span>
-          <span className="text-black">를 불러올 방식을 선택하세요.</span>
+          <span className="text-blue-500 font-pretendard font-bold">이미지</span>
+          <span className="text-black font-pretendard font-bold">를 불러올 방식을 선택하세요.</span>
         </h2>
         <div className="flex justify-center mb-4">
           <button
