@@ -8,7 +8,10 @@ import {
   NETWORK_CARD_DATA,
   VOLUME_CARD_DATA,
 } from '@/data/mock';
-import { useMenuStore } from '@/store/store';
+import AddHostButton from '../button/addHostButton';
+import { SnackbarProvider } from 'notistack';
+import SaveButton from '../button/saveButton';
+import { useMenuStore } from '@/store/menuStore';
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   const { activeId } = useMenuStore();
@@ -37,21 +40,26 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   }
 
   return (
-    <div className="relative flex h-screen bg-basic_1">
-      <Header />
-      <Sidebar data={cardData} progress={30} />
-      <div className="flex flex-col flex-1 ml-[300px] mt-[56px]">
-        <div className="flex-1 overflow-y-auto bg-basic_1 p-4 bg-grey_0">
-          <main className={`relative ${isHandMode ? 'hand-mode' : ''}`}>
-            {children}
-          </main>
-          <div className="flex flex-col">
-            <ZoomButtons />
-            <PanButtons setIsHandMode={setIsHandMode} />
+    <SnackbarProvider maxSnack={3}>
+      <div className="relative flex h-screen bg-basic_1 overflow-hidden">
+        <Header />
+        <div className="flex flex-col flex-1 ml-[300px] mt-[56px]">
+          {/* <div className="flex-1 overflow-y-auto bg-basic_1 p-4 bg-grey_0"> */}
+          <div className="flex-1 bg-basic_1 bg-grey_0">
+            <main className={`relative ${isHandMode ? 'hand-mode' : ''}`}>
+              {children}
+            </main>
+            <div className="flex flex-col">
+              {/* <ZoomButtons /> */}
+              <Sidebar progress={30} />
+              <PanButtons />
+              <AddHostButton />
+              <SaveButton />
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </SnackbarProvider>
   );
 };
 

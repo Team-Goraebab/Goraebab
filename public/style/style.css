@@ -1,16 +1,3 @@
-main,
-main * {
-  cursor: default;
-}
-main.hand-mode,
-main.hand-mode * {
-  cursor: grab;
-}
-main.hand-mode.grabbing,
-main.hand-mode.grabbing * {
-  cursor: grabbing;
-}
-
 /* scrollbar custom */
 
 .scrollbar-custom::-webkit-scrollbar {
@@ -49,3 +36,13 @@ main.hand-mode.grabbing * {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+/* cursor */
+
+.grabbing {
+  cursor: grabbing;
+}
+.grab {
+  cursor: grab;
+}
+
