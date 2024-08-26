@@ -74,8 +74,6 @@ const ImageCard = ({ data, selectedHostId }: CardDataProps) => {
   };
 
   const handleGetInfo = () => {
-    console.log('정보 가져오기 클릭됨');
-    console.log(data);
     setShowOptions(false);
   };
 

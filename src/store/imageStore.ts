@@ -7,7 +7,6 @@ interface Image {
   tags: string;
   source: 'local' | 'dockerHub';
   size: string;
-  status: string;
 }
 
 interface ImageStore {
