@@ -17,7 +17,7 @@ interface ModalProps {
     file: File | null,
     size: string,
     source: 'local' | 'dockerHub',
-    dockerImageInfo?: any
+    dockerImageInfo?: any,
   ) => void;
 }
 

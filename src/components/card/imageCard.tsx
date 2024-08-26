@@ -74,8 +74,6 @@ const ImageCard = ({ data, selectedHostId }: CardDataProps) => {
   };
 
   const handleGetInfo = () => {
-    console.log('정보 가져오기 클릭됨');
-    console.log(data);
     setShowOptions(false);
   };
 
@@ -95,7 +93,6 @@ const ImageCard = ({ data, selectedHostId }: CardDataProps) => {
         'error',
         '#FF4853'
       );
-      console.log('호스트를 선택하세요');
     }
     setShowOptions(false);
   };

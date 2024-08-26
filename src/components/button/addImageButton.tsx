@@ -25,7 +25,7 @@ const AddImageButton = ({ onCreate }: AddImageButtonProps) => {
     file: File | null,
     size: string,
     source: 'local' | 'dockerHub', // 이미지의 출처를 구분
-    dockerImageInfo?: any // Docker Hub에서 선택된 이미지의 추가 정보
+    dockerImageInfo?: any, // Docker Hub에서 선택된 이미지의 추가 정보
   ) => {
     const imageData = {
       id,
@@ -34,7 +34,7 @@ const AddImageButton = ({ onCreate }: AddImageButtonProps) => {
       file,
       size,
       source,
-      dockerImageInfo, // Docker Hub 이미지 정보 (선택적)
+      dockerImageInfo // Docker Hub 이미지 정보 (선택적)
     };
 
     // 부모 컴포넌트로 이미지 데이터 전달

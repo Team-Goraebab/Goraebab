@@ -6,7 +6,8 @@ import { useStore } from '@/store/cardStore';
 import { v4 as uuidv4 } from 'uuid';
 import { useSnackbar } from 'notistack';
 import { showSnackbar } from '@/utils/toastUtils';
-import { useSelectedNetworkStore } from '@/store/selectedNetworkStore'; // 새로운 전역 상태 가져오기
+import { useSelectedNetworkStore } from '@/store/selectedNetworkStore';
+import { useContainerStore } from '@/store/containerStore'; // 새로운 전역 상태 가져오기
 
 interface Volume {
   id: string;
@@ -25,7 +26,7 @@ interface CardProps {
   status: string;
   image?: string;
   volumes?: Volume[];
-  network?: string;
+  network?: string
 }
 
 interface CardDataProps {
@@ -56,7 +57,7 @@ const ContainerCard = ({ data, selectedHostId }: CardDataProps) => {
   const [showOptions, setShowOptions] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
-  const addContainerToHost = useStore((state) => state.addContainerToHost);
+  const { addContainer, assignImageToContainer, assignNetworkToContainer } = useContainerStore();
 
   const items = [
     { label: 'ID', value: data.id },
@@ -88,12 +89,19 @@ const ContainerCard = ({ data, selectedHostId }: CardDataProps) => {
     if (selectedHostId) {
       const newContainer = {
         id: uuidv4(),
-        name: data.name,
-        ip: data.ip,
-        active: data.active,
-        network: selectedNetwork,
+        name: data.name || '',
+        ip: data.ip || '',
+        size: data.size,
+        tags: data.tags,
+        active: data.active || 'false',
+        status: 'running',
+        imageId: data.id, // 현재 카드의 ID를 이미지 ID로 사용
       };
-      addContainerToHost(selectedHostId, newContainer);
+
+      addContainer(newContainer);
+      assignImageToContainer(newContainer.id, data.id);
+      assignNetworkToContainer(newContainer.id, selectedNetwork.hostId);
+
       showSnackbar(
         enqueueSnackbar,
         `호스트 ${selectedHostId}의 ${selectedNetwork} 네트워크에서 컨테이너가 실행되었습니다.`,
@@ -107,7 +115,6 @@ const ContainerCard = ({ data, selectedHostId }: CardDataProps) => {
         'error',
         '#FF4853'
       );
-      console.log('호스트를 선택하세요');
     }
     setShowOptions(false);
   };
@@ -198,6 +205,8 @@ const ContainerCard = ({ data, selectedHostId }: CardDataProps) => {
                 <p className="text-xs font-semibold">
                   {typeof item === 'string' ? item : item.name}
                 </p>
+                {item.driver && <p className="text-xs">Driver: {item.driver}</p>}
+                {item.mountPoint && <p className="text-xs">Mount: {item.mountPoint}</p>}
               </div>
             ))}
           </div>
