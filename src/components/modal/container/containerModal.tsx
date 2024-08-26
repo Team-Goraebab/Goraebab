@@ -33,7 +33,7 @@ const ContainerModal = ({ onClose, onSave }: ContainerModalProps) => {
   };
 
   const handleSave = () => {
-    if (!name || !selectedImage || !ip || selectedVolumes.length === 0) {
+    if (!name || !selectedImage || !ip) {
       showSnackbar(
         enqueueSnackbar,
         '모든 필드를 입력해주세요.',
@@ -43,10 +43,16 @@ const ContainerModal = ({ onClose, onSave }: ContainerModalProps) => {
       return;
     }
 
+    const selectedImageData = images.find(img => img.name === selectedImage);
+
     const newContainer = {
       id: uuidv4(),
       name,
-      image: selectedImage,
+      image: {
+        name: selectedImage,
+        tag: selectedImageData?.tags || 'latest',
+        source: selectedImageData?.source || 'unknown'
+      },
       ip,
       status: 'running',
       ports: ports.split(',').map((port) => port.trim()),
@@ -70,7 +76,6 @@ const ContainerModal = ({ onClose, onSave }: ContainerModalProps) => {
           onChange={(e) => setName(e.target.value)}
           className="mb-2 p-2 border border-gray-300 rounded w-full"
         />
-        {/* 이미지 선택 드롭다운 */}
         <select
           value={selectedImage}
           onChange={(e) => setSelectedImage(e.target.value)}
