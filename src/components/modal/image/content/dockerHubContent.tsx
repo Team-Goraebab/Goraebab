@@ -32,7 +32,7 @@ const DockerHubContent: React.FC = () => {
   };
 
   const handleCopy = async (text: string) => {
-    await navigator.clipboard.writeText("docker pull " + text);
+    await navigator.clipboard.writeText('docker pull ' + text);
 
     showSnackbar(
       enqueueSnackbar,
@@ -40,7 +40,6 @@ const DockerHubContent: React.FC = () => {
       'success',
       '#4C48FF'
     );
-
   };
 
   return (
@@ -60,52 +59,68 @@ const DockerHubContent: React.FC = () => {
           검색
         </button>
       </div>
-      {loading && <p className="mt-4 font-pretendard font-light">이미지 검색 중...</p>}
+      {loading && (
+        <p className="mt-4 font-pretendard font-light">이미지 검색 중...</p>
+      )}
       <div className="mt-4 w-full h-64 overflow-y-auto scrollbar-hide">
         {images.length > 0
           ? images.map((image) => (
-            <div
-              key={image.id}
-              className={`border ${image.is_official ? 'border-blue-500' : 'border-gray-300'} rounded p-4 mb-4 flex justify-between items-center`}
-            >
-              <div className="flex flex-col w-full">
-                <div className="flex justify-between items-center mb-1">
-                  <div className="flex items-center">
-                    <p className="font-bold font-pretendard mr-2 text-lg">{image.repo_name}</p>
-                    {image.is_official && (
-                      <span className="bg-blue-500 text-white text-xs px-3 py-1 rounded-full flex items-center font-pretendard font-bold">
-                        <FaCheckCircle className="mr-1" />
-                        Official
+              <div
+                key={image.id}
+                className={`border ${
+                  image.is_official ? 'border-blue-500' : 'border-gray-300'
+                } rounded p-4 mb-4 flex justify-between items-center`}
+              >
+                <div className="flex flex-col w-full">
+                  <div className="flex justify-between items-center mb-1">
+                    <div className="flex items-center">
+                      <p className="font-bold font-pretendard mr-2 text-lg">
+                        {image.repo_name}
+                      </p>
+                      {image.is_official && (
+                        <span className="bg-blue-500 text-white text-xs px-3 py-1 rounded-full flex items-center font-pretendard font-bold">
+                          <FaCheckCircle className="mr-1" />
+                          Official
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center">
+                      <FaStar className="mr-2 text-yellow-500" />
+                      <span className="font-pretendard font-light text-sm">
+                        {formatNumber(image.star_count)}
                       </span>
-                    )}
+                      <FaDownload className="ml-4 mr-2 text-blue-500" />
+                      <span className="font-pretendard font-light text-sm">
+                        {formatNumber(image.pull_count)}
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex items-center">
-                    <FaStar className="mr-2 text-yellow-500" />
-                    <span className="font-pretendard font-light text-sm">{formatNumber(image.star_count)}</span>
-                    <FaDownload className="ml-4 mr-2 text-blue-500" />
-                    <span className="font-pretendard font-light text-sm">{formatNumber(image.pull_count)}</span>
-                  </div>
-                </div>
-                <p className="text-xs text-gray-600 pretendard font-light mb-2">
-                  {image.short_description}
-                </p>
-                <div className="flex justify-end items-center mt-4">
-                  <div className="border border-blue-500 rounded-xl flex flex-row items-center gap-4">
-                    <p className="text-gray-700 font-pretendard font-medium text-sm pl-4">
-                      docker pull {image.repo_name}
-                    </p>
-                    <button
-                      onClick={() => handleCopy(image.repo_name)}
-                      className="flex items-center bg-blue-500 px-4 py-1.5 rounded-r-lg text-white hover:bg-blue-600 focus:outline-none"
-                    >
-                      <span className="font-pretendard font-bold text-sm">Copy</span>
-                    </button>
+                  <p className="text-xs text-gray-600 pretendard font-light mb-2">
+                    {image.short_description}
+                  </p>
+                  <div className="flex justify-end items-center mt-4">
+                    <div className="border border-blue-500 rounded-xl flex flex-row items-center gap-4">
+                      <p className="text-gray-700 font-pretendard font-medium text-sm pl-4">
+                        docker pull {image.repo_name}
+                      </p>
+                      <button
+                        onClick={() => handleCopy(image.repo_name)}
+                        className="flex items-center bg-blue-500 px-4 py-1.5 rounded-r-lg text-white hover:bg-blue-600 focus:outline-none"
+                      >
+                        <span className="font-pretendard font-bold text-sm">
+                          Copy
+                        </span>
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))
-          : !loading && <p className="text-gray-500 font-pretendard font-light text-center mt-20">검색 결과가 없습니다.</p>}
+            ))
+          : !loading && (
+              <p className="text-gray-500 font-pretendard font-light text-center mt-20">
+                검색 결과가 없습니다.
+              </p>
+            )}
       </div>
     </div>
   );
