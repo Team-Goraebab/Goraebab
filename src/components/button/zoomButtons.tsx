@@ -4,8 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { FaSearchPlus, FaSearchMinus } from 'react-icons/fa';
 
 const ZoomButtons = () => {
-  const [zoomLevel, setZoomLevel] = useState(100);
-  const [isShiftPressed, setIsShiftPressed] = useState(false);
+  const [zoomLevel, setZoomLevel] = useState<number>(100);
+  const [isShiftPressed, setIsShiftPressed] = useState<boolean>(false);
 
   /**
    * 최대 200%까지 확대

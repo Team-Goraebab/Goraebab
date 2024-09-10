@@ -8,7 +8,7 @@ import { showSnackbar } from '@/utils/toastUtils';
 import { selectedHostStore } from '@/store/seletedHostStore';
 
 const AddHostButton = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [availableNetworks] = useState<{ name: string; ip: string }[]>([
     { name: 'bridge', ip: '172.17.0.1' },
     { name: 'host', ip: '192.168.1.1' },
