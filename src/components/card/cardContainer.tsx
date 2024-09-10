@@ -19,10 +19,21 @@ export interface CardContainerProps {
     textColor: string;
   };
   onDelete?: () => void;
-  onSelectNetwork?: () => void; // 네트워크 선택 시 호출되는 함수
-  isSelected?: boolean; // 선택된 상태
+  onSelectNetwork?: () => void;
+  isSelected?: boolean;
 }
 
+/**
+ *
+ * @param networkName 네트워크 이름
+ * @param networkIp 네트워크 ip 주소
+ * @param containers 컨테이너 목록
+ * @param themeColor 테마 색상
+ * @param onDelete 네트워크 삭제 시 호출되는 함수
+ * @param onSelectNetwork 네트워크 선택 시 호출되는 함수
+ * @param isSelected 선택된 상태
+ * @returns
+ */
 const CardContainer = ({
   networkName,
   networkIp,
@@ -30,7 +41,7 @@ const CardContainer = ({
   themeColor,
   onDelete,
   onSelectNetwork,
-  isSelected, // 선택된 상태
+  isSelected,
 }: CardContainerProps) => {
   const handleNetworkClick = () => {
     if (onSelectNetwork) {
