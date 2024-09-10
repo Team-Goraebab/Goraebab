@@ -17,10 +17,10 @@ const formatNumber = (num: number) => {
   }
 };
 
-const DockerHubContent: React.FC = () => {
-  const [query, setQuery] = useState('');
+const DockerHubContent = () => {
+  const [query, setQuery] = useState<string>('');
   const [images, setImages] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const { enqueueSnackbar } = useSnackbar();
 
