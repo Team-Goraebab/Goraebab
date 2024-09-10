@@ -26,7 +26,7 @@ interface CardProps {
   status: string;
   image?: string;
   volumes?: Volume[];
-  network?: string
+  network?: string;
 }
 
 interface CardDataProps {
@@ -50,6 +50,12 @@ const getStatusColors = (status: string) => {
   }
 };
 
+/**
+ *
+ * @param data 컨테이너 정보
+ * @param selectedHostId 선택한 호스트 id
+ * @returns
+ */
 const ContainerCard = ({ data, selectedHostId }: CardDataProps) => {
   const { enqueueSnackbar } = useSnackbar();
   const { selectedNetwork } = useSelectedNetworkStore();
@@ -57,7 +63,8 @@ const ContainerCard = ({ data, selectedHostId }: CardDataProps) => {
   const [showOptions, setShowOptions] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
-  const { addContainer, assignImageToContainer, assignNetworkToContainer } = useContainerStore();
+  const { addContainer, assignImageToContainer, assignNetworkToContainer } =
+    useContainerStore();
 
   const items = [
     { label: 'ID', value: data.id },
@@ -205,8 +212,12 @@ const ContainerCard = ({ data, selectedHostId }: CardDataProps) => {
                 <p className="text-xs font-semibold">
                   {typeof item === 'string' ? item : item.name}
                 </p>
-                {item.driver && <p className="text-xs">Driver: {item.driver}</p>}
-                {item.mountPoint && <p className="text-xs">Mount: {item.mountPoint}</p>}
+                {item.driver && (
+                  <p className="text-xs">Driver: {item.driver}</p>
+                )}
+                {item.mountPoint && (
+                  <p className="text-xs">Mount: {item.mountPoint}</p>
+                )}
               </div>
             ))}
           </div>
