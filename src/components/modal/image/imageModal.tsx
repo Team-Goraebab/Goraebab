@@ -27,6 +27,13 @@ interface ModalProps {
   ) => void;
 }
 
+/**
+ * 이미지 모달
+ * @param isOpen 이미지 모달 열림 유무 
+ * @param onClose 이미지 모달 닫기 핸들러
+ * @param onSave 이미지 모달 저장 핸들러
+ * @returns 
+ */
 const ImageModal = ({ isOpen, onClose, onSave }: ModalProps) => {
   const [activeTab, setActiveTab] = useState('local');
   const [file, setFile] = useState<File | null>(null);

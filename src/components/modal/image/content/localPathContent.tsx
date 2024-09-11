@@ -7,6 +7,13 @@ interface LocalPathContentProps {
   onClose: () => void;
 }
 
+/**
+ * 로컬에서 이미지 가져오기
+ * @param onFileChange 선택한 파일 변경 핸들러
+ * @param file 선택한 파일
+ * @param onClose 로컬 이미지 컨텐츠 닫기 핸들러
+ * @returns 
+ */
 const LocalPathContent = ({
   onFileChange,
   file,
