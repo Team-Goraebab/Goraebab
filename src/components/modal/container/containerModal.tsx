@@ -12,6 +12,12 @@ interface ContainerModalProps {
   onSave: (containerData: any) => void;
 }
 
+/**
+ * 
+ * @param onClose 모달 닫기 핸들러
+ * @param onSave 저장 핸들러 
+ * @returns 
+ */
 const ContainerModal = ({ onClose, onSave }: ContainerModalProps) => {
   const [name, setName] = useState<string>('');
   const [ip, setIp] = useState<string>('');

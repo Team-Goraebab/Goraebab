@@ -3,19 +3,7 @@ import React, { useState } from 'react';
 import { FaStar, FaDownload, FaCheckCircle } from 'react-icons/fa';
 import { showSnackbar } from '@/utils/toastUtils';
 import { useSnackbar } from 'notistack';
-
-// 숫자 포맷팅 함수
-const formatNumber = (num: number) => {
-  if (num >= 1_000_000_000) {
-    return (num / 1_000_000_000).toFixed(1) + 'B';
-  } else if (num >= 1_000_000) {
-    return (num / 1_000_000).toFixed(1) + 'M';
-  } else if (num >= 1_000) {
-    return (num / 1_000).toFixed(1) + 'K';
-  } else {
-    return num.toString();
-  }
-};
+import { formatNumber } from '@/utils/format';
 
 const DockerHubContent = () => {
   const [query, setQuery] = useState<string>('');
