@@ -37,6 +37,12 @@ const getStatusColors = (status: string) => {
   }
 };
 
+/**
+ * 
+ * @param data 볼륨 데이터
+ * @param selectedHostId 선택한 호스트 아이디
+ * @returns 
+ */
 const VolumeCard = ({ data, selectedHostId }: VolumeCardProps) => {
   const { enqueueSnackbar } = useSnackbar();
   const { bg1, bg2 } = getStatusColors(data.status);
