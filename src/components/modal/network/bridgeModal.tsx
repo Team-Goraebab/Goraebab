@@ -14,6 +14,12 @@ interface BridgeModalProps {
   ) => void;
 }
 
+/**
+ *
+ * @param onClose 브릿지 모달 닫기 핸들러
+ * @param onCreate 브릿지 모달 생성 핸들러
+ * @returns
+ */
 const BridgeModal = ({ onClose, onCreate }: BridgeModalProps) => {
   const [name, setName] = useState<string>('');
   const [subnet, setSubnet] = useState<string>('192.168.1.0/24');

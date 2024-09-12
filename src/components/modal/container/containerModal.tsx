@@ -12,14 +12,20 @@ interface ContainerModalProps {
   onSave: (containerData: any) => void;
 }
 
+/**
+ * 
+ * @param onClose 모달 닫기 핸들러
+ * @param onSave 저장 핸들러 
+ * @returns 
+ */
 const ContainerModal = ({ onClose, onSave }: ContainerModalProps) => {
-  const [name, setName] = useState('');
-  const [ip, setIp] = useState('');
-  const [ports, setPorts] = useState('80:80,443:443');
+  const [name, setName] = useState<string>('');
+  const [ip, setIp] = useState<string>('');
+  const [ports, setPorts] = useState<string>('80:80,443:443');
   const [selectedVolumes, setSelectedVolumes] = useState<string[]>([]); // 선택된 볼륨 저장
-  const [network, setNetwork] = useState('bridge');
-  const [tags, setTags] = useState('');
-  const [selectedImage, setSelectedImage] = useState(''); // 선택된 이미지 저장
+  const [network, setNetwork] = useState<string>('bridge');
+  const [tags, setTags] = useState<string>('');
+  const [selectedImage, setSelectedImage] = useState<string>(''); // 선택된 이미지 저장
   const { enqueueSnackbar } = useSnackbar();
   const images = useImageStore((state) => state.images); // 이미지 스토어에서 이미지 목록 가져오기
   const volumes = useVolumeStore((state) => state.volumes); // 볼륨 스토어에서 볼륨 목록 가져오기
@@ -43,7 +49,7 @@ const ContainerModal = ({ onClose, onSave }: ContainerModalProps) => {
       return;
     }
 
-    const selectedImageData = images.find(img => img.name === selectedImage);
+    const selectedImageData = images.find((img) => img.name === selectedImage);
 
     const newContainer = {
       id: uuidv4(),
@@ -51,7 +57,7 @@ const ContainerModal = ({ onClose, onSave }: ContainerModalProps) => {
       image: {
         name: selectedImage,
         tag: selectedImageData?.tags || 'latest',
-        source: selectedImageData?.source || 'unknown'
+        source: selectedImageData?.source || 'unknown',
       },
       ip,
       status: 'running',

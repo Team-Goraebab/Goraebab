@@ -41,6 +41,12 @@ const getStatusColors = (status: string) => {
   }
 };
 
+/**
+ * 
+ * @param data 네트워크 데이터
+ * @param selectedHostId 선택한 호스트 아이디 
+ * @returns 
+ */
 const NetworkCard = ({ data, selectedHostId }: CardDataProps) => {
   const { enqueueSnackbar } = useSnackbar();
   const { bg1, bg2 } = getStatusColors('primary');

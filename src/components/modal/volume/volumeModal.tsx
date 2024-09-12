@@ -16,6 +16,12 @@ interface VolumeModalProps {
   ) => void;
 }
 
+/**
+ * 
+ * @param onClose 볼륨 모달 닫기 핸들러
+ * @param onCreate 볼륨 생성 핸들러
+ * @returns 
+ */
 const VolumeModal = ({ onClose, onCreate }: VolumeModalProps) => {
   const [name, setName] = useState<string>('');
   const [driver, setDriver] = useState<string>('local');

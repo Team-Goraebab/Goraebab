@@ -11,6 +11,16 @@ interface OptionModalProps {
   onBottomHandler: () => void;
 }
 
+/**
+ * 옵션 모달
+ * @param topTitle 첫 번째 옵션
+ * @param middleTitle 두 번째 옵션
+ * @param bottomTitle 세 번째 옵션
+ * @param onTopHandler 첫 번째 옵션 핸들러
+ * @param onMiddleHandler 두 번쨰 옵션 핸들러
+ * @param onBottomHandler 세 번째 옵션 핸들러
+ * @returns
+ */
 const OptionModal = ({
   topTitle,
   middleTitle,

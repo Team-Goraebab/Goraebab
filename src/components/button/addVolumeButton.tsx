@@ -12,7 +12,7 @@ interface AddVolumeButtonProps {
 }
 
 const AddVolumeButton = ({ onCreate }: AddVolumeButtonProps) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const { enqueueSnackbar } = useSnackbar();
   const addVolume = useVolumeStore((state) => state.addVolume);
 

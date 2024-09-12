@@ -14,6 +14,12 @@ interface CardSectionProps {
   isHandMode: boolean;
 }
 
+/**
+ * 
+ * @param hostData 호스트 데이터 
+ * @param isHandMode 손 동작 모드
+ * @returns 
+ */
 const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
   const {
     selectedHostId,

@@ -11,6 +11,16 @@ interface ModalProps {
   onConfirm: () => void;
 }
 
+/**
+ * 모달 컴포넌트
+ * @param question 모달 텍스트 (default: 정말로 삭제하시겠습니까?)
+ * @param confirmText 확인 텍트스 (default: 삭제)
+ * @param closeText 닫기 텍스트 (default: 취소)
+ * @param isOpen 모달 open 유무
+ * @param onClose 모달 닫기 핸들러
+ * @param onConfirm 모달 확인 핸들러
+ * @returns 
+ */
 const Modal = ({
   question,
   confirmText,

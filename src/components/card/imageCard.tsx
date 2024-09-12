@@ -52,6 +52,12 @@ const getStatusColors = (status: string) => {
   }
 };
 
+/**
+ * 
+ * @param data 이미지 데이터
+ * @param selectedHostId 선택한 호스트 아이디
+ * @returns 
+ */
 const ImageCard = ({ data, selectedHostId }: CardDataProps) => {
   const { enqueueSnackbar } = useSnackbar();
   const removeImage = useImageStore((state) => state.removeImage);

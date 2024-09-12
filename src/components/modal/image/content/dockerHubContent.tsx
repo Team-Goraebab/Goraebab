@@ -3,24 +3,12 @@ import React, { useState } from 'react';
 import { FaStar, FaDownload, FaCheckCircle } from 'react-icons/fa';
 import { showSnackbar } from '@/utils/toastUtils';
 import { useSnackbar } from 'notistack';
+import { formatNumber } from '@/utils/format';
 
-// 숫자 포맷팅 함수
-const formatNumber = (num: number) => {
-  if (num >= 1_000_000_000) {
-    return (num / 1_000_000_000).toFixed(1) + 'B';
-  } else if (num >= 1_000_000) {
-    return (num / 1_000_000).toFixed(1) + 'M';
-  } else if (num >= 1_000) {
-    return (num / 1_000).toFixed(1) + 'K';
-  } else {
-    return num.toString();
-  }
-};
-
-const DockerHubContent: React.FC = () => {
-  const [query, setQuery] = useState('');
+const DockerHubContent = () => {
+  const [query, setQuery] = useState<string>('');
   const [images, setImages] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const { enqueueSnackbar } = useSnackbar();
 

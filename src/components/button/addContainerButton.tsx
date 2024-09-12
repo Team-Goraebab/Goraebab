@@ -10,7 +10,7 @@ interface AddContainerButtonProps {
 }
 
 const AddContainerButton = ({ onCreate }: AddContainerButtonProps) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const { enqueueSnackbar } = useSnackbar();
 
   const handleAddContainer = (containerData: any) => {
