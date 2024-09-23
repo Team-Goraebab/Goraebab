@@ -4,7 +4,7 @@ import { FaTrash, FaHome } from 'react-icons/fa';
 
 export type HostCardProps = {
   id: string;
-  hostNm?: string;
+  hostNm: string;
   ip: string;
   status?: boolean;
   isRemote: boolean;
@@ -39,7 +39,12 @@ const HostCard = ({
   className = '',
   isSelectedNetwork = false, // 기본값은 false
 }: HostCardProps) => {
-  const { selectedHostId, setSelectedHostId } = selectedHostStore();
+  const {
+    selectedHostId,
+    setSelectedHostId,
+    selectedHostName,
+    setSelectedHostName,
+  } = selectedHostStore();
   const deleteHost = useHostStore((state) => state.deleteHost);
 
   const handleDeleteHost = () => {
@@ -48,6 +53,9 @@ const HostCard = ({
 
   const handleClick = () => {
     setSelectedHostId(selectedHostId === id ? null : id);
+    setSelectedHostName(
+      selectedHostName === (hostNm ?? 'HOST') ? null : hostNm ?? 'HOST'
+    );
   };
 
   // 선택된 호스트 또는 네트워크에 따라 테두리 색상을 설정
