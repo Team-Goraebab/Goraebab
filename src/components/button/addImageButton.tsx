@@ -21,7 +21,7 @@ const AddImageButton = ({ onCreate }: AddImageButtonProps) => {
   const handleSave = (
     id: string,
     name: string,
-    tags: string,
+    tag: string,
     file: File | null,
     size: string,
     source: 'local' | 'dockerHub', // 이미지의 출처를 구분
@@ -30,7 +30,7 @@ const AddImageButton = ({ onCreate }: AddImageButtonProps) => {
     const imageData = {
       id,
       name,
-      tags,
+      tag,
       file,
       size,
       source,
