@@ -203,16 +203,16 @@ const ContainerCard = ({ data, selectedHostId }: CardDataProps) => {
         {/* 볼륨 정보 표시 */}
         <div className="flex mt-2">
           <p
-            className="text-xs py-1 w-[65px] h-6 mr-2 rounded-md font-bold text-center mb-2"
+            className="text-xs py-1 w-[65px] h-6 mr-2 rounded-md font-bold text-center mb-2 flex-shrink-0"
             style={{ backgroundColor: bg1, color: bg2 }}
           >
             VOLUME
           </p>
-          <div className="max-h-32 overflow-y-auto">
+          <div className="max-h-42 overflow-y-auto scrollbar-custom w-full flex-grow">
             {data.volume?.map((volume, index) => (
               <div
                 key={index}
-                className="flex flex-col mb-2 p-1 border rounded"
+                className="flex flex-col mb-2 p-1 border rounded w-full"
               >
                 <p className="text-xs font-semibold">{volume.name}</p>
                 {volume.driver && (
