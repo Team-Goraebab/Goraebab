@@ -87,7 +87,10 @@ const CardContainer = ({
               className="flex justify-between items-center p-2 mb-2 border rounded-md bg-gray-50 hover:bg-gray-200 transition-colors duration-200"
             >
               <span>{container.name}</span>
-              <span className="text-sm text-transparent">
+              <span
+                className="text-sm text-transparent"
+                style={{ fontSize: 0.1 }}
+              >
                 {container.image.name}:{container.tag}
               </span>
               {container.volume?.map((volume, index) => (
