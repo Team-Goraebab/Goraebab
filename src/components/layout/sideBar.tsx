@@ -19,7 +19,6 @@ interface SidebarProps {
 }
 
 const Sidebar = ({ progress }: SidebarProps) => {
-  const { selectedHostId } = selectedHostStore();
   const { activeId } = useMenuStore();
   const images = useImageStore((state) => state.images);
 
@@ -55,56 +54,46 @@ const Sidebar = ({ progress }: SidebarProps) => {
           <>
             {containerData.length > 0 ? (
               containerData.map((container, index) => (
-                <ContainerCard
-                  key={index}
-                  data={container}
-                  selectedHostId={selectedHostId}
-                />
+                <ContainerCard key={index} data={container} />
               ))
             ) : (
-              <p className={"font-pretendard font-light"}>컨테이너를 추가하세요</p>
+              <p className={'font-pretendard font-light'}>
+                컨테이너를 추가하세요
+              </p>
             )}
           </>
         ) : activeId === 2 ? (
           <>
             {images.length > 0 ? (
-              images.map((image) => (
-                <ImageCard
-                  key={image.id}
-                  data={image}
-                  selectedHostId={selectedHostId}
-                />
-              ))
+              images.map((image) => <ImageCard key={image.id} data={image} />)
             ) : (
-              <p className={"font-pretendard font-light"}>이미지를 추가하세요</p>
+              <p className={'font-pretendard font-light'}>
+                이미지를 추가하세요
+              </p>
             )}
           </>
         ) : activeId === 3 ? (
           <>
             {networkData.length > 0 ? (
               networkData.map((network, index) => (
-                <NetworkCard
-                  key={index}
-                  data={network}
-                  selectedHostId={selectedHostId}
-                />
+                <NetworkCard key={index} data={network} />
               ))
             ) : (
-              <p className={"font-pretendard font-light"}>네트워크 데이터를 추가하세요</p>
+              <p className={'font-pretendard font-light'}>
+                네트워크 데이터를 추가하세요
+              </p>
             )}
           </>
         ) : activeId === 4 ? (
           <>
             {volumeData.length > 0 ? (
               volumeData.map((volume, index) => (
-                <VolumeCard
-                  key={index}
-                  data={volume}
-                  selectedHostId={selectedHostId}
-                />
+                <VolumeCard key={index} data={volume} />
               ))
             ) : (
-              <p className={"font-pretendard font-light"}>볼륨 데이터를 추가하세요</p>
+              <p className={'font-pretendard font-light'}>
+                볼륨 데이터를 추가하세요
+              </p>
             )}
           </>
         ) : (
