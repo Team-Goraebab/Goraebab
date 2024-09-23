@@ -49,7 +49,7 @@ export interface Container {
   active: string;
   status: string;
   network: string;
-  image?: Image; // Image 객체를 기대
-  volumes?: Volume[]; // 전체 Volume 객체를 저장
+  image: Image; // Image 객체를 기대
+  volume?: Volume[]; // 전체 Volume 객체를 저장
   networkId?: string; // 연결된 네트워크 ID
 }
