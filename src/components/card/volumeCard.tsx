@@ -21,7 +21,6 @@ interface VolumeProps {
 
 interface VolumeCardProps {
   data: VolumeProps;
-  selectedHostId: string | null;
 }
 
 const getStatusColors = (status: string) => {
@@ -38,13 +37,11 @@ const getStatusColors = (status: string) => {
 };
 
 /**
- * 
+ *
  * @param data 볼륨 데이터
- * @param selectedHostId 선택한 호스트 아이디
- * @returns 
+ * @returns
  */
-const VolumeCard = ({ data, selectedHostId }: VolumeCardProps) => {
-  const { enqueueSnackbar } = useSnackbar();
+const VolumeCard = ({ data }: VolumeCardProps) => {
   const { bg1, bg2 } = getStatusColors(data.status);
   const [showOptions, setShowOptions] = useState(false);
   const [showModal, setShowModal] = useState(false);
