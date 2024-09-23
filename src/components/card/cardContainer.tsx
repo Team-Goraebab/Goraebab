@@ -1,178 +1,127 @@
-'use client';
-
+import { Container } from '@/types/type';
 import React from 'react';
-import { CardContainer, ConnectBar, HostCard } from '@/components';
-import { HostCardProps } from './hostCard';
-import Draggable from 'react-draggable';
-import { useStore } from '@/store/cardStore';
-import { selectedHostStore } from '@/store/seletedHostStore';
-import { useHostStore } from '@/store/hostStore';
-import { useSelectedNetworkStore } from '@/store/selectedNetworkStore';
+import { FaTimesCircle } from 'react-icons/fa';
 
-interface CardSectionProps {
-  hostData: HostCardProps[];
-  isHandMode: boolean;
+export interface CardContainerProps {
+  networkName: string;
+  networkIp: string;
+  containers: Container[];
+  themeColor: {
+    label: string;
+    bgColor: string;
+    borderColor: string;
+    textColor: string;
+  };
+  onDelete?: () => void;
+  onSelectNetwork?: () => void;
+  isSelected?: boolean;
 }
 
 /**
  *
- * @param hostData 호스트 데이터
- * @param isHandMode 손 동작 모드
+ * @param networkName 네트워크 이름
+ * @param networkIp 네트워크 ip 주소
+ * @param containers 컨테이너 목록
+ * @param themeColor 테마 색상
+ * @param onDelete 네트워크 삭제 시 호출되는 함수
+ * @param onSelectNetwork 네트워크 선택 시 호출되는 함수
+ * @param isSelected 선택된 상태
  * @returns
  */
-const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
-  const {
-    selectedHostId,
-    setSelectedHostId,
-    selectedHostName,
-    setSelectedHostName,
-    connectedBridgeIds,
-    deleteConnectedBridgeId,
-  } = selectedHostStore();
-  const { selectedNetwork, setSelectedNetwork, clearSelectedNetwork } =
-    useSelectedNetworkStore();
-
-  const allContainers = useStore((state) => state.hostContainers);
-  const deleteNetwork = useHostStore((state) => state.deleteNetwork);
-
-  const handleHostClick = (id: string, name: string) => {
-    setSelectedHostId(selectedHostId === id ? null : id);
-    setSelectedHostName(selectedHostName === name ? null : name); // 호스트 이름 저장
-    clearSelectedNetwork(); // 새로운 호스트 선택 시 네트워크 선택 해제
-  };
-
-  const handleDeleteNetwork = (hostId: string, networkName: string) => {
-    if (
-      selectedNetwork?.hostId === hostId &&
-      selectedNetwork?.networkName === networkName
-    ) {
-      clearSelectedNetwork(); // 네트워크 삭제 시 선택된 네트워크 해제
+const CardContainer = ({
+  networkName,
+  networkIp,
+  containers,
+  themeColor,
+  onDelete,
+  onSelectNetwork,
+  isSelected,
+}: CardContainerProps) => {
+  const handleNetworkClick = () => {
+    if (onSelectNetwork) {
+      onSelectNetwork();
     }
-    deleteNetwork(hostId, networkName);
-    deleteConnectedBridgeId(hostId, networkName);
   };
 
-  const handleSelectNetwork = (hostId: string, networkName: string) => {
-    if (
-      selectedNetwork?.hostId === hostId &&
-      selectedNetwork?.networkName === networkName
-    ) {
-      clearSelectedNetwork(); // 이미 선택된 네트워크를 다시 클릭하면 선택 해제
-    } else {
-      setSelectedNetwork(hostId, networkName); // 새로운 네트워크 선택
-      setSelectedHostId(hostId); // 네트워크를 선택하면 해당 호스트도 자동 선택
-    }
-    console.log(`Selected network: ${networkName} on host: ${hostId}`);
-  };
+  console.log('containers', containers);
 
   return (
-    <Draggable disabled={!isHandMode}>
+    <div
+      className="relative flex flex-col items-center p-[10px] border bg-white rounded-lg shadow-lg w-[450px] transition-colors duration-200 cursor-pointer"
+      onClick={handleNetworkClick}
+      style={{
+        borderColor: isSelected ? themeColor.textColor : '',
+        backgroundColor: isSelected ? '#F4F4F4' : 'white',
+      }}
+    >
+      {onDelete && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete?.();
+          }}
+          className="absolute top-2 right-2 hover:text-gray-500 transition-colors duration-200 hover:scale-105"
+        >
+          <FaTimesCircle
+            className="w-5 h-5"
+            style={{ color: themeColor.borderColor }}
+          />
+        </button>
+      )}
+
       <div
-        className="flex flex-col items-center"
+        className="w-full text-center text-blue_2 border-2 p-2 rounded-md mb-3 text-sm font-semibold"
         style={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
+          borderColor: `${themeColor.borderColor}`,
+          backgroundColor: `${themeColor.bgColor}`,
+          color: `${themeColor.textColor}`,
         }}
       >
-        {hostData.map((host) => {
-          const containers = allContainers[host.id] || [];
-          const networks = connectedBridgeIds[host.id] || [];
-          const isHostSelected =
-            selectedNetwork?.hostId === host.id || selectedHostId === host.id;
-
-          return (
-            <div key={host.id} className="flex flex-col items-center">
-              <div className="flex flex-row items-center">
-                {networks.length > 0 && (
-                  <div className="flex items-center">
-                    <CardContainer
-                      networkName={networks[0].name}
-                      networkIp={networks[0].gateway}
-                      containers={containers}
-                      themeColor={host.themeColor}
-                      onDelete={() =>
-                        handleDeleteNetwork(host.id, networks[0].name)
-                      }
-                      onSelectNetwork={() =>
-                        handleSelectNetwork(host.id, networks[0].name)
-                      }
-                      isSelected={
-                        selectedNetwork?.hostId === host.id &&
-                        selectedNetwork?.networkName === networks[0].name
-                      }
-                    />
-                    <ConnectBar rotate={180} themeColor={host.themeColor} />
-                  </div>
-                )}
-
-                <HostCard
-                  id={host.id}
-                  hostNm={host.hostNm}
-                  ip={host.ip}
-                  status={host.status}
-                  onClick={() => handleHostClick(host.id, host.hostNm)}
-                  className={isHostSelected ? 'scale-105 border-blue-500' : ''}
-                  isRemote={host.isRemote}
-                  themeColor={host.themeColor}
-                  networkIp={host.networkIp}
-                  isSelectedNetwork={isHostSelected}
-                />
-
-                {networks.length > 1 && (
-                  <div className="flex items-center">
-                    <ConnectBar themeColor={host.themeColor} />
-                    <CardContainer
-                      networkName={networks[1].name}
-                      networkIp={networks[1].gateway}
-                      containers={containers}
-                      themeColor={host.themeColor}
-                      onDelete={() =>
-                        handleDeleteNetwork(host.id, networks[1].name)
-                      }
-                      onSelectNetwork={() =>
-                        handleSelectNetwork(host.id, networks[1].name)
-                      }
-                      isSelected={
-                        selectedNetwork?.hostId === host.id &&
-                        selectedNetwork?.networkName === networks[1].name
-                      }
-                    />
-                  </div>
-                )}
-              </div>
-              {networks.length > 2 && (
-                <div className="flex flex-col items-center">
-                  <ConnectBar
-                    rotate={90}
-                    themeColor={host.themeColor}
-                    length={'long'}
-                  />
-                  <CardContainer
-                    networkName={networks[2].name}
-                    networkIp={networks[2].gateway}
-                    containers={containers}
-                    themeColor={host.themeColor}
-                    onDelete={() =>
-                      handleDeleteNetwork(host.id, networks[2].name)
-                    }
-                    onSelectNetwork={() =>
-                      handleSelectNetwork(host.id, networks[2].name)
-                    }
-                    isSelected={
-                      selectedNetwork?.hostId === host.id &&
-                      selectedNetwork?.networkName === networks[2].name
-                    }
-                  />
-                </div>
-              )}
-            </div>
-          );
-        })}
+        {`${networkName} : ${networkIp}`}
       </div>
-    </Draggable>
+      {containers.length > 0 ? (
+        <div className="w-full h-36 scrollbar-hide overflow-y-auto">
+          {containers.map((container, index) => (
+            <div
+              key={index}
+              className="flex justify-between items-center p-2 mb-2 border rounded-md bg-gray-50 hover:bg-gray-200 transition-colors duration-200"
+            >
+              <span>{container.name}</span>
+              <span className="text-sm text-transparent">
+                {container.image.name}:{container.tag}
+              </span>
+              {container.volume?.map((volume, index) => (
+                <span key={index}>
+                  <p className="text-transparent" style={{ fontSize: 0.1 }}>
+                    {volume.name}
+                  </p>
+                </span>
+              ))}
+              <div className="flex items-center space-x-4">
+                <span>{container.ip}</span>
+                <div className="flex items-center space-x-2">
+                  <span
+                    className={`w-2 h-2 rounded-full ${
+                      container.active === 'running'
+                        ? 'bg-green-500'
+                        : 'bg-red-500'
+                    }`}
+                  />
+                  <span className="text-sm">
+                    {container.active === 'running' ? 'Running' : 'Stopped'}
+                  </span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="w-full h-36 text-center text-gray-500 p-4">
+          No containers available
+        </div>
+      )}
+    </div>
   );
 };
 
-export default CardSection;
+export default CardContainer;
