@@ -8,23 +8,24 @@ import { showSnackbar } from '@/utils/toastUtils';
 import { useSelectedNetworkStore } from '@/store/selectedNetworkStore';
 import { useContainerStore } from '@/store/containerStore';
 import { Volume, Image } from '@/types/type';
+import { useStore } from '@/store/cardStore';
+import { selectedHostStore } from '@/store/seletedHostStore';
 
 interface CardProps {
   id: string;
-  name?: string;
-  ip?: string;
+  name: string;
+  ip: string;
   size: string;
   tag: string;
-  active?: string;
+  active: string;
   status: string;
-  image?: Image;
+  image: Image;
   volume?: Volume[];
   network?: string;
 }
 
 interface CardDataProps {
   data: CardProps;
-  selectedHostId: string | null;
   onSelectNetwork?: (networkName: string) => void;
 }
 
@@ -47,20 +48,25 @@ const getStatusColors = (status: string) => {
  *
  * @param data 컨테이너 정보
  * @param selectedHostId 선택한 호스트 id
+ * @param selectedHostName 선택한 호스트 name
  * @returns
  */
-const ContainerCard = ({ data, selectedHostId }: CardDataProps) => {
+const ContainerCard = ({ data }: CardDataProps) => {
   const { enqueueSnackbar } = useSnackbar();
   const { selectedNetwork } = useSelectedNetworkStore();
+  const { selectedHostId, selectedHostName } = selectedHostStore();
+  const addContainerToHost = useStore((state) => state.addContainerToHost);
+
+  const cardRef = useRef<HTMLDivElement>(null);
   const { bg1, bg2 } = getStatusColors(data.status || 'primary');
   const [showOptions, setShowOptions] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const cardRef = useRef<HTMLDivElement>(null);
-  const { addContainer, assignImageToContainer, assignNetworkToContainer } =
+  const { assignImageToContainer, assignNetworkToContainer } =
     useContainerStore();
 
   const items = [
     { label: 'ID', value: data.id },
+    { label: 'NAME', value: data.name },
     { label: 'IMAGE', value: data.image?.name || 'N/A' },
     { label: 'NETWORK', value: data.network || 'N/A' },
     { label: 'TAGS', value: data.tag || 'N/A' },
@@ -88,37 +94,32 @@ const ContainerCard = ({ data, selectedHostId }: CardDataProps) => {
     }
 
     if (selectedHostId) {
-      const imageObject: Image = {
-        id: data.image?.id || uuidv4(),
-        name: data.image?.name || 'Default Image Name',
-        tag: data.image?.tag || 'latest',
-        source: data.image?.source || 'dockerHub',
-        size: data.image?.size || 'N/A',
-      };
-
-      // newContainer 객체 생성
       const newContainer = {
         id: uuidv4(),
-        name: data.name || '',
-        ip: data.ip || '',
+        name: data.name,
+        ip: data.ip,
         size: data.size,
-        tag: data.tag,
-        active: data.active || 'false',
+        tag: data.image?.tag || 'latest',
+        active: data.active,
         status: 'running',
-        image: imageObject,
-        volumes: data.volume || [],
-        network: selectedNetwork.hostId,
+        network: selectedNetwork.networkName,
+        image: data.image,
+        volume: data.volume || [],
       };
 
-      // 컨테이너 저장
-      addContainer(newContainer);
-      // 이미지와 네트워크 연결
-      assignImageToContainer(newContainer.id, imageObject);
+      addContainerToHost(selectedHostId, newContainer);
+
+      if (data.image) {
+        assignImageToContainer(newContainer.id, data.image);
+      } else {
+        console.warn('Image information is missing for the container.');
+      }
+
       assignNetworkToContainer(newContainer.id, selectedNetwork.hostId);
 
       showSnackbar(
         enqueueSnackbar,
-        `호스트 ${selectedHostId}의 ${selectedNetwork.networkName} 네트워크에서 컨테이너가 실행되었습니다.`,
+        `호스트 ${selectedHostName}의 ${selectedNetwork.networkName} 네트워크에서 컨테이너가 실행되었습니다.`,
         'success',
         '#4C48FF'
       );
