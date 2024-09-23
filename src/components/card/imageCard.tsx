@@ -12,7 +12,7 @@ interface CardProps {
   name?: string;
   ip?: string;
   size: string;
-  tags: string;
+  tag: string;
   /**
    * running
    * stopped
@@ -53,10 +53,10 @@ const getStatusColors = (status: string) => {
 };
 
 /**
- * 
+ *
  * @param data 이미지 데이터
  * @param selectedHostId 선택한 호스트 아이디
- * @returns 
+ * @returns
  */
 const ImageCard = ({ data, selectedHostId }: CardDataProps) => {
   const { enqueueSnackbar } = useSnackbar();
@@ -72,7 +72,7 @@ const ImageCard = ({ data, selectedHostId }: CardDataProps) => {
   const items = [
     { label: 'ID', value: data.id },
     { label: 'SIZE', value: data.size },
-    { label: 'TAGS', value: data.tags },
+    { label: 'TAGS', value: data.tag },
   ];
 
   const handleOptionClick = () => {
@@ -148,7 +148,7 @@ const ImageCard = ({ data, selectedHostId }: CardDataProps) => {
       />
       <div className="ml-4 flex flex-col w-full">
         <div className="flex justify-between text-grey_4 text-sm mt-2 mb-3 relative">
-          <span className={"font-pretendard font-bold text-black"}>
+          <span className={'font-pretendard font-bold text-black'}>
             {data.name}
           </span>
           <span
