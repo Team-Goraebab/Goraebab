@@ -21,6 +21,32 @@ const SaveButton = () => {
       return;
     }
 
+    // mainContent를 실제 DOM으로 변환
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(mainContent, 'text/html');
+
+    // react-transform-wrapper와 react-transform-component를 찾음
+    const wrapper = doc.querySelector('.react-transform-wrapper');
+    const component = doc.querySelector('.react-transform-component');
+
+    // react-transform-wrapper 및 react-transform-component가 있는지 확인
+    if (wrapper && component) {
+      // wrapper와 component 안에 다른 태그나 요소가 있는지 확인
+      const hasOtherContent =
+        wrapper.innerHTML.trim().length > 0 ||
+        component.innerHTML.trim().length > 0;
+
+      if (!hasOtherContent) {
+        showSnackbar(
+          enqueueSnackbar,
+          '유효하지 않은 설계도는 저장할 수 없습니다.',
+          'error',
+          '#FF4848'
+        );
+        return;
+      }
+    }
+
     // 파일 이름 생성 (설계도_날짜 형식)
     const currentDateTime = new Date().toISOString().replace(/[:.]/g, '-');
     const fileName = `설계도_${currentDateTime}.html`;
