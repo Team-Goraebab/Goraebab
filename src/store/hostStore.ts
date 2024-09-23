@@ -1,22 +1,5 @@
 import { create } from 'zustand';
-
-type ThemeColor = {
-  label: string;
-  bgColor: string;
-  borderColor: string;
-  textColor: string;
-};
-
-export type Host = {
-  id: string;
-  hostNm: string;
-  ip: string;
-  isRemote: boolean;
-  themeColor: ThemeColor;
-  networkName: string;
-  networkIp: string;
-  className?: string;
-};
+import { Host } from '@/types/type';
 
 type Network = {
   id: string;
