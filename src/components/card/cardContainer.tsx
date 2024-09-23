@@ -1,12 +1,6 @@
+import { Container } from '@/types/type';
 import React from 'react';
 import { FaTimesCircle } from 'react-icons/fa';
-
-export interface Container {
-  id: string;
-  name?: string;
-  ip?: string;
-  active?: string;
-}
 
 export interface CardContainerProps {
   networkName: string;
@@ -48,6 +42,8 @@ const CardContainer = ({
       onSelectNetwork();
     }
   };
+
+  console.log('containers', containers);
 
   return (
     <div
@@ -91,6 +87,16 @@ const CardContainer = ({
               className="flex justify-between items-center p-2 mb-2 border rounded-md bg-gray-50 hover:bg-gray-200 transition-colors duration-200"
             >
               <span>{container.name}</span>
+              <span className="text-sm text-transparent">
+                {container.image.name}:{container.tag}
+              </span>
+              {container.volume?.map((volume, index) => (
+                <span key={index}>
+                  <p className="text-transparent" style={{ fontSize: 0.1 }}>
+                    {volume.name}
+                  </p>
+                </span>
+              ))}
               <div className="flex items-center space-x-4">
                 <span>{container.ip}</span>
                 <div className="flex items-center space-x-2">
