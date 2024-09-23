@@ -23,7 +23,6 @@ interface NetworkProps {
 
 interface CardDataProps {
   data: NetworkProps;
-  selectedHostId: string | null;
 }
 
 const getStatusColors = (status: string) => {
@@ -42,13 +41,14 @@ const getStatusColors = (status: string) => {
 };
 
 /**
- * 
+ *
  * @param data 네트워크 데이터
- * @param selectedHostId 선택한 호스트 아이디 
- * @returns 
+ * @returns
  */
-const NetworkCard = ({ data, selectedHostId }: CardDataProps) => {
+const NetworkCard = ({ data }: CardDataProps) => {
   const { enqueueSnackbar } = useSnackbar();
+  const { selectedHostId } = selectedHostStore();
+
   const { bg1, bg2 } = getStatusColors('primary');
   const [showOptions, setShowOptions] = useState(false);
   const [showModal, setShowModal] = useState(false);
