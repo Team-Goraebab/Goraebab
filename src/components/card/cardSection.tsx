@@ -7,7 +7,7 @@ import Draggable from 'react-draggable';
 import { useStore } from '@/store/cardStore';
 import { selectedHostStore } from '@/store/seletedHostStore';
 import { useHostStore } from '@/store/hostStore';
-import { useSelectedNetworkStore } from '@/store/selectedNetworkStore'; // 새로운 전역 상태 가져오기
+import { useSelectedNetworkStore } from '@/store/selectedNetworkStore';
 
 interface CardSectionProps {
   hostData: HostCardProps[];
@@ -15,15 +15,17 @@ interface CardSectionProps {
 }
 
 /**
- * 
- * @param hostData 호스트 데이터 
+ *
+ * @param hostData 호스트 데이터
  * @param isHandMode 손 동작 모드
- * @returns 
+ * @returns
  */
 const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
   const {
     selectedHostId,
     setSelectedHostId,
+    selectedHostName,
+    setSelectedHostName,
     connectedBridgeIds,
     deleteConnectedBridgeId,
   } = selectedHostStore();
@@ -33,8 +35,9 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
   const allContainers = useStore((state) => state.hostContainers);
   const deleteNetwork = useHostStore((state) => state.deleteNetwork);
 
-  const handleHostClick = (id: string) => {
+  const handleHostClick = (id: string, name: string) => {
     setSelectedHostId(selectedHostId === id ? null : id);
+    setSelectedHostName(selectedHostName === name ? null : name); // 호스트 이름 저장
     clearSelectedNetwork(); // 새로운 호스트 선택 시 네트워크 선택 해제
   };
 
@@ -109,7 +112,7 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
                   hostNm={host.hostNm}
                   ip={host.ip}
                   status={host.status}
-                  onClick={() => handleHostClick(host.id)}
+                  onClick={() => handleHostClick(host.id, host.hostNm)}
                   className={isHostSelected ? 'scale-105 border-blue-500' : ''}
                   isRemote={host.isRemote}
                   themeColor={host.themeColor}
