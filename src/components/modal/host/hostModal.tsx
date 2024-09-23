@@ -1,15 +1,11 @@
+'use client';
+
 import React, { useState } from 'react';
 import { useSnackbar } from 'notistack';
 import { v4 as uuidv4 } from 'uuid';
 import { showSnackbar } from '@/utils/toastUtils';
 import { colorsOption } from '@/data/color';
-
-interface ThemeColor {
-  label: string;
-  bgColor: string;
-  borderColor: string;
-  textColor: string;
-}
+import { ThemeColor } from '@/types/type';
 
 interface HostModalProps {
   onClose: () => void;
@@ -19,8 +15,8 @@ interface HostModalProps {
     ip: string,
     isRemote: boolean,
     themeColor: ThemeColor,
-    networkName: string, // 추가된 네트워크 이름
-    networkIp: string // 추가된 네트워크 IP
+    networkName: string,
+    networkIp: string
   ) => void;
   availableNetworks: { name: string; ip: string }[]; // 네트워크 이름과 IP 목록
 }
