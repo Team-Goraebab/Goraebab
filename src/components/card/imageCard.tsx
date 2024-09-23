@@ -2,8 +2,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Modal, OptionModal } from '@/components';
-import { useStore } from '@/store/cardStore';
-import { v4 as uuidv4 } from 'uuid';
 import { useSnackbar } from 'notistack';
 import { showSnackbar } from '@/utils/toastUtils';
 import { useImageStore } from '@/store/imageStore';
@@ -29,7 +27,6 @@ interface CardProps {
 
 interface CardDataProps {
   data: CardProps;
-  selectedHostId: string | null;
 }
 
 /**
@@ -55,19 +52,16 @@ const getStatusColors = (status: string) => {
 /**
  *
  * @param data 이미지 데이터
- * @param selectedHostId 선택한 호스트 아이디
  * @returns
  */
-const ImageCard = ({ data, selectedHostId }: CardDataProps) => {
+const ImageCard = ({ data }: CardDataProps) => {
   const { enqueueSnackbar } = useSnackbar();
   const removeImage = useImageStore((state) => state.removeImage);
 
-  const id = uuidv4();
   const { bg1, bg2 } = getStatusColors(data.status || 'primary');
   const [showOptions, setShowOptions] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
-  const addContainerToHost = useStore((state) => state.addContainerToHost);
 
   const items = [
     { label: 'ID', value: data.id },
@@ -80,26 +74,6 @@ const ImageCard = ({ data, selectedHostId }: CardDataProps) => {
   };
 
   const handleGetInfo = () => {
-    setShowOptions(false);
-  };
-
-  const handleRun = () => {
-    if (selectedHostId) {
-      const newContainer = {
-        id: uuidv4(),
-        name: data.name,
-        ip: data.ip,
-        active: data.active,
-      };
-      addContainerToHost(selectedHostId, newContainer);
-    } else {
-      showSnackbar(
-        enqueueSnackbar,
-        '호스트를 선택해주세요.',
-        'error',
-        '#FF4853'
-      );
-    }
     setShowOptions(false);
   };
 
@@ -161,8 +135,9 @@ const ImageCard = ({ data, selectedHostId }: CardDataProps) => {
             <div className="absolute top-4 left-16">
               <OptionModal
                 onTopHandler={handleGetInfo}
-                onMiddleHandler={handleRun}
+                onMiddleHandler={() => {}}
                 onBottomHandler={handleDelete}
+                btnVisible={false}
               />
             </div>
           )}
