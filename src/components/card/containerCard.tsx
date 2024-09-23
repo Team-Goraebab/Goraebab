@@ -2,30 +2,23 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Modal, OptionModal } from '@/components';
-import { useStore } from '@/store/cardStore';
 import { v4 as uuidv4 } from 'uuid';
 import { useSnackbar } from 'notistack';
 import { showSnackbar } from '@/utils/toastUtils';
 import { useSelectedNetworkStore } from '@/store/selectedNetworkStore';
-import { useContainerStore } from '@/store/containerStore'; // 새로운 전역 상태 가져오기
-
-interface Volume {
-  id: string;
-  name: string;
-  driver: string;
-  mountPoint: string;
-}
+import { useContainerStore } from '@/store/containerStore';
+import { Volume, Image } from '@/types/type';
 
 interface CardProps {
   id: string;
   name?: string;
   ip?: string;
   size: string;
-  tags: string;
+  tag: string;
   active?: string;
   status: string;
-  image?: string;
-  volumes?: Volume[];
+  image?: Image;
+  volume?: Volume[];
   network?: string;
 }
 
@@ -68,11 +61,12 @@ const ContainerCard = ({ data, selectedHostId }: CardDataProps) => {
 
   const items = [
     { label: 'ID', value: data.id },
-    { label: 'IMAGE', value: data.image },
-    { label: 'NETWORK', value: data.network },
-    { label: 'TAGS', value: data.tags },
+    { label: 'IMAGE', value: data.image?.name || 'N/A' },
+    { label: 'NETWORK', value: data.network || 'N/A' },
+    { label: 'TAGS', value: data.tag || 'N/A' },
   ];
-
+  console.log(data);
+  console.log('컨테이너 볼륨 데이터', data.volume);
   const handleOptionClick = () => {
     setShowOptions(!showOptions);
   };
@@ -94,24 +88,37 @@ const ContainerCard = ({ data, selectedHostId }: CardDataProps) => {
     }
 
     if (selectedHostId) {
+      const imageObject: Image = {
+        id: data.image?.id || uuidv4(),
+        name: data.image?.name || 'Default Image Name',
+        tag: data.image?.tag || 'latest',
+        source: data.image?.source || 'dockerHub',
+        size: data.image?.size || 'N/A',
+      };
+
+      // newContainer 객체 생성
       const newContainer = {
         id: uuidv4(),
         name: data.name || '',
         ip: data.ip || '',
         size: data.size,
-        tags: data.tags,
+        tag: data.tag,
         active: data.active || 'false',
         status: 'running',
-        imageId: data.id, // 현재 카드의 ID를 이미지 ID로 사용
+        image: imageObject,
+        volumes: data.volume || [],
+        network: selectedNetwork.hostId,
       };
 
+      // 컨테이너 저장
       addContainer(newContainer);
-      assignImageToContainer(newContainer.id, data.id);
+      // 이미지와 네트워크 연결
+      assignImageToContainer(newContainer.id, imageObject);
       assignNetworkToContainer(newContainer.id, selectedNetwork.hostId);
 
       showSnackbar(
         enqueueSnackbar,
-        `호스트 ${selectedHostId}의 ${selectedNetwork} 네트워크에서 컨테이너가 실행되었습니다.`,
+        `호스트 ${selectedHostId}의 ${selectedNetwork.networkName} 네트워크에서 컨테이너가 실행되었습니다.`,
         'success',
         '#4C48FF'
       );
@@ -127,13 +134,11 @@ const ContainerCard = ({ data, selectedHostId }: CardDataProps) => {
   };
 
   const handleDelete = () => {
-    console.log('삭제하기 클릭됨');
     setShowModal(true);
     setShowOptions(false);
   };
 
   const handleConfirmDelete = () => {
-    console.log('삭제가 확인되었습니다.');
     setShowModal(false);
   };
 
@@ -204,19 +209,17 @@ const ContainerCard = ({ data, selectedHostId }: CardDataProps) => {
             VOLUME
           </p>
           <div className="max-h-32 overflow-y-auto">
-            {data.volumes?.map((item, index) => (
+            {data.volume?.map((volume, index) => (
               <div
                 key={index}
                 className="flex flex-col mb-2 p-1 border rounded"
               >
-                <p className="text-xs font-semibold">
-                  {typeof item === 'string' ? item : item.name}
-                </p>
-                {item.driver && (
-                  <p className="text-xs">Driver: {item.driver}</p>
+                <p className="text-xs font-semibold">{volume.name}</p>
+                {volume.driver && (
+                  <p className="text-xs">Driver: {volume.driver}</p>
                 )}
-                {item.mountPoint && (
-                  <p className="text-xs">Mount: {item.mountPoint}</p>
+                {volume.mountPoint && (
+                  <p className="text-xs">Mount: {volume.mountPoint}</p>
                 )}
               </div>
             ))}
