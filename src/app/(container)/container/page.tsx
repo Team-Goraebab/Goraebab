@@ -17,18 +17,18 @@ const ContainerPage = () => {
     setIsHandMode(newIsHandMode);
   });
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const response = await axios.get('http://localhost:2387/remote/daemons');
-        console.log(response);
-      } catch (error) {
-        console.error('원격 데몬 정보를 가져오는 데 실패했습니다:', error);
-      }
-    }
+  // useEffect(() => {
+  //   async function fetchData() {
+  //     try {
+  //       const response = await axios.get('http://localhost:2387/remote/daemons');
+  //       console.log(response);
+  //     } catch (error) {
+  //       console.error('원격 데몬 정보를 가져오는 데 실패했습니다:', error);
+  //     }
+  //   }
 
-    fetchData();
-  }, []);
+  //   fetchData();
+  // }, []);
 
   return (
     <TransformProvider>
