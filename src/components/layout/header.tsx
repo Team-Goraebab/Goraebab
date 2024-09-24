@@ -5,14 +5,9 @@ import { useRouter } from 'next/navigation';
 import { Tooltip } from 'react-tooltip';
 import { MENU_ITEMS } from '@/data/menu';
 import { useMenuStore } from '@/store/menuStore';
-import axios from 'axios';
-import { showSnackbar } from '@/utils/toastUtils';
-import { useSnackbar } from 'notistack';
-import { API_URL, REMOTE_DEAMONS } from '@/app/api/urlPath';
 
 const Header = () => {
   const { activeId, setActiveId } = useMenuStore();
-  const { enqueueSnackbar } = useSnackbar();
   const router = useRouter();
   const navRef = useRef<HTMLDivElement>(null);
   const [barWidth, setBarWidth] = useState(0);
@@ -36,26 +31,6 @@ const Header = () => {
     setActiveId(id);
     router.push(path);
   };
-
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const response = await axios.get(`${API_URL}${REMOTE_DEAMONS}`);
-        console.log('원격 데몬 연결', response);
-      } catch (error) {
-        console.error('원격 데몬 정보를 가져오는 데 실패했습니다:', error);
-        // 연결 실패 시 알림 표시
-        showSnackbar(
-          enqueueSnackbar,
-          '도커 엔진이 실행되지 않았습니다.',
-          'info',
-          '#7F7F7F'
-        );
-      }
-    }
-
-    fetchData();
-  }, []);
 
   return (
     <header className="fixed w-full p-4 bg-grey_1 shadow z-10">
