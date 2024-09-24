@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import { Button, ProgressBar } from '@/components';
-import { selectedHostStore } from '@/store/seletedHostStore';
 import AddBridgeButton from '../button/addBridgeButton';
 import NetworkCard from '../card/networkCard';
 import VolumeCard from '../card/volumeCard';
@@ -13,6 +12,7 @@ import { useMenuStore } from '@/store/menuStore';
 import ImageCard from '../card/imageCard';
 import ContainerCard from '../card/containerCard';
 import { useImageStore } from '@/store/imageStore';
+import DaemonConnectBar from '../bar/daemonConnectBar';
 
 interface SidebarProps {
   progress: number;
@@ -101,7 +101,7 @@ const Sidebar = ({ progress }: SidebarProps) => {
         )}
       </div>
       <div className="flex-shrink-0">
-        <ProgressBar progress={progress} />
+        {/* <ProgressBar progress={progress} /> */}
         {activeId === 1 ? (
           <AddContainerButton onCreate={handleCreateContainer} />
         ) : activeId === 2 ? (
@@ -114,6 +114,7 @@ const Sidebar = ({ progress }: SidebarProps) => {
           <Button title={'추가하기'} />
         )}
       </div>
+      <DaemonConnectBar />
     </div>
   );
 };
