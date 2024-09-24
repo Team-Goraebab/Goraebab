@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Modal, OptionModal } from '@/components';
 import { useSnackbar } from 'notistack';
+import { getStatusColors } from '@/utils/statusColorsUtils';
 
 interface VolumeProps {
   id: string;
@@ -22,19 +23,6 @@ interface VolumeProps {
 interface VolumeCardProps {
   data: VolumeProps;
 }
-
-const getStatusColors = (status: string) => {
-  switch (status) {
-    case 'Available':
-      return { bg1: '#d1f6e2', bg2: '#25BD6B' };
-    case 'In Use':
-      return { bg1: '#f6e3d1', bg2: '#FFA048' };
-    case 'Error':
-      return { bg1: '#f6d4d6', bg2: '#FF4853' };
-    default:
-      return { bg1: '#d1d1d1', bg2: '#7F7F7F' };
-  }
-};
 
 /**
  *
