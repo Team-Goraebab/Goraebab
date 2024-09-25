@@ -8,67 +8,89 @@ import { API_URL, REMOTE_DEAMONS } from '@/app/api/urlPath';
 import {
   FaPlay,
   FaPause,
-  FaPowerOff,
+  FaStop,
   FaEllipsisV,
   FaDocker,
+  FaPowerOff,
 } from 'react-icons/fa';
 
 const DaemonConnectBar = () => {
   const { enqueueSnackbar } = useSnackbar();
 
-  const [engineStatus, setEngineStatus] = useState<'connect' | 'disconnect'>(
-    'connect'
-  );
+  const [engineStatus, setEngineStatus] = useState<
+    'connect' | 'disconnect' | 'connecting'
+  >('disconnect');
+
+  async function fetchData() {
+    try {
+      setEngineStatus('connecting');
+      const response = await axios.get(`${API_URL}${REMOTE_DEAMONS}`);
+      console.log('원격 데몬 연결', response);
+      setEngineStatus('connect');
+    } catch (error) {
+      console.error('원격 데몬 정보를 가져오는 데 실패했습니다:', error);
+      setEngineStatus('disconnect');
+      // 연결 실패 시 알림 표시
+      showSnackbar(
+        enqueueSnackbar,
+        '도커 엔진이 실행되지 않았습니다.',
+        'info',
+        '#7F7F7F'
+      );
+    }
+  }
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        const response = await axios.get(`${API_URL}${REMOTE_DEAMONS}`);
-        console.log('원격 데몬 연결', response);
-      } catch (error) {
-        console.error('원격 데몬 정보를 가져오는 데 실패했습니다:', error);
-        // 연결 실패 시 알림 표시
-        showSnackbar(
-          enqueueSnackbar,
-          '도커 엔진이 실행되지 않았습니다.',
-          'info',
-          '#7F7F7F'
-        );
-      }
-    }
-
     fetchData();
   }, []);
 
   const handleEngineStartStop = () => {
-    // 엔진을 시작/중지하는 로직 추가
-    setEngineStatus((prevStatus) =>
-      prevStatus === 'connect' ? 'disconnect' : 'connect'
-    );
+    if (engineStatus === 'connect' || engineStatus === 'connecting') {
+      setEngineStatus('disconnect');
+    } else {
+      fetchData();
+    }
   };
+  // rounded-md
   return (
-    <div className="mt-4 p-2 bg-green-500 rounded-md flex items-center justify-between text-white">
+    <div
+      className={`mt-4 p-1 flex items-center justify-between text-white ${
+        engineStatus === 'connect'
+          ? 'bg-yellow_6'
+          : engineStatus === 'connecting'
+          ? 'bg-green_6'
+          : 'bg-red_6'
+      }`}
+    >
       <div className="flex items-center">
-        <FaDocker className="text-xl mr-2" />
-        <span className="font-semibold">
-          {engineStatus === 'connect' ? 'Daemon connect' : 'Daemon disconnect'}
+        <FaDocker className="mr-2 w-4 h-4" />
+        <span className="font-semibold text-sm">
+          {engineStatus === 'connect'
+            ? 'Daemon connected'
+            : engineStatus === 'connecting'
+            ? 'Connecting...'
+            : 'Daemon disconnected'}
         </span>
       </div>
       <div className="flex items-center space-x-2">
         {engineStatus === 'connect' ? (
           <button onClick={handleEngineStartStop}>
-            <FaPause className="text-white" />
+            <FaStop className="text-white w-3 h-3" />
+          </button>
+        ) : engineStatus === 'connecting' ? (
+          <button onClick={handleEngineStartStop}>
+            <FaPause className="text-white w-3 h-3" />
           </button>
         ) : (
           <button onClick={handleEngineStartStop}>
-            <FaPlay className="text-white" />
+            <FaPlay className="text-white w-3 h-3" />
           </button>
         )}
-        <button>
+        {/* <button>
           <FaPowerOff className="text-white" />
-        </button>
+        </button> */}
         <button>
-          <FaEllipsisV className="text-white" />
+          <FaEllipsisV className="text-white w-3 h-3" />
         </button>
       </div>
     </div>
