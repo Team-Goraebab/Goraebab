@@ -33,7 +33,7 @@ const AddContainerButton = ({ onCreate }: AddContainerButtonProps) => {
     <>
       <button
         onClick={() => setIsModalOpen(true)}
-        className="mt-4 p-2 w-full text-white rounded font-bold bg-blue_6"
+        className="mt-4 p-2 w-full text-blue_6 rounded font-bold border border-blue_6"
       >
         Add Container
       </button>
