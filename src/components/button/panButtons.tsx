@@ -54,7 +54,7 @@ const PanButtons = () => {
 
   return (
     // <div className="fixed bottom-4 left-[445px] transform translate-x-4 w-[130px] h-[50px] p-3 bg-white rounded-lg shadow-lg flex items-center justify-between">
-    <div className="fixed bottom-4 left-[300px] transform translate-x-4 w-[130px] h-[50px] p-3 bg-white rounded-lg shadow-lg flex items-center justify-between">
+    <div className="fixed bottom-10 left-[315px] transform translate-x-4 w-[130px] h-[45px] p-3 bg-white rounded-lg shadow-lg flex items-center justify-between">
       <button
         className={`p-2 rounded-full ${
           !isHandMode ? 'bg-blue_1 text-blue_6' : 'text-black'
