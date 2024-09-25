@@ -12,7 +12,7 @@ const DeleteBlueprintButton = () => {
   };
 
   return (
-    <div className="fixed bottom-4 right-[140px] transform translate-x-4 h-[50px] p-3 text-red_6 hover:text-white bg-white hover:bg-red_4 active:bg-red_6 rounded-lg shadow-lg flex items-center justify-between">
+    <div className="fixed bottom-10 right-[155px] transform translate-x-4 h-[45px] p-3 text-red_6 hover:text-white bg-white hover:bg-red_4 active:bg-red_6 rounded-lg shadow-lg flex items-center justify-between">
       <button className="px-4 py-2 text-center" onClick={handleDelete}>
         Delete All
       </button>
