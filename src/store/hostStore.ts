@@ -15,6 +15,7 @@ interface HostStore {
   addHost: (host: Host) => void;
   deleteHost: (hostId: string) => void;
   deleteNetwork: (hostId: string, networkId: string) => void;
+  deleteAllHosts: () => void;
 }
 
 // 호스트 정보를 저장하는 store
@@ -60,4 +61,11 @@ export const useHostStore = create<HostStore>((set) => ({
         hosts: updatedHosts,
       };
     }),
+
+  // 모든 호스트 삭제
+  deleteAllHosts: () =>
+    set(() => ({
+      hosts: [],
+      networks: [],
+    })),
 }));
