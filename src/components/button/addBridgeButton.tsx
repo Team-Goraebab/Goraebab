@@ -48,7 +48,7 @@ const AddBridgeButton = ({ onCreate }: AddBridgeButtonProps) => {
     <>
       <button
         onClick={() => setIsModalOpen(true)}
-        className="mt-4 p-2 w-full text-white rounded font-bold bg-blue_2"
+        className="mt-4 p-2 w-full text-white rounded font-bold bg-blue_6"
       >
         Add Custom Bridge
       </button>

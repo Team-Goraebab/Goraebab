@@ -68,7 +68,7 @@ const CardContainer = ({
       )}
 
       <div
-        className="w-full text-center text-blue_2 border-2 p-2 rounded-md mb-3 text-sm font-semibold"
+        className="w-full text-center text-blue_6 border-2 p-2 rounded-md mb-3 text-sm font-semibold"
         style={{
           borderColor: `${themeColor.borderColor}`,
           backgroundColor: `${themeColor.bgColor}`,

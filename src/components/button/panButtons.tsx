@@ -57,7 +57,7 @@ const PanButtons = () => {
     <div className="fixed bottom-4 left-[300px] transform translate-x-4 w-[130px] h-[50px] p-3 bg-white rounded-lg shadow-lg flex items-center justify-between">
       <button
         className={`p-2 rounded-full ${
-          !isHandMode ? 'bg-blue_1 text-blue_2' : 'text-black'
+          !isHandMode ? 'bg-blue_1 text-blue_6' : 'text-black'
         }`}
         onClick={handleMouseClick}
       >
@@ -66,7 +66,7 @@ const PanButtons = () => {
       <div className="mx-2 border-r h-full"></div>
       <button
         className={`p-2 rounded-full ${
-          isHandMode ? 'bg-blue_1 text-blue_2' : 'text-black'
+          isHandMode ? 'bg-blue_1 text-blue_6' : 'text-black'
         }`}
         onClick={handleHandClick}
       >

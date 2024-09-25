@@ -41,7 +41,7 @@ const Header = () => {
               key={item.id}
               onClick={() => handleNavigation(item.path, item.id)}
               className={`flex flex-col items-center cursor-pointer ${
-                activeId === item.id ? 'text-blue_2' : 'text-gray-600'
+                activeId === item.id ? 'text-blue_6' : 'text-gray-600'
               }`}
               data-tooltip-id="my-tooltip"
               data-tooltip-content={item.name}
@@ -50,7 +50,7 @@ const Header = () => {
             </div>
           ))}
           <div
-            className="absolute bottom-0 h-1 bg-blue_2 rounded-tl rounded-tr transition-all duration-300"
+            className="absolute bottom-0 h-1 bg-blue_6 rounded-tl rounded-tr transition-all duration-300"
             style={{
               width: `${barWidth}px`,
               left: `${barLeft - 24}px`,

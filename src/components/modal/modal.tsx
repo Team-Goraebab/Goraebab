@@ -19,7 +19,7 @@ interface ModalProps {
  * @param isOpen 모달 open 유무
  * @param onClose 모달 닫기 핸들러
  * @param onConfirm 모달 확인 핸들러
- * @returns 
+ * @returns
  */
 const Modal = ({
   question,
@@ -43,7 +43,7 @@ const Modal = ({
         </p>
         <div className="flex justify-center space-x-3 md:space-x-5">
           <button
-            className="w-24 sm:w-28 md:w-32 2xl:w-40 py-2 2xl:py-3 bg-red_1 text-red_2 rounded-lg font-bold text-sm md:text-base 2xl:text-xl"
+            className="w-24 sm:w-28 md:w-32 2xl:w-40 py-2 2xl:py-3 bg-red_1 text-red_6 rounded-lg font-bold text-sm md:text-base 2xl:text-xl"
             onClick={onConfirm}
           >
             {confirmText || '삭제'}
