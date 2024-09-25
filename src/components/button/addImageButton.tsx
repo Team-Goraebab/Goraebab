@@ -11,9 +11,9 @@ interface AddImageButtonProps {
 }
 
 const AddImageButton = ({ onCreate }: AddImageButtonProps) => {
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const { enqueueSnackbar } = useSnackbar();
   const addImage = useImageStore((state) => state.addImage);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);

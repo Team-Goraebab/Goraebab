@@ -45,8 +45,8 @@ const ContainerCard = ({ data }: CardDataProps) => {
 
   const cardRef = useRef<HTMLDivElement>(null);
   const { bg1, bg2 } = getStatusColors(data.status || 'primary');
-  const [showOptions, setShowOptions] = useState(false);
-  const [showModal, setShowModal] = useState(false);
+  const [showOptions, setShowOptions] = useState<boolean>(false);
+  const [showModal, setShowModal] = useState<boolean>(false);
   const { assignImageToContainer, assignNetworkToContainer } =
     useContainerStore();
 

@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Modal, OptionModal } from '@/components';
-import { useSnackbar } from 'notistack';
 import { getStatusColors } from '@/utils/statusColorsUtils';
 
 interface VolumeProps {
@@ -31,8 +30,8 @@ interface VolumeCardProps {
  */
 const VolumeCard = ({ data }: VolumeCardProps) => {
   const { bg1, bg2 } = getStatusColors(data.status);
-  const [showOptions, setShowOptions] = useState(false);
-  const [showModal, setShowModal] = useState(false);
+  const [showOptions, setShowOptions] = useState<boolean>(false);
+  const [showModal, setShowModal] = useState<boolean>(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
   const handleOptionClick = () => {

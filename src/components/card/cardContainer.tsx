@@ -43,8 +43,6 @@ const CardContainer = ({
     }
   };
 
-  console.log('containers', containers);
-
   return (
     <div
       className="relative flex flex-col items-center p-[10px] border bg-white rounded-lg shadow-lg w-[450px] transition-colors duration-200 cursor-pointer"

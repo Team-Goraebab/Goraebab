@@ -36,8 +36,8 @@ const NetworkCard = ({ data }: CardDataProps) => {
   const { selectedHostId } = selectedHostStore();
 
   const { bg1, bg2 } = getStatusColors('primary');
-  const [showOptions, setShowOptions] = useState(false);
-  const [showModal, setShowModal] = useState(false);
+  const [showOptions, setShowOptions] = useState<boolean>(false);
+  const [showModal, setShowModal] = useState<boolean>(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
   const addConnectedBridgeId = selectedHostStore(
