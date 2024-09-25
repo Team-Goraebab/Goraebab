@@ -74,7 +74,7 @@ const AddHostButton = () => {
 
   return (
     <>
-      <div className="fixed bottom-4 left-[445px] transform translate-x-4 w-[130px] h-[50px] p-3 bg-white rounded-lg shadow-lg flex items-center justify-between">
+      <div className="fixed bottom-10 left-[460px] transform translate-x-4 w-[130px] h-[45px] p-3 bg-white rounded-lg shadow-lg flex items-center justify-between">
         <button
           onClick={() => setIsModalOpen(true)}
           className="px-4 py-2 text-blue_6 text-center"
