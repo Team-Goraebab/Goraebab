@@ -73,7 +73,7 @@ const SaveButton = () => {
 
   return (
     <>
-      <div className="fixed bottom-4 right-[35px] transform translate-x-4 h-[50px] p-3 text-blue_6 hover:text-white bg-white hover:bg-blue_4 rounded-lg shadow-lg flex items-center justify-between">
+      <div className="fixed bottom-10 right-[50px] transform translate-x-4 h-[45px] p-3 text-blue_6 hover:text-white bg-white hover:bg-blue_4 rounded-lg shadow-lg flex items-center justify-between">
         <button className="px-4 py-2 text-center" onClick={handleSave}>
           Save
         </button>
