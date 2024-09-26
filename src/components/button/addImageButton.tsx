@@ -2,75 +2,76 @@
 
 import React, { useState } from 'react';
 import { useSnackbar } from 'notistack';
+import VolumeModal from '../modal/volume/volumeModal';
 import { showSnackbar } from '@/utils/toastUtils';
-import ImageModal from '../modal/image/imageModal';
-import { useImageStore } from '@/store/imageStore';
+import { useVolumeStore } from '@/store/volumeStore';
+import { FiDatabase } from 'react-icons/fi';
 
-interface AddImageButtonProps {
-  onCreate: (imageData: any) => void;
+interface AddVolumeButtonProps {
+  onCreate: (volumeData: any) => void;
 }
 
-const AddImageButton = ({ onCreate }: AddImageButtonProps) => {
-  const { enqueueSnackbar } = useSnackbar();
-  const addImage = useImageStore((state) => state.addImage);
+const AddVolumeButton = ({ onCreate }: AddVolumeButtonProps) => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const { enqueueSnackbar } = useSnackbar();
+  const addVolume = useVolumeStore((state) => state.addVolume);
 
-  const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
-
-  const handleSave = (
+  /**
+   * add vloume handler
+   * @param id volume id
+   * @param name volume name
+   * @param driver volume driver
+   * @param mountPoint volume mountPoint
+   * @param capacity volume capacity
+   */
+  const handleCreateVolume = (
     id: string,
     name: string,
-    tag: string,
-    file: File | null,
-    size: string,
-    source: 'local' | 'dockerHub', // 이미지의 출처를 구분
-    dockerImageInfo?: any // Docker Hub에서 선택된 이미지의 추가 정보
+    driver: string,
+    mountPoint: string,
+    capacity: string
   ) => {
-    const imageData = {
+    const newVolumeData = {
       id,
       name,
-      tag,
-      file,
-      size,
-      source,
-      dockerImageInfo, // Docker Hub 이미지 정보 (선택적)
+      driver,
+      mountPoint,
+      capacity,
+      status: 'available',
     };
 
-    // 부모 컴포넌트로 이미지 데이터 전달
-    // store에 이미지 데이터 저장
-    onCreate(imageData);
-    addImage(imageData);
+    // 부모 컴포넌트로 생성된 볼륨 데이터 전달
+    onCreate(newVolumeData);
+    // store에 볼륨 데이터 저장
+    addVolume(newVolumeData);
+    console.log('new volume ::', newVolumeData);
 
-    // 성공 메시지 표시
     showSnackbar(
       enqueueSnackbar,
-      '이미지가 성공적으로 추가되었습니다!',
+      '볼륨이 성공적으로 생성되었습니다!',
       'success',
       '#4C48FF'
     );
 
-    // 모달 닫기
     setIsModalOpen(false);
   };
 
   return (
     <>
       <button
-        onClick={openModal}
-        className="mt-4 p-2 w-full text-white rounded font-bold bg-blue_6"
+        onClick={() => setIsModalOpen(true)}
+        className="mt-4 p-2 w-full text-blue_6 rounded font-bold border border-blue_6"
       >
-        Add Image
+        Add Volume
       </button>
       {isModalOpen && (
-        <ImageModal
-          isOpen={isModalOpen}
-          onClose={closeModal}
-          onSave={handleSave}
+        <VolumeModal
+          onClose={() => setIsModalOpen(false)}
+          onCreate={handleCreateVolume}
         />
       )}
     </>
   );
 };
 
-export default AddImageButton;
+export default AddVolumeButton;
