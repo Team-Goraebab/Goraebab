@@ -3,9 +3,9 @@
 import React, { useState } from 'react';
 import { useSnackbar } from 'notistack';
 import VolumeModal from '../modal/volume/volumeModal';
-import { v4 as uuidv4 } from 'uuid';
 import { showSnackbar } from '@/utils/toastUtils';
 import { useVolumeStore } from '@/store/volumeStore';
+import { FiDatabase } from 'react-icons/fi';
 
 interface AddVolumeButtonProps {
   onCreate: (volumeData: any) => void;
@@ -16,6 +16,14 @@ const AddVolumeButton = ({ onCreate }: AddVolumeButtonProps) => {
   const { enqueueSnackbar } = useSnackbar();
   const addVolume = useVolumeStore((state) => state.addVolume);
 
+  /**
+   * add vloume handler
+   * @param id volume id
+   * @param name volume name
+   * @param driver volume driver
+   * @param mountPoint volume mountPoint
+   * @param capacity volume capacity
+   */
   const handleCreateVolume = (
     id: string,
     name: string,
@@ -52,7 +60,7 @@ const AddVolumeButton = ({ onCreate }: AddVolumeButtonProps) => {
     <>
       <button
         onClick={() => setIsModalOpen(true)}
-        className="mt-4 p-2 w-full text-white rounded font-bold bg-blue_6"
+        className="mt-4 p-2 w-full text-blue_6 rounded font-bold border border-blue_6"
       >
         Add Volume
       </button>
