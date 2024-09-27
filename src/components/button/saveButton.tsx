@@ -3,6 +3,7 @@
 import React from 'react';
 import { useSnackbar } from 'notistack';
 import { showSnackbar } from '@/utils/toastUtils';
+import { AiOutlineSave } from 'react-icons/ai';
 
 const SaveButton = () => {
   const { enqueueSnackbar } = useSnackbar();
@@ -65,7 +66,7 @@ const SaveButton = () => {
     // 저장 완료 메시지 표시
     showSnackbar(
       enqueueSnackbar,
-      '설계도가 성공적으로 저장되었습니다!',
+      '설계도가 성공적으Z로 저장되었습니다!',
       'success',
       '#4C48FF'
     );
@@ -73,9 +74,13 @@ const SaveButton = () => {
 
   return (
     <>
-      <div className="fixed bottom-10 right-[50px] transform translate-x-4 h-[45px] p-3 text-blue_6 hover:text-white bg-white hover:bg-blue_4 rounded-lg shadow-lg flex items-center justify-between">
-        <button className="px-4 py-2 text-center" onClick={handleSave}>
-          Save
+      <div className="fixed bottom-8 right-[50px] transform translate-x-4 h-[40px] px-4 bg-white text-blue_6 hover:text-white hover:bg-blue_4 active:bg-blue_5 rounded-lg shadow-lg flex items-center justify-center transition duration-200 ease-in-out">
+        <button
+          className="flex items-center gap-2 text-center"
+          onClick={handleSave}
+        >
+          <AiOutlineSave size={20} />
+          <span className="font-medium">Save</span>
         </button>
       </div>
     </>
