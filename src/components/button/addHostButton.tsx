@@ -6,6 +6,10 @@ import { useHostStore } from '@/store/hostStore';
 import { useSnackbar } from 'notistack';
 import { showSnackbar } from '@/utils/toastUtils';
 import { selectedHostStore } from '@/store/seletedHostStore';
+import { FaHome, FaPlus, FaRegPlusSquare } from 'react-icons/fa';
+import { AiFillHome, AiOutlineHome } from 'react-icons/ai';
+import { HiOutlineHome, HiHome, HiOutlinePlus, HiPlus } from 'react-icons/hi';
+import { MdOutlineHome } from 'react-icons/md';
 
 const AddHostButton = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -74,12 +78,16 @@ const AddHostButton = () => {
 
   return (
     <>
-      <div className="fixed bottom-10 left-[460px] transform translate-x-4 w-[130px] h-[45px] p-3 bg-white rounded-lg shadow-lg flex items-center justify-between">
+      <div className="fixed top-20 right-[50px] transform translate-x-4 h-[40px] hover:bg-blue_5 bg-blue_4 rounded-lg shadow-lg flex items-center justify-between">
         <button
           onClick={() => setIsModalOpen(true)}
-          className="px-4 py-2 text-blue_6 text-center"
+          className="px-4 py-2 text-white text-center rounded-md  transition-all duration-200"
         >
-          Add Host
+          <div className="flex gap-1 items-center">
+            <HiPlus size={20} className="font-bold" />
+            <span className="text-sm font-medium">New Host</span>
+            <HiOutlineHome size={20} className="font-bold" />
+          </div>
         </button>
       </div>
       <div className="min-h-screen flex items-center justify-center">
