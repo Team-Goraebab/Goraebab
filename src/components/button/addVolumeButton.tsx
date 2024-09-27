@@ -6,6 +6,7 @@ import VolumeModal from '../modal/volume/volumeModal';
 import { showSnackbar } from '@/utils/toastUtils';
 import { useVolumeStore } from '@/store/volumeStore';
 import { FiDatabase } from 'react-icons/fi';
+import LargeButton from './largeButton';
 
 interface AddVolumeButtonProps {
   onCreate: (volumeData: any) => void;
@@ -58,12 +59,7 @@ const AddVolumeButton = ({ onCreate }: AddVolumeButtonProps) => {
 
   return (
     <>
-      <button
-        onClick={() => setIsModalOpen(true)}
-        className="mt-4 p-2 w-full text-blue_6 rounded font-bold border border-blue_6"
-      >
-        Add Volume
-      </button>
+      <LargeButton title={'Volume'} onClick={() => setIsModalOpen(true)} />
       {isModalOpen && (
         <VolumeModal
           onClose={() => setIsModalOpen(false)}

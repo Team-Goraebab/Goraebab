@@ -4,6 +4,8 @@ import React, { useState } from 'react';
 import { useSnackbar } from 'notistack';
 import { showSnackbar } from '@/utils/toastUtils';
 import BridgeModal from '../modal/network/bridgeModal';
+import { HiPlus } from 'react-icons/hi';
+import LargeButton from './largeButton';
 
 interface AddBridgeButtonProps {
   onCreate: (networkData: any) => void;
@@ -54,12 +56,10 @@ const AddBridgeButton = ({ onCreate }: AddBridgeButtonProps) => {
 
   return (
     <>
-      <button
+      <LargeButton
+        title={'Custom Bridge'}
         onClick={() => setIsModalOpen(true)}
-        className="mt-4 p-2 w-full text-blue_6 rounded font-bold border border-blue_6"
-      >
-        Add Custom Bridge
-      </button>
+      />
       {isModalOpen && (
         <BridgeModal
           onClose={() => setIsModalOpen(false)}

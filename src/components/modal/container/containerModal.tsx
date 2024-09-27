@@ -7,6 +7,7 @@ import { showSnackbar } from '@/utils/toastUtils';
 import { useImageStore } from '@/store/imageStore';
 import { useVolumeStore } from '@/store/volumeStore';
 import { useContainerStore } from '@/store/containerStore';
+import { Button } from '@/components';
 
 interface ContainerModalProps {
   onClose: () => void;
@@ -88,8 +89,8 @@ const ContainerModal = ({ onClose, onSave }: ContainerModalProps) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-32">
-      <div className="bg-white p-6 rounded-md shadow-lg w-3/5">
-        <h2 className="text-lg font-semibold mb-4">Add New Container</h2>
+      <div className="bg-white p-6 rounded-md shadow-lg w-2/5">
+        <h2 className="text-lg font-semibold mb-4">Create Container</h2>
         <input
           type="text"
           placeholder="Container Name"
@@ -99,7 +100,7 @@ const ContainerModal = ({ onClose, onSave }: ContainerModalProps) => {
         />
 
         {/* 이미지 선택 드롭다운 (단일 선택) */}
-        <p className="font-semibold mb-2">Select an Image:</p>
+        <p className="font-semibold mb-2 mt-2">Select an Image:</p>
         <select
           value={selectedImage}
           onChange={handleImageChange}
@@ -116,31 +117,34 @@ const ContainerModal = ({ onClose, onSave }: ContainerModalProps) => {
         </select>
 
         {/* 볼륨 선택 체크박스 */}
-        <p className="font-semibold mb-2">Select Volumes:</p>
+        <p className="font-semibold mb-2 mt-2">Select Volumes:</p>
         <div className="mb-4 max-h-24 overflow-y-auto border p-2 rounded">
-          {volumes.map((volume) => (
-            <div key={volume.id} className="flex items-center mb-2">
-              <input
-                type="checkbox"
-                id={`volume-${volume.id}`}
-                value={volume.name}
-                checked={selectedVolumes.includes(volume.name)}
-                onChange={() => handleVolumeChange(volume, volume.name)}
-                className="mr-2"
-              />
-              <label htmlFor={`volume-${volume.id}`}>
-                {volume.name} ({volume.driver})
-              </label>
-            </div>
-          ))}
+          {volumes.length > 0 ? (
+            volumes.map((volume) => (
+              <div key={volume.id} className="flex items-center mb-2">
+                <input
+                  type="checkbox"
+                  id={`volume-${volume.id}`}
+                  value={volume.name}
+                  checked={selectedVolumes.includes(volume.name)}
+                  onChange={() => handleVolumeChange(volume, volume.name)}
+                  className="mr-2"
+                />
+                <label htmlFor={`volume-${volume.id}`}>
+                  {volume.name} ({volume.driver})
+                </label>
+              </div>
+            ))
+          ) : (
+            <div>No volumes</div>
+          )}
         </div>
-
         <input
           type="text"
           placeholder="IP Address"
           value={ip}
           onChange={(e) => setIp(e.target.value)}
-          className="mb-2 p-2 border border-gray-300 rounded w-full"
+          className="mb-2 p-2 border border-gray-300 rounded w-full mt-2"
         />
         <input
           type="text"
@@ -163,19 +167,9 @@ const ContainerModal = ({ onClose, onSave }: ContainerModalProps) => {
           onChange={(e) => setTag(e.target.value)}
           className="mb-4 p-2 border border-gray-300 rounded w-full"
         />
-        <div className="flex justify-end space-x-2">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 bg-gray-300 rounded-md"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleSave}
-            className="px-4 py-2 bg-blue-500 text-white rounded-md"
-          >
-            Add Container
-          </button>
+        <div className="flex justify-end space-x-2 pt-8">
+          <Button title={'Cancel'} onClick={onClose} color="grey" />
+          <Button title={'Create'} onClick={handleSave} />
         </div>
       </div>
     </div>

@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useSnackbar } from 'notistack';
 import { showSnackbar } from '@/utils/toastUtils';
 import ContainerModal from '../modal/container/containerModal';
+import LargeButton from './largeButton';
 
 interface AddContainerButtonProps {
   onCreate: (containerData: any) => void;
@@ -31,12 +32,7 @@ const AddContainerButton = ({ onCreate }: AddContainerButtonProps) => {
 
   return (
     <>
-      <button
-        onClick={() => setIsModalOpen(true)}
-        className="mt-4 p-2 w-full text-blue_6 rounded font-bold border border-blue_6"
-      >
-        Add Container
-      </button>
+      <LargeButton title={'Container'} onClick={() => setIsModalOpen(true)} />
       {isModalOpen && (
         <ContainerModal
           onClose={() => setIsModalOpen(false)}

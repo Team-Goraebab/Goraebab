@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useSnackbar } from 'notistack';
 import { showSnackbar } from '@/utils/toastUtils';
 import { v4 as uuidv4 } from 'uuid';
+import { Button } from '@/components';
 
 interface VolumeModalProps {
   onClose: () => void;
@@ -17,10 +18,10 @@ interface VolumeModalProps {
 }
 
 /**
- * 
+ *
  * @param onClose 볼륨 모달 닫기 핸들러
  * @param onCreate 볼륨 생성 핸들러
- * @returns 
+ * @returns
  */
 const VolumeModal = ({ onClose, onCreate }: VolumeModalProps) => {
   const [name, setName] = useState<string>('');
@@ -101,19 +102,9 @@ const VolumeModal = ({ onClose, onCreate }: VolumeModalProps) => {
           <option value="glusterfs">GlusterFS</option>
           <option value="ceph">Ceph</option>
         </select>
-        <div className="flex justify-end space-x-2">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 bg-gray-300 rounded-md"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleCreate}
-            className="px-4 py-2 bg-blue-500 text-white rounded-md"
-          >
-            Create
-          </button>
+        <div className="flex justify-end space-x-2 pt-8">
+          <Button title={'Cancel'} onClick={onClose} color="grey" />
+          <Button title={'Create'} onClick={handleCreate} />
         </div>
       </div>
     </div>
