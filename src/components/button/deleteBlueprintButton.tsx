@@ -1,6 +1,7 @@
 'use client';
 
 import { useHostStore } from '@/store/hostStore';
+import { AiOutlineDelete } from 'react-icons/ai';
 
 const DeleteBlueprintButton = () => {
   const deleteAllHosts = useHostStore((state) => state.deleteAllHosts);
@@ -12,9 +13,13 @@ const DeleteBlueprintButton = () => {
   };
 
   return (
-    <div className="fixed bottom-10 right-[155px] transform translate-x-4 h-[45px] p-3 text-red_6 hover:text-white bg-white hover:bg-red_4 active:bg-red_6 rounded-lg shadow-lg flex items-center justify-between">
-      <button className="px-4 py-2 text-center" onClick={handleDelete}>
-        Delete All
+    <div className="fixed bottom-8 right-[160px] transform translate-x-4 h-[40px] px-4 bg-white text-red_6 hover:text-white hover:bg-red_5 active:bg-red_6 rounded-lg shadow-lg flex items-center justify-center transition duration-200 ease-in-out">
+      <button
+        className="flex items-center gap-2 text-center"
+        onClick={handleDelete}
+      >
+        <AiOutlineDelete size={20} />
+        <span className="font-medium">Delete All</span>
       </button>
     </div>
   );
