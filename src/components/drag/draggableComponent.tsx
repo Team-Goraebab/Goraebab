@@ -1,8 +1,7 @@
-'use client'
+'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import Draggable from 'react-draggable';
-import { TransformProvider } from '@/context/useTransformContext';
 
 const DraggableComponent: React.FC<{ isHandMode: boolean }> = ({
   isHandMode,

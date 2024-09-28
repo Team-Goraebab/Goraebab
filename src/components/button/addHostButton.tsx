@@ -6,10 +6,7 @@ import { useHostStore } from '@/store/hostStore';
 import { useSnackbar } from 'notistack';
 import { showSnackbar } from '@/utils/toastUtils';
 import { selectedHostStore } from '@/store/seletedHostStore';
-import { FaHome, FaPlus, FaRegPlusSquare } from 'react-icons/fa';
-import { AiFillHome, AiOutlineHome } from 'react-icons/ai';
-import { HiOutlineHome, HiHome, HiOutlinePlus, HiPlus } from 'react-icons/hi';
-import { MdOutlineHome } from 'react-icons/md';
+import { HiOutlineHome, HiPlus } from 'react-icons/hi';
 
 const AddHostButton = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);

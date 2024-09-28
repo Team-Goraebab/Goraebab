@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import { useSnackbar } from 'notistack';
 import { showSnackbar } from '@/utils/toastUtils';
 import BridgeModal from '../modal/network/bridgeModal';
-import { HiPlus } from 'react-icons/hi';
 import LargeButton from './largeButton';
 
 interface AddBridgeButtonProps {

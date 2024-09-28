@@ -5,7 +5,6 @@ import { useSnackbar } from 'notistack';
 import VolumeModal from '../modal/volume/volumeModal';
 import { showSnackbar } from '@/utils/toastUtils';
 import { useVolumeStore } from '@/store/volumeStore';
-import { FiDatabase } from 'react-icons/fi';
 import LargeButton from './largeButton';
 
 interface AddVolumeButtonProps {
