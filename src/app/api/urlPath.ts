@@ -1,5 +1,6 @@
 export const API_URL = 'http://localhost:2387';
 export const BASE_URL = '/api/v1';
+export const HUB_URL = 'https://hub.docker.com/v2';
 
 // blueprint
 export const STORAGE = '/storage';
