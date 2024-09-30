@@ -14,6 +14,7 @@ import ContainerCard from '../card/containerCard';
 import { useImageStore } from '@/store/imageStore';
 import DaemonConnectBar from '../bar/daemonConnectBar';
 import { AiOutlineInfoCircle } from 'react-icons/ai';
+import LargeButton from '../button/largeButton';
 
 interface SidebarProps {
   progress: number;
@@ -103,7 +104,7 @@ const Sidebar = ({ progress }: SidebarProps) => {
               onCreate: handleCreate,
             })
           ) : (
-            <Button title={'추가하기'} />
+            <LargeButton title={'추가하기'} onClick={() => {}} />
           )}
         </div>
       </div>
