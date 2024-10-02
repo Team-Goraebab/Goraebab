@@ -6,10 +6,10 @@ import { getStatusColors } from '@/utils/statusColorsUtils';
 
 interface VolumeProps {
   id: string;
-  name: string;
-  driver: string;
-  mountPoint: string;
-  capacity: string;
+  Name: string;
+  Driver: string;
+  Mountpoint: string;
+  Scope: string;
   status: string;
   connectedContainers?: {
     id: string;
@@ -67,10 +67,10 @@ const VolumeCard = ({ data }: VolumeCardProps) => {
   }, [cardRef]);
 
   const volumeItems = [
-    { label: 'Name', value: data.name },
-    { label: 'Driver', value: data.driver },
-    { label: 'Mount Point', value: data.mountPoint },
-    { label: 'Capacity', value: data.capacity },
+    { label: 'Name', value: data.Name },
+    { label: 'Driver', value: data.Driver },
+    { label: 'Mount Point', value: data.Mountpoint },
+    { label: 'Capacity', value: data.Scope },
     {
       label: 'Containers',
       value:
