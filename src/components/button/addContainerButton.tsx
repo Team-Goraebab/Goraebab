@@ -4,14 +4,15 @@ import React, { useState } from 'react';
 import { useSnackbar } from 'notistack';
 import { showSnackbar } from '@/utils/toastUtils';
 import ContainerModal from '../modal/container/containerModal';
+import LargeButton from './largeButton';
 
 interface AddContainerButtonProps {
   onCreate: (containerData: any) => void;
 }
 
 const AddContainerButton = ({ onCreate }: AddContainerButtonProps) => {
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const { enqueueSnackbar } = useSnackbar();
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   const handleAddContainer = (containerData: any) => {
     // 부모 컴포넌트로 컨테이너 데이터 전달
@@ -31,12 +32,7 @@ const AddContainerButton = ({ onCreate }: AddContainerButtonProps) => {
 
   return (
     <>
-      <button
-        onClick={() => setIsModalOpen(true)}
-        className="mt-4 p-2 w-full text-white rounded font-bold bg-blue_2"
-      >
-        Add Container
-      </button>
+      <LargeButton title={'Container'} onClick={() => setIsModalOpen(true)} />
       {isModalOpen && (
         <ContainerModal
           onClose={() => setIsModalOpen(false)}

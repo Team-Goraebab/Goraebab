@@ -1,12 +1,5 @@
 import { create } from 'zustand';
-
-interface Network {
-  id: string;
-  name: string;
-  subnet: string;
-  gateway: string;
-  driver: string;
-}
+import { Network } from '@/types/type';
 
 interface NetworkStore {
   networks: Network[];

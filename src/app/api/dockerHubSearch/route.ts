@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
+import { HUB_URL } from '../urlPath';
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -13,12 +14,9 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const response = await axios.get(
-      `https://hub.docker.com/v2/search/repositories`,
-      {
-        params: { query },
-      }
-    );
+    const response = await axios.get(`${HUB_URL}/search/repositories`, {
+      params: { query },
+    });
     return NextResponse.json(response.data.results, { status: 200 });
   } catch (error) {
     console.error('Error fetching Docker Hub images:', error);

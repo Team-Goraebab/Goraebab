@@ -2,17 +2,16 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Modal, OptionModal } from '@/components';
-import { useStore } from '@/store/cardStore';
-import { v4 as uuidv4 } from 'uuid';
 import { useSnackbar } from 'notistack';
 import { showSnackbar } from '@/utils/toastUtils';
 import { useImageStore } from '@/store/imageStore';
+import { getStatusColors } from '@/utils/statusColorsUtils';
 interface CardProps {
   id: string;
   name?: string;
   ip?: string;
   size: string;
-  tags: string;
+  tag: string;
   /**
    * running
    * stopped
@@ -29,50 +28,26 @@ interface CardProps {
 
 interface CardDataProps {
   data: CardProps;
-  selectedHostId: string | null;
 }
 
 /**
  *
- * @param status card의 상태 값
- * @returns status에 따른 색상을 반환
- */
-const getStatusColors = (status: string) => {
-  switch (status) {
-    case 'primary':
-      return { bg1: '#d2d1f6', bg2: '#4C48FF' };
-    case 'secondary':
-      return { bg1: '#f6d4d6', bg2: '#FF4853' };
-    case 'accent':
-      return { bg1: '#f6e3d1', bg2: '#FFA048' };
-    case 'success':
-      return { bg1: '#d1f6e2', bg2: '#25BD6B' };
-    default:
-      return { bg1: '#d1d1d1', bg2: '#7F7F7F' };
-  }
-};
-
-/**
- * 
  * @param data 이미지 데이터
- * @param selectedHostId 선택한 호스트 아이디
- * @returns 
+ * @returns
  */
-const ImageCard = ({ data, selectedHostId }: CardDataProps) => {
+const ImageCard = ({ data }: CardDataProps) => {
   const { enqueueSnackbar } = useSnackbar();
   const removeImage = useImageStore((state) => state.removeImage);
 
-  const id = uuidv4();
   const { bg1, bg2 } = getStatusColors(data.status || 'primary');
-  const [showOptions, setShowOptions] = useState(false);
-  const [showModal, setShowModal] = useState(false);
+  const [showOptions, setShowOptions] = useState<boolean>(false);
+  const [showModal, setShowModal] = useState<boolean>(false);
   const cardRef = useRef<HTMLDivElement>(null);
-  const addContainerToHost = useStore((state) => state.addContainerToHost);
 
   const items = [
     { label: 'ID', value: data.id },
     { label: 'SIZE', value: data.size },
-    { label: 'TAGS', value: data.tags },
+    { label: 'TAGS', value: data.tag },
   ];
 
   const handleOptionClick = () => {
@@ -80,26 +55,6 @@ const ImageCard = ({ data, selectedHostId }: CardDataProps) => {
   };
 
   const handleGetInfo = () => {
-    setShowOptions(false);
-  };
-
-  const handleRun = () => {
-    if (selectedHostId) {
-      const newContainer = {
-        id: uuidv4(),
-        name: data.name,
-        ip: data.ip,
-        active: data.active,
-      };
-      addContainerToHost(selectedHostId, newContainer);
-    } else {
-      showSnackbar(
-        enqueueSnackbar,
-        '호스트를 선택해주세요.',
-        'error',
-        '#FF4853'
-      );
-    }
     setShowOptions(false);
   };
 
@@ -148,7 +103,7 @@ const ImageCard = ({ data, selectedHostId }: CardDataProps) => {
       />
       <div className="ml-4 flex flex-col w-full">
         <div className="flex justify-between text-grey_4 text-sm mt-2 mb-3 relative">
-          <span className={"font-pretendard font-bold text-black"}>
+          <span className={'font-pretendard font-bold text-black'}>
             {data.name}
           </span>
           <span
@@ -161,8 +116,8 @@ const ImageCard = ({ data, selectedHostId }: CardDataProps) => {
             <div className="absolute top-4 left-16">
               <OptionModal
                 onTopHandler={handleGetInfo}
-                onMiddleHandler={handleRun}
                 onBottomHandler={handleDelete}
+                btnVisible={false}
               />
             </div>
           )}

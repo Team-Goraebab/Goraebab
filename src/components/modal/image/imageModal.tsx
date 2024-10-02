@@ -19,7 +19,7 @@ interface ModalProps {
   onSave: (
     id: string,
     name: string,
-    tags: string,
+    tag: string,
     file: File | null,
     size: string,
     source: 'local' | 'dockerHub',
@@ -29,16 +29,16 @@ interface ModalProps {
 
 /**
  * 이미지 모달
- * @param isOpen 이미지 모달 열림 유무 
+ * @param isOpen 이미지 모달 열림 유무
  * @param onClose 이미지 모달 닫기 핸들러
  * @param onSave 이미지 모달 저장 핸들러
- * @returns 
+ * @returns
  */
 const ImageModal = ({ isOpen, onClose, onSave }: ModalProps) => {
   const [activeTab, setActiveTab] = useState('local');
   const [file, setFile] = useState<File | null>(null);
   const [name, setName] = useState<string>('');
-  const [tags, setTags] = useState<string>('');
+  const [tag, setTag] = useState<string>('');
   const [size, setSize] = useState<string>('');
   const { enqueueSnackbar } = useSnackbar();
 
@@ -46,7 +46,7 @@ const ImageModal = ({ isOpen, onClose, onSave }: ModalProps) => {
     if (!isOpen) {
       setFile(null);
       setName('');
-      setTags('');
+      setTag('');
       setSize('');
     }
   }, [isOpen]);
@@ -77,27 +77,27 @@ const ImageModal = ({ isOpen, onClose, onSave }: ModalProps) => {
           '#FF4853'
         );
         setFile(null);
-        setSize(''); // 파일 크기 초기화
+        setSize('');
         return;
       }
 
-      const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2); // 파일 크기 계산
-      if (parseFloat(fileSizeMB) > 150) {
+      const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+      if (parseFloat(fileSizeMB) > 5000) {
         showSnackbar(
           enqueueSnackbar,
-          '파일 용량이 150MB를 초과했습니다.',
+          '파일 용량이 5000MB를 초과했습니다.',
           'error',
           '#FF4853'
         );
         setFile(null);
-        setSize(''); // 파일 크기 초기화
+        setSize('');
       } else {
         setFile(file);
-        setSize(fileSizeMB); // 파일 크기 설정
+        setSize(fileSizeMB);
       }
     } else {
       setFile(null);
-      setSize(''); // 파일 크기 초기화
+      setSize('');
     }
   };
 
@@ -121,7 +121,7 @@ const ImageModal = ({ isOpen, onClose, onSave }: ModalProps) => {
       showSnackbar(enqueueSnackbar, '이름을 입력해주세요.', 'error', '#FF4853');
       return false;
     }
-    if (!tags) {
+    if (!tag) {
       showSnackbar(enqueueSnackbar, '태그를 입력해주세요.', 'error', '#FF4853');
       return false;
     }
@@ -132,11 +132,11 @@ const ImageModal = ({ isOpen, onClose, onSave }: ModalProps) => {
     if (validateInputs()) {
       const id = uuidv4();
       if (activeTab === 'local' && file) {
-        onSave(id, name, tags, file, size, 'local');
+        onSave(id, name, tag, file, size, 'local');
       } else if (activeTab === 'docker') {
         // Docker Hub 이미지 데이터 전달
         const dockerImageInfo = {}; // Docker Hub에서 선택한 이미지 정보
-        onSave(id, name, tags, null, size, 'dockerHub', dockerImageInfo);
+        onSave(id, name, tag, null, size, 'dockerHub', dockerImageInfo);
       }
       onClose();
     }
@@ -257,8 +257,8 @@ const ImageModal = ({ isOpen, onClose, onSave }: ModalProps) => {
             <input
               type="text"
               placeholder="태그 (쉼표로 구분)"
-              value={tags}
-              onChange={(e) => setTags(e.target.value)}
+              value={tag}
+              onChange={(e) => setTag(e.target.value)}
               className="w-full pl-10 p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>

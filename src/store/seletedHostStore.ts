@@ -2,8 +2,10 @@ import { create } from 'zustand';
 
 interface SelectedHostStore {
   selectedHostId: string | null;
+  selectedHostName: string | null;
   connectedBridgeIds: { [key: string]: { name: string; gateway: string }[] };
   setSelectedHostId: (id: string | null) => void;
+  setSelectedHostName: (name: string | null) => void;
   addConnectedBridgeId: (
     hostId: string,
     bridge: { name: string; gateway: string }
@@ -14,12 +16,19 @@ interface SelectedHostStore {
 // 선택한 호스트를 저장하는 store
 export const selectedHostStore = create<SelectedHostStore>((set) => ({
   selectedHostId: null,
+  selectedHostName: null,
   connectedBridgeIds: {},
 
   // 선택한 호스트 아이디
   setSelectedHostId: (id) =>
     set((state) => ({
       selectedHostId: id,
+    })),
+
+  // 선택한 호스트 이름
+  setSelectedHostName: (name) =>
+    set((state) => ({
+      selectedHostName: name,
     })),
 
   // 브릿지 연결

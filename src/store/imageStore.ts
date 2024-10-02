@@ -1,13 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-
-interface Image {
-  id: string;
-  name: string;
-  tags: string;
-  source: 'local' | 'dockerHub';
-  size: string;
-}
+import { Image } from '@/types/type';
 
 interface ImageStore {
   images: Image[];

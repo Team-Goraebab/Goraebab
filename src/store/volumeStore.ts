@@ -1,13 +1,5 @@
+import { Volume } from '@/types/type';
 import { create } from 'zustand';
-
-interface Volume {
-  id: string;
-  name: string;
-  driver: string;
-  mountPoint: string;
-  capacity: string;
-  status?: string;
-}
 
 interface VolumeStore {
   volumes: Volume[];

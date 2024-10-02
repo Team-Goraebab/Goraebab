@@ -2,7 +2,8 @@
 
 import { useHandModeStore } from '@/store/handModeStore';
 import React, { useEffect } from 'react';
-import { FaMousePointer, FaHandPaper } from 'react-icons/fa';
+import { FaRegHandPaper } from 'react-icons/fa';
+import { HiOutlineCursorClick } from 'react-icons/hi';
 
 const PanButtons = () => {
   const isHandMode = useHandModeStore((state) => state.isHandMode);
@@ -53,24 +54,23 @@ const PanButtons = () => {
   };
 
   return (
-    // <div className="fixed bottom-4 left-[445px] transform translate-x-4 w-[130px] h-[50px] p-3 bg-white rounded-lg shadow-lg flex items-center justify-between">
-    <div className="fixed bottom-4 left-[300px] transform translate-x-4 w-[130px] h-[50px] p-3 bg-white rounded-lg shadow-lg flex items-center justify-between">
+    <div className="fixed top-1/2 right-[40px] transform translate-x-4 w-[40px] p-1 bg-white rounded-lg shadow-lg flex flex-col items-center justify-center">
       <button
-        className={`p-2 rounded-full ${
-          !isHandMode ? 'bg-blue_1 text-blue_2' : 'text-black'
+        className={`p-1.5 rounded-lg mb-1 ${
+          !isHandMode ? 'bg-blue_1 text-blue_6' : 'text-black'
         }`}
         onClick={handleMouseClick}
       >
-        <FaMousePointer size={20} />
+        <HiOutlineCursorClick size={20} />
       </button>
-      <div className="mx-2 border-r h-full"></div>
+      <div className="border-t w-full"></div>
       <button
-        className={`p-2 rounded-full ${
-          isHandMode ? 'bg-blue_1 text-blue_2' : 'text-black'
+        className={`p-1.5 rounded-lg mt-1 ${
+          isHandMode ? 'bg-blue_1 text-blue_6' : 'text-black'
         }`}
         onClick={handleHandClick}
       >
-        <FaHandPaper size={20} />
+        <FaRegHandPaper size={20} />
       </button>
     </div>
   );

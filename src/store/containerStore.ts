@@ -1,24 +1,11 @@
 import { create } from 'zustand';
+import { Volume, Image, Container } from '@/types/type';
 
-interface Container {
-  id: string;
-  name: string;
-  ip: string;
-  size: string;
-  tags: string;
-  active: string;
-  status: string;
-  imageId?: string; // 연결된 이미지 ID
-  volumeId?: string; // 연결된 볼륨 ID
-  networkId?: string; // 연결된 네트워크 ID
-}
-
-// 컨테이너 정보를 저장하는 store
 interface ContainerStore {
   containers: Container[];
   addContainer: (container: Container) => void;
-  assignImageToContainer: (containerId: string, imageId: string) => void;
-  assignVolumeToContainer: (containerId: string, volumeId: string) => void;
+  assignImageToContainer: (containerId: string, image: Image) => void;
+  assignVolumeToContainer: (containerId: string, volume: Volume) => void;
   assignNetworkToContainer: (containerId: string, networkId: string) => void;
 }
 
@@ -28,16 +15,16 @@ export const useContainerStore = create<ContainerStore>((set) => ({
     set((state) => ({
       containers: [...state.containers, container],
     })),
-  assignImageToContainer: (containerId, imageId) =>
+  assignImageToContainer: (containerId, image) =>
     set((state) => ({
       containers: state.containers.map((container) =>
-        container.id === containerId ? { ...container, imageId } : container
+        container.id === containerId ? { ...container, image } : container
       ),
     })),
-  assignVolumeToContainer: (containerId, volumeId) =>
+  assignVolumeToContainer: (containerId, volume) =>
     set((state) => ({
       containers: state.containers.map((container) =>
-        container.id === containerId ? { ...container, volumeId } : container
+        container.id === containerId ? { ...container, volume } : container
       ),
     })),
   assignNetworkToContainer: (containerId, networkId) =>

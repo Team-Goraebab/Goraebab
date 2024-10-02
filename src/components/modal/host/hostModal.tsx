@@ -1,15 +1,12 @@
+'use client';
+
 import React, { useState } from 'react';
 import { useSnackbar } from 'notistack';
 import { v4 as uuidv4 } from 'uuid';
 import { showSnackbar } from '@/utils/toastUtils';
 import { colorsOption } from '@/data/color';
-
-interface ThemeColor {
-  label: string;
-  bgColor: string;
-  borderColor: string;
-  textColor: string;
-}
+import { ThemeColor } from '@/types/type';
+import { Button } from '@/components';
 
 interface HostModalProps {
   onClose: () => void;
@@ -19,8 +16,8 @@ interface HostModalProps {
     ip: string,
     isRemote: boolean,
     themeColor: ThemeColor,
-    networkName: string, // 추가된 네트워크 이름
-    networkIp: string // 추가된 네트워크 IP
+    networkName: string,
+    networkIp: string
   ) => void;
   availableNetworks: { name: string; ip: string }[]; // 네트워크 이름과 IP 목록
 }
@@ -104,7 +101,7 @@ const HostModal = ({ onClose, onSave, availableNetworks }: HostModalProps) => {
     <div className="fixed inset-0 flex items-center justify-center z-50">
       <div className="absolute inset-0 bg-black opacity-20" />
       <div className="relative bg-white p-6 rounded-md shadow-lg">
-        <h2 className="text-lg font-semibold mb-4">Add New Host</h2>
+        <h2 className="text-lg font-semibold mb-4">Create New Host</h2>
         <input
           type="text"
           placeholder="Host Name"
@@ -178,20 +175,9 @@ const HostModal = ({ onClose, onSave, availableNetworks }: HostModalProps) => {
               ))}
           </div>
         </div>
-
-        <div className="flex justify-end space-x-2">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 bg-gray-300 rounded-md"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleSave}
-            className="px-4 py-2 bg-blue-500 text-white rounded-md"
-          >
-            Add Host
-          </button>
+        <div className="flex justify-end space-x-2 pt-8">
+          <Button title={'Cancel'} onClick={onClose} color="grey" />
+          <Button title={'Create'} onClick={handleSave} />
         </div>
       </div>
     </div>

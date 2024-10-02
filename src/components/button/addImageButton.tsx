@@ -5,13 +5,14 @@ import { useSnackbar } from 'notistack';
 import { showSnackbar } from '@/utils/toastUtils';
 import ImageModal from '../modal/image/imageModal';
 import { useImageStore } from '@/store/imageStore';
+import LargeButton from './largeButton';
 
 interface AddImageButtonProps {
   onCreate: (imageData: any) => void;
 }
 
 const AddImageButton = ({ onCreate }: AddImageButtonProps) => {
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
   const addImage = useImageStore((state) => state.addImage);
 
@@ -21,7 +22,7 @@ const AddImageButton = ({ onCreate }: AddImageButtonProps) => {
   const handleSave = (
     id: string,
     name: string,
-    tags: string,
+    tag: string,
     file: File | null,
     size: string,
     source: 'local' | 'dockerHub', // 이미지의 출처를 구분
@@ -30,7 +31,7 @@ const AddImageButton = ({ onCreate }: AddImageButtonProps) => {
     const imageData = {
       id,
       name,
-      tags,
+      tag,
       file,
       size,
       source,
@@ -56,12 +57,7 @@ const AddImageButton = ({ onCreate }: AddImageButtonProps) => {
 
   return (
     <>
-      <button
-        onClick={openModal}
-        className="mt-4 p-2 w-full text-white rounded font-bold bg-blue_2"
-      >
-        Add Image
-      </button>
+      <LargeButton title={'Image'} onClick={openModal} />
       {isModalOpen && (
         <ImageModal
           isOpen={isModalOpen}

@@ -1,11 +1,5 @@
+import { Container } from '@/types/type';
 import { create } from 'zustand';
-
-interface Container {
-  id: string;
-  name?: string;
-  ip?: string;
-  active?: string;
-}
 
 interface HostContainers {
   [hostId: string]: Container[];
