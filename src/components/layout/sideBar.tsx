@@ -1,7 +1,6 @@
 'use client';
 
-import React, { useState, Dispatch, SetStateAction } from 'react';
-import { Button } from '@/components';
+import React, { useState, Dispatch, SetStateAction, useEffect } from 'react';
 import AddBridgeButton from '../button/addBridgeButton';
 import NetworkCard from '../card/networkCard';
 import VolumeCard from '../card/volumeCard';
@@ -15,6 +14,7 @@ import { useImageStore } from '@/store/imageStore';
 import DaemonConnectBar from '../bar/daemonConnectBar';
 import { AiOutlineInfoCircle } from 'react-icons/ai';
 import LargeButton from '../button/largeButton';
+import axios from 'axios';
 
 interface SidebarProps {
   progress: number;
@@ -92,6 +92,23 @@ const Sidebar = ({ progress }: SidebarProps) => {
       ? data.map((item, index) => <CardComponent key={index} data={item} />)
       : renderNoDataMessage(noDataMessage);
   };
+
+  const fetchData = async () => {
+    try {
+      const response = await axios.get('/api/volume/list', {
+        params: {},
+      });
+      console.log('response >>', response.data);
+      return response;
+    } catch (error) {
+      console.error('Error fetching volumes:', error);
+      return [];
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   return (
     <div className="fixed top-0 left-0 w-[300px] flex flex-col h-full bg-white border-r-2 border-grey_2">
