@@ -116,7 +116,6 @@ const ImageCard = ({ data }: CardDataProps) => {
             <div className="absolute top-4 left-16">
               <OptionModal
                 onTopHandler={handleGetInfo}
-                onMiddleHandler={() => {}}
                 onBottomHandler={handleDelete}
                 btnVisible={false}
               />

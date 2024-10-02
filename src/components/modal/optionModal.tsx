@@ -6,9 +6,9 @@ interface OptionModalProps {
   topTitle?: string;
   middleTitle?: string;
   bottomTitle?: string;
-  onTopHandler: () => void;
-  onMiddleHandler: () => void;
-  onBottomHandler: () => void;
+  onTopHandler?: () => void;
+  onMiddleHandler?: () => void;
+  onBottomHandler?: () => void;
   btnVisible?: boolean;
 }
 

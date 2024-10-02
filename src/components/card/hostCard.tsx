@@ -53,9 +53,7 @@ const HostCard = ({
 
   const handleClick = () => {
     setSelectedHostId(selectedHostId === id ? null : id);
-    setSelectedHostName(
-      selectedHostName === (hostNm ?? 'HOST') ? null : hostNm ?? 'HOST'
-    );
+    setSelectedHostName(selectedHostName === hostNm ? null : hostNm ?? 'HOST');
   };
 
   // 선택된 호스트 또는 네트워크에 따라 테두리 색상을 설정
