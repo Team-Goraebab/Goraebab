@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Button } from '@/components';
 import AddBridgeButton from '../button/addBridgeButton';
 import NetworkCard from '../card/networkCard';
 import VolumeCard from '../card/volumeCard';
@@ -40,7 +39,7 @@ const Sidebar = ({ progress }: SidebarProps) => {
 
   const loadNetworkData = async () => {
     const data = await fetchData('/api/network/list');
-    setNetworkData(data?.Networks || []);
+    setNetworkData(data || []);
   };
 
   const loadContainerData = async () => {
@@ -50,7 +49,7 @@ const Sidebar = ({ progress }: SidebarProps) => {
 
   const loadImageData = async () => {
     const data = await fetchData('/api/image/list');
-    setImageData(data?.Images || []);
+    setImageData(data || []);
   };
 
   // 데이터를 관리하는 핸들러 매핑
@@ -124,7 +123,7 @@ const Sidebar = ({ progress }: SidebarProps) => {
     } else if (activeId === 4) {
       loadVolumeData();
     }
-  }, [activeId])
+  }, [activeId]);
 
   return (
     <div className="fixed top-0 left-0 w-[300px] flex flex-col h-full bg-white border-r-2 border-grey_2">
