@@ -29,7 +29,7 @@ interface VolumeCardProps {
  * @returns
  */
 const VolumeCard = ({ data }: VolumeCardProps) => {
-  const { bg1, bg2 } = getStatusColors(data.status);
+  const { bg1, bg2 } = getStatusColors('primary');
   const [showOptions, setShowOptions] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
   const cardRef = useRef<HTMLDivElement>(null);

@@ -48,12 +48,19 @@ const AddVolumeButton = ({ onCreate }: AddVolumeButtonProps) => {
         body: JSON.stringify(newVolumeData),
       });
 
+      const result = await response.json();
+
       if (!response.ok) {
-        throw new Error('Failed to create volume');
+        showSnackbar(
+          enqueueSnackbar,
+          result.error || '볼륨 생성에 실패했습니다.',
+          'error',
+          '#FF0000'
+        );
+        return;
       }
 
-      const createdVolume = await response.json();
-      console.log('Volume created on Docker:', createdVolume);
+      const createdVolume = result;
 
       // 부모 컴포넌트로 생성된 볼륨 데이터 전달
       onCreate(createdVolume);
@@ -70,7 +77,7 @@ const AddVolumeButton = ({ onCreate }: AddVolumeButtonProps) => {
       console.error('Error creating volume:', error);
       showSnackbar(
         enqueueSnackbar,
-        '볼륨 생성에 실패했습니다.',
+        '서버 오류로 인해 볼륨 생성에 실패했습니다.',
         'error',
         '#FF0000'
       );
