@@ -1,13 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
-import axios from 'axios';
-import { DOCKER_URL } from '../../urlPath';
+import { createDockerClient } from '../../\baxiosInstance';
 
 export async function GET(req: NextRequest) {
+  const dockerClient = createDockerClient();
+
   try {
-    const response = await axios.get(`${DOCKER_URL}/images/json`);
+    const response = await dockerClient.get('/images/json');
     return NextResponse.json(response.data, { status: 200 });
   } catch (error) {
     console.error('Error fetching images:', error);
-    return NextResponse.json({ status: 500 });
+
+    if (error instanceof Error && (error as any).response) {
+      return NextResponse.json(
+        { error: (error as any).response.data.message },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json(
+      { error: 'Unknown error occurred' },
+      { status: 500 }
+    );
   }
 }
