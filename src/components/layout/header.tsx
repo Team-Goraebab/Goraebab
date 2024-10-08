@@ -33,14 +33,14 @@ const Header = () => {
   };
 
   return (
-    <header className="fixed w-full p-4 bg-grey_1 shadow z-10">
+    <header className="fixed w-full p-4 bg-grey_1 z-30">
       <div className="container mx-auto flex justify-center items-center relative">
         <nav className="flex space-x-6 relative" ref={navRef}>
           {MENU_ITEMS.map((item) => (
             <div
               key={item.id}
               onClick={() => handleNavigation(item.path, item.id)}
-              className={`flex flex-col items-center cursor-pointer ${
+              className={`flex flex-col items-center cursor-pointer font-pretendard ${
                 activeId === item.id ? 'text-blue_6' : 'text-gray-600'
               }`}
               data-tooltip-id="my-tooltip"
