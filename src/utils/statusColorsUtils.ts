@@ -10,7 +10,7 @@ export const getStatusColors = (status: string) => {
     case 'paused':
       return { bg1: '#f6e3d1', bg2: '#FFA048' }; // 파랑
     case 'exited':
-      return { bg1: '#F4F4F4', bg2: '#7F7F7F' }; // 회색
+      return { bg1: '#E3E6EA', bg2: '#7F7F7F' }; // 회색
     case 'dead':
       return { bg1: '#f6d4d6', bg2: '#FF4853' }; // 붉은색
     default:
