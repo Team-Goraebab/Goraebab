@@ -1,6 +1,9 @@
 import { FaBox, FaImages, FaNetworkWired, FaDatabase } from 'react-icons/fa';
+import { FiSettings, FiGrid } from 'react-icons/fi';
 
-{/* 메뉴의 id 값을 통해 sidebar를 랜더링합니다. */}
+{
+  /* 메뉴의 id 값을 통해 sidebar를 랜더링합니다. */
+}
 
 export const MENU_ITEMS = [
   { id: 1, name: 'Container', path: '/', icon: FaBox },
