@@ -1,6 +1,9 @@
+// tailwind.config.js
+
 import type { Config } from 'tailwindcss';
 
 const config: Config = {
+  darkMode: 'class', // 다크 모드를 class 기반으로 설정
   content: [
     './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
@@ -69,21 +72,10 @@ const config: Config = {
         black_2: '#b3b3b3',
         black_3: '#808080',
         black_4: '#4d4d4d',
-        black_5: '#262626',
-        black_6: '#1F1F1F',
-        black_7: '#0d0d0d',
-      },
-      backgroundImage: {
-        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'gradient-conic':
-          'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
-      },
-      screens: {
-        sm: '640px',
-        md: '768px',
-        lg: '1024px',
-        xl: '1280px',
-        '2xl': '1536px',
+        black_5: '#333333',
+        black_6: '#262626',
+        black_7: '#1F1F1F',
+        black_8: '#0d0d0d',
       },
     },
   },
