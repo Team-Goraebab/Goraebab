@@ -16,7 +16,7 @@ const Header = () => {
   const [barWidth, setBarWidth] = useState(0);
   const [barLeft, setBarLeft] = useState(0);
 
-  const isRightSidePath = pathname === '/setting' || pathname === '/dashboard';
+  const isRightSidePath = pathname === '/settings' || pathname === '/dashboard';
 
   useEffect(() => {
     if (navRef.current && !isRightSidePath) {
@@ -85,16 +85,16 @@ const Header = () => {
           </div>
 
           <div
-            onClick={() => handleNavigation('/setting', 6)}
+            onClick={() => handleNavigation('/settings', 6)}
             className={`cursor-pointer text-grey_6 hover:text-blue_6 transition-colors ${
-              pathname === '/setting' ? 'text-blue_6' : ''
+              pathname === '/settings' ? 'text-blue_6' : ''
             }`}
           >
             <FiSettings
               className="text-2xl"
-              data-tooltip-id="setting-tooltip"
+              data-tooltip-id="settings-tooltip"
             />
-            <Tooltip id="setting-tooltip" content="Setting" />
+            <Tooltip id="settings-tooltip" content="Settings" />
           </div>
         </div>
 
@@ -103,7 +103,7 @@ const Header = () => {
             className="absolute bottom-0 h-1 bg-blue_6 rounded-tl rounded-tr transition-all duration-300"
             style={{
               width: `${barWidth}px`,
-              right: pathname === '/setting' ? '23px' : '64px',
+              right: pathname === '/settings' ? '0px' : '40px',
               top: 37,
             }}
           />
