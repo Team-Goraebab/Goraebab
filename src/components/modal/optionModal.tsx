@@ -33,25 +33,28 @@ const OptionModal = ({
   btnVisible = true,
 }: OptionModalProps) => {
   return (
-    <div className="flex flex-col z-50 items-center border border-grey_3 rounded-xl w-32 absolute bg-white shadow-lg">
+    <div className="flex flex-col z-50 items-center rounded-xl w-32 absolute bg-white shadow-lg">
       <button
-        className="w-full py-1 text-black_6 border-b border-grey_3 text-xs font-semibold hover:bg-grey_0 rounded-t-xl transition-colors"
+        className="w-full py-2 text-black_6 text-xs font-semibold hover:bg-grey_0 rounded-t-xl transition-colors relative"
         onClick={onTopHandler}
       >
         {topTitle || '상세 정보'}
+        {/* Divider */}
+        <div className="absolute bottom-0 left-2 right-2 h-[1px] bg-grey_2" />
       </button>
 
       {btnVisible && (
         <button
-          className="w-full py-1 text-black_6 border-b border-grey_3 text-xs font-semibold hover:bg-grey_0 transition-colors"
+          className="w-full py-2 text-black_6 text-xs font-semibold hover:bg-grey_0 transition-colors relative"
           onClick={onMiddleHandler}
         >
           {middleTitle || '실행'}
+          <div className="absolute bottom-0 left-2 right-2 h-[1px] bg-grey_2" />
         </button>
       )}
 
       <button
-        className="w-full py-1 text-danger text-xs font-semibold hover:bg-red_0 rounded-b-xl transition-colors"
+        className="w-full py-2 text-danger text-xs font-semibold hover:bg-red_0 rounded-b-xl transition-colors"
         onClick={onBottomHandler}
       >
         {bottomTitle || '삭제'}

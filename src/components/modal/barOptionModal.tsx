@@ -21,21 +21,27 @@ const BarOptionModal = ({
   onBottomHandler,
 }: OptionModalProps) => {
   return (
-    <div className="flex flex-col z-50 items-center border border-grey_3 rounded-xl w-32 absolute bg-white shadow-lg">
+    <div className="flex flex-col z-50 items-center rounded-xl w-32 absolute bg-white shadow-lg">
       <button
-        className="w-full py-1 text-black_6 border-b border-grey_3 text-xs font-semibold hover:bg-grey_0 rounded-t-xl transition-colors"
+        className="w-full py-2 text-black_6 text-xs font-semibold hover:bg-grey_0 rounded-t-xl transition-colors relative"
         onClick={onTopHandler}
       >
         {'버전 정보'}
+        <div className="absolute bottom-0 left-2 right-2 h-[1px] bg-grey_3" />
       </button>
-      {/* <button
-        className="w-full py-1 text-black_6 border-b border-grey_3 text-xs font-semibold hover:bg-grey_0 transition-colors"
+
+      {/* 
+      <button
+        className="w-full py-2 text-black_6 text-xs font-semibold hover:bg-grey_0 transition-colors relative"
         onClick={onMiddleHandler}
       >
         {'시스템 정보'}
-      </button> */}
+        <div className="absolute bottom-0 left-2 right-2 h-[1px] bg-grey_3" />
+      </button>
+      */}
+
       <button
-        className="w-full py-1 text-black_6 text-xs font-semibold hover:bg-grey_0 rounded-b-xl transition-colors"
+        className="w-full py-2 text-black_6 text-xs font-semibold hover:bg-grey_0 rounded-b-xl transition-colors"
         onClick={onBottomHandler}
       >
         {'시스템 정보'}
