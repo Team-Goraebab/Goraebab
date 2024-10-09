@@ -24,7 +24,7 @@ const DaemonConnectBar = () => {
   async function fetchData() {
     try {
       setEngineStatus('connecting');
-      const response = await axios.get(`${BASE_URL}${REMOTE_DEAMONS}`);
+      const response = await axios.get(`api/daemon/version`);
       console.log('원격 데몬 연결', response);
       setEngineStatus('connect');
     } catch (error) {
