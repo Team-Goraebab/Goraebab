@@ -1,6 +1,8 @@
 'use client';
 
 import React from 'react';
+import { Dialog } from '@mui/material';
+import Button from '../button/button';
 
 interface ModalProps {
   question?: string;
@@ -14,7 +16,7 @@ interface ModalProps {
 /**
  * 모달 컴포넌트
  * @param question 모달 텍스트 (default: 정말로 삭제하시겠습니까?)
- * @param confirmText 확인 텍트스 (default: 삭제)
+ * @param confirmText 확인 텍스트 (default: 삭제)
  * @param closeText 닫기 텍스트 (default: 취소)
  * @param isOpen 모달 open 유무
  * @param onClose 모달 닫기 핸들러
@@ -32,31 +34,17 @@ const Modal = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50">
-      <div
-        className="absolute inset-0 bg-black opacity-50"
-        //   onClick={onClose}
-      />
-      <div className="bg-white rounded-lg p-4 md:p-5 z-10 shadow-lg w-[90%] max-w-xs sm:max-w-[360px] md:max-w-sm lg:max-w-[400px] xl:max-w-[400px] 2xl:max-w-[400px]">
-        <p className="mb-4 md:mb-6 2xl:mb-8 mt-3 md:mt-4 2xl:mt-6 text-center font-bold text-base md:text-lg 2xl:text-2xl">
+    <Dialog open={isOpen} onClose={onClose}>
+      <div className="bg-white rounded-2xl py-6 px-12 shadow-xl">
+        <p className="mb-6 text-center font-semibold text-lg text-black_6">
           {question || '정말로 삭제하시겠습니까?'}
         </p>
-        <div className="flex justify-center space-x-3 md:space-x-5">
-          <button
-            className="w-24 sm:w-28 md:w-32 2xl:w-40 py-2 2xl:py-3 bg-red_1 text-red_6 rounded-lg font-bold text-sm md:text-base 2xl:text-xl"
-            onClick={onConfirm}
-          >
-            {confirmText || '삭제'}
-          </button>
-          <button
-            className="w-24 sm:w-28 md:w-32 2xl:w-40 py-2 2xl:py-3 bg-grey_1 text-grey_6 rounded-lg font-bold text-sm md:text-base 2xl:text-xl"
-            onClick={onClose}
-          >
-            {closeText || '취소'}
-          </button>
+        <div className="flex justify-center space-x-4">
+          <Button title={'삭제'} color="red" onClick={onConfirm} />
+          <Button title={'취소'} color="grey" onClick={onClose} />
         </div>
       </div>
-    </div>
+    </Dialog>
   );
 };
 
