@@ -4,15 +4,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { showSnackbar } from '@/utils/toastUtils';
 import { useSnackbar } from 'notistack';
-import { BASE_URL, REMOTE_DEAMONS } from '@/app/api/urlPath';
-import {
-  FaPlay,
-  FaPause,
-  FaStop,
-  FaEllipsisV,
-  FaDocker,
-  FaPowerOff,
-} from 'react-icons/fa';
+import { FaPlay, FaPause, FaStop, FaEllipsisV, FaDocker } from 'react-icons/fa';
 
 const DaemonConnectBar = () => {
   const { enqueueSnackbar } = useSnackbar();

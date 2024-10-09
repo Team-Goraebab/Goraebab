@@ -236,7 +236,7 @@ const ContainerCard = ({ data, onDeleteSuccess }: CardDataProps) => {
             •••
           </span>
           {showOptions && (
-            <div className="absolute top-4 left-16">
+            <div className="absolute top-3 left-20">
               <OptionModal
                 onTopHandler={handleGetInfo}
                 onMiddleHandler={handleRun}

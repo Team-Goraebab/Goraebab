@@ -27,7 +27,6 @@ const HostModal = ({ onClose, onSave }: HostModalProps) => {
 
   const [isRemote, setIsRemote] = useState<boolean>(false);
   const [hostNm, setHostNm] = useState<string>('');
-  const [ip, setIp] = useState<string>('');
   const [availableNetworks, setAvailableNetworks] = useState<
     { Id: number; Name: string; IPAM: any }[]
   >([]);
