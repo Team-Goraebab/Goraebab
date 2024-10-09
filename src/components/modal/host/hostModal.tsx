@@ -215,7 +215,7 @@ const HostModal = ({ onClose, onSave }: HostModalProps) => {
                   onClick={() => handleColorSelection(color.label)}
                   className={`w-8 h-8 rounded-full cursor-pointer transition-transform duration-200 transform hover:scale-110 ${
                     selectedColor?.label === color.label
-                      ? 'ring-4 ring-offset-2 ring-grey_4'
+                      ? 'ring-2 ring-offset-2 ring-grey_4'
                       : ''
                   }`}
                   style={{ backgroundColor: color.color }}
