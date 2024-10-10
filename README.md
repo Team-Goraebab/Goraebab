@@ -1,4 +1,4 @@
-# 🌟 Goraebab Frontend
+# 🐳 Goraebab Frontend 🐳
 
 Welcome to the **Goraebab Frontend** project! 
 
@@ -84,7 +84,7 @@ goraebab-frontend/
 ├── tailwind.config.ts        # Tailwind CSS configuration
 ├── tsconfig.json             # TypeScript configuration
 └── README.md                 # Project documentation
-
+```
 
 
 
