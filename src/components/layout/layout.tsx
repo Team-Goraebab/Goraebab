@@ -43,7 +43,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   }
 
   const isSimpleLayout =
-    pathname.includes('settings') || pathname.includes('dashboard');
+    pathname.includes('management') || pathname.includes('dashboard');
 
   return (
     <SnackbarProvider maxSnack={3}>

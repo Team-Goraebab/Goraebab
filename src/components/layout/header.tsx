@@ -16,26 +16,45 @@ const Header = () => {
   const [barWidth, setBarWidth] = useState(0);
   const [barLeft, setBarLeft] = useState(0);
 
-  const isRightSidePath = pathname === '/settings' || pathname === '/dashboard';
-
-  useEffect(() => {
-    if (navRef.current && !isRightSidePath) {
-      const activeIndex = MENU_ITEMS.findIndex((item) => item.id === activeId);
-      const activeItem = navRef.current.children[activeIndex];
-      if (activeItem) {
-        setBarWidth(activeItem.clientWidth);
-        setBarLeft(
-          activeItem.getBoundingClientRect().left -
-            navRef.current.getBoundingClientRect().left
-        );
-      }
-    }
-  }, [activeId, isRightSidePath]);
+  const isRightSidePath =
+    pathname === '/management' || pathname === '/dashboard';
 
   const handleNavigation = (path: string, id: number) => {
     setActiveId(id);
     router.push(path);
   };
+
+  useEffect(() => {
+    if (navRef.current) {
+      if (isRightSidePath) {
+        const activeIndex = MENU_ITEMS.findIndex(
+          (item) => item.id === activeId
+        );
+        if (activeIndex !== -1) {
+          const activeItem = navRef.current.children[activeIndex];
+          if (activeItem) {
+            setBarWidth(activeItem.clientWidth);
+            setBarLeft(
+              activeItem.getBoundingClientRect().left -
+                navRef.current.getBoundingClientRect().left
+            );
+          }
+        }
+      } else {
+        const activeIndex = MENU_ITEMS.findIndex(
+          (item) => item.id === activeId
+        );
+        const activeItem = navRef.current.children[activeIndex];
+        if (activeItem) {
+          setBarWidth(activeItem.clientWidth);
+          setBarLeft(
+            activeItem.getBoundingClientRect().left -
+              navRef.current.getBoundingClientRect().left
+          );
+        }
+      }
+    }
+  }, [activeId, isRightSidePath]);
 
   return (
     <header className="fixed w-full p-4 bg-grey_1 z-30">
@@ -76,7 +95,7 @@ const Header = () => {
         <div className="flex items-center space-x-4">
           <div
             onClick={() => handleNavigation('/dashboard', 5)}
-            className={`cursor-pointer text-grey_6 hover:text-blue_6 transition-colors ${
+            className={`cursor-pointer text-grey_6 hover:text-blue_6 ${
               pathname === '/dashboard' ? 'text-blue_6' : ''
             }`}
           >
@@ -85,16 +104,16 @@ const Header = () => {
           </div>
 
           <div
-            onClick={() => handleNavigation('/settings', 6)}
-            className={`cursor-pointer text-grey_6 hover:text-blue_6 transition-colors ${
-              pathname === '/settings' ? 'text-blue_6' : ''
+            onClick={() => handleNavigation('/management', 6)}
+            className={`cursor-pointer text-grey_6 hover:text-blue_6 ${
+              pathname === '/management' ? 'text-blue_6' : ''
             }`}
           >
             <FiSettings
               className="text-2xl"
-              data-tooltip-id="settings-tooltip"
+              data-tooltip-id="management-tooltip"
             />
-            <Tooltip id="settings-tooltip" content="Settings" />
+            <Tooltip id="management-tooltip" content="management" />
           </div>
         </div>
 
@@ -103,7 +122,7 @@ const Header = () => {
             className="absolute bottom-0 h-1 bg-blue_6 rounded-tl rounded-tr transition-all duration-300"
             style={{
               width: `${barWidth}px`,
-              right: pathname === '/settings' ? '0px' : '40px',
+              right: pathname === '/management' ? '0px' : '40px',
               top: 37,
             }}
           />
