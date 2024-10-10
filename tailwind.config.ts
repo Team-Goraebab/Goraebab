@@ -1,5 +1,3 @@
-// tailwind.config.js
-
 import type { Config } from 'tailwindcss';
 
 const config: Config = {
@@ -25,6 +23,7 @@ const config: Config = {
         grey_3: '#999999',
         grey_4: '#7F7F7F',
         grey_6: '#4E4E4E',
+        grey_7: '#3E3E3E',
         blue_0: '#e6ecf5',
         blue_1: '#ccd9eb',
         blue_2: '#99b3d6',
