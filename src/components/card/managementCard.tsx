@@ -25,7 +25,7 @@ const ManagementCard = ({
           </h3>
           {cardData.map((item, index) => (
             <div key={index} className="flex items-center mt-[5px] space-x-3.5">
-              <span className="text-sm py-1 w-[80px] rounded-md font-bold text-center text-blue_6 bg-blue_0 dark:text-blue_0 dark:bg-blue_3">
+              <span className="text-sm py-1 w-[80px] rounded-md font-bold text-center text-blue_6 bg-blue_1 dark:text-blue_6 dark:bg-blue_1">
                 {item.label}
               </span>
               <span className="font-semibold text-sm truncate max-w-[150px]">
