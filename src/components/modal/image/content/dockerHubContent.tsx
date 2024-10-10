@@ -1,3 +1,5 @@
+'use client';
+
 import { getDockerHubImages } from '@/services/api';
 import React, { useState } from 'react';
 import { FaStar, FaDownload, FaCheckCircle } from 'react-icons/fa';
@@ -42,7 +44,7 @@ const DockerHubContent = () => {
         />
         <button
           onClick={handleSearch}
-          className="px-6 py-2 bg-blue-500 text-white rounded-r-lg hover:bg-blue-600 focus:outline-none text-nowrap font-pretendard font-medium"
+          className="px-6 py-2 bg-blue_6 text-white rounded-r-lg hover:bg-blue-600 focus:outline-none text-nowrap font-pretendard font-medium"
         >
           검색
         </button>
@@ -50,13 +52,13 @@ const DockerHubContent = () => {
       {loading && (
         <p className="mt-4 font-pretendard font-light">이미지 검색 중...</p>
       )}
-      <div className="mt-4 w-full h-64 overflow-y-auto scrollbar-hide">
+      <div className="mt-4 w-full h-48 overflow-y-auto scrollbar-hide">
         {images.length > 0
           ? images.map((image) => (
               <div
                 key={image.id}
                 className={`border ${
-                  image.is_official ? 'border-blue-500' : 'border-gray-300'
+                  image.is_official ? 'border-blue_6' : 'border-gray-300'
                 } rounded p-4 mb-4 flex justify-between items-center`}
               >
                 <div className="flex flex-col w-full">
@@ -66,7 +68,7 @@ const DockerHubContent = () => {
                         {image.repo_name}
                       </p>
                       {image.is_official && (
-                        <span className="bg-blue-500 text-white text-xs px-3 py-1 rounded-full flex items-center font-pretendard font-bold">
+                        <span className="bg-blue_6 text-white text-xs px-3 py-1 rounded-full flex items-center font-pretendard font-bold">
                           <FaCheckCircle className="mr-1" />
                           Official
                         </span>
@@ -77,7 +79,7 @@ const DockerHubContent = () => {
                       <span className="font-pretendard font-light text-sm">
                         {formatNumber(image.star_count)}
                       </span>
-                      <FaDownload className="ml-4 mr-2 text-blue-500" />
+                      <FaDownload className="ml-4 mr-2 text-blue_6" />
                       <span className="font-pretendard font-light text-sm">
                         {formatNumber(image.pull_count)}
                       </span>
@@ -87,13 +89,13 @@ const DockerHubContent = () => {
                     {image.short_description}
                   </p>
                   <div className="flex justify-end items-center mt-4">
-                    <div className="border border-blue-500 rounded-xl flex flex-row items-center gap-4">
+                    <div className="border border-blue_6 rounded-xl flex flex-row items-center gap-4">
                       <p className="text-gray-700 font-pretendard font-medium text-sm pl-4">
                         docker pull {image.repo_name}
                       </p>
                       <button
                         onClick={() => handleCopy(image.repo_name)}
-                        className="flex items-center bg-blue-500 px-4 py-1.5 rounded-r-lg text-white hover:bg-blue-600 focus:outline-none"
+                        className="flex items-center bg-blue_6 px-4 py-1.5 rounded-r-lg text-white hover:bg-blue_4 focus:outline-none"
                       >
                         <span className="font-pretendard font-bold text-sm">
                           Copy

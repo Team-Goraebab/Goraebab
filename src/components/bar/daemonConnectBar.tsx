@@ -54,11 +54,11 @@ const DaemonConnectBar = () => {
   // rounded-md
   return (
     <div
-      className={`mt-4 p-1 flex items-center justify-between text-white ${
+      className={`px-4 p-1 flex items-center justify-between text-white ${
         engineStatus === 'connect'
-          ? 'bg-yellow_6'
-          : engineStatus === 'connecting'
           ? 'bg-green_6'
+          : engineStatus === 'connecting'
+          ? 'bg-yellow_6'
           : 'bg-red_6'
       }`}
     >
