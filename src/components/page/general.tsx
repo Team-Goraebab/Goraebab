@@ -26,6 +26,7 @@ const General = () => {
       setVersionInfo(response.data);
     } catch (error) {
       console.error('원격 데몬 정보를 가져오는 데 실패했습니다:', error);
+      setVersionInfo({});
     }
   }
 
@@ -35,6 +36,7 @@ const General = () => {
       setSystemInfo(response.data);
     } catch (error) {
       console.error('원격 데몬 정보를 가져오는 데 실패했습니다:', error);
+      setSystemInfo({});
     }
   }
 

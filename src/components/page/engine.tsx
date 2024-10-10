@@ -25,6 +25,7 @@ const Engine = () => {
       setEngineInfo(response.data);
     } catch (error) {
       console.error('Failed to fetch engine info:', error);
+      setEngineInfo({});
     }
   };
 
@@ -35,6 +36,7 @@ const Engine = () => {
       setDiskUsage(response.data);
     } catch (error) {
       console.error('Failed to fetch disk usage:', error);
+      setDiskUsage({});
     }
   };
 
@@ -64,19 +66,24 @@ const Engine = () => {
             icon={FiTrash2}
             title="Engine Info"
             cardData={[
-              { label: 'Server Version', value: engineInfo.ServerVersion },
-              { label: 'OS', value: engineInfo.OperatingSystem },
-              { label: 'Containers', value: engineInfo.Containers },
+              {
+                label: 'Server Version',
+                value: engineInfo.ServerVersion || 'N/A',
+              },
+              { label: 'OS', value: engineInfo.OperatingSystem || 'N/A' },
+              { label: 'Containers', value: engineInfo.Containers || 0 },
               {
                 label: 'Running Containers',
-                value: engineInfo.ContainersRunning,
+                value: engineInfo.ContainersRunning || 0,
               },
-              { label: 'Images', value: engineInfo.Images },
+              { label: 'Images', value: engineInfo.Images || 0 },
               {
                 label: 'Memory',
-                value: `${Math.round(
-                  engineInfo.MemTotal / (1024 * 1024 * 1024)
-                )} GB`,
+                value: engineInfo.MemTotal
+                  ? `${Math.round(
+                      engineInfo.MemTotal / (1024 * 1024 * 1024)
+                    )} GB`
+                  : 'N/A',
               },
             ]}
           />
@@ -90,13 +97,15 @@ const Engine = () => {
             cardData={[
               {
                 label: 'Total Disk Space',
-                value: `${Math.round(
-                  diskUsage.LayerSize / (1024 * 1024 * 1024)
-                )} GB`,
+                value: diskUsage.LayerSize
+                  ? `${Math.round(
+                      diskUsage.LayerSize / (1024 * 1024 * 1024)
+                    )} GB`
+                  : 'N/A',
               },
-              { label: 'Containers', value: diskUsage.Containers.length },
-              { label: 'Images', value: diskUsage.Images.length },
-              { label: 'Volumes', value: diskUsage.Volumes.length },
+              { label: 'Containers', value: diskUsage.Containers?.length || 0 },
+              { label: 'Images', value: diskUsage.Images?.length || 0 },
+              { label: 'Volumes', value: diskUsage.Volumes?.length || 0 },
             ]}
           />
         )}
@@ -120,7 +129,7 @@ const Engine = () => {
           {pruneResult && (
             <div className="mt-4 text-sm">
               <strong>Space Reclaimed: </strong>
-              {Math.round(pruneResult.SpaceReclaimed / (1024 * 1024))} MB
+              {Math.round(pruneResult.SpaceReclaimed / (1024 * 1024)) || 0} MB
             </div>
           )}
         </div>
