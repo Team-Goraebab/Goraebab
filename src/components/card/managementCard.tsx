@@ -15,8 +15,6 @@ const ManagementCard = ({
   title,
   cardData,
 }: ManagementCardProps) => {
-  const { bg1, bg2 } = getStatusColors('');
-
   return (
     <div className="bg-white dark:bg-grey_7 p-6 rounded-lg shadow-md">
       <div className="flex items-center space-x-4">
@@ -27,10 +25,7 @@ const ManagementCard = ({
           </h3>
           {cardData.map((item, index) => (
             <div key={index} className="flex items-center mt-[5px] space-x-3.5">
-              <span
-                className="text-sm py-1 w-[80px] rounded-md font-bold text-center"
-                style={{ backgroundColor: bg1, color: bg2 }}
-              >
+              <span className="text-sm py-1 w-[80px] rounded-md font-bold text-center text-blue_6 bg-blue_0 dark:text-blue_0 dark:bg-blue_3">
                 {item.label}
               </span>
               <span className="font-semibold text-sm truncate max-w-[150px]">

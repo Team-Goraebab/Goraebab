@@ -66,14 +66,14 @@ const General = () => {
         },
       ],
     },
-    {
-      icon: FiDatabase,
-      title: 'Containers & Images',
-      data: [
-        { label: 'Running Containers', value: systemInfo?.ContainersRunning },
-        { label: 'Total Images', value: systemInfo?.Images },
-      ],
-    },
+    // {
+    //   icon: FiDatabase,
+    //   title: 'Containers & Images',
+    //   data: [
+    //     { label: 'Running Containers', value: systemInfo?.ContainersRunning },
+    //     { label: 'Total Images', value: systemInfo?.Images },
+    //   ],
+    // },
   ];
 
   return (
