@@ -1,21 +1,29 @@
 /* scrollbar custom */
 
 .scrollbar-custom::-webkit-scrollbar {
-  width: 12px; /* 스크롤바의 너비 */
+  width: 12px !important;
 }
 
 .scrollbar-custom::-webkit-scrollbar-track {
-  background: #f1f1f1; /* 스크롤바 트랙 색상 */
+  background: #f1f1f1 !important;
+  border-radius: 10px;
 }
 
 .scrollbar-custom::-webkit-scrollbar-thumb {
-  background-color: #888; /* 스크롤바 색상 */
-  border-radius: 10px; /* 스크롤바 둥글기 */
-  border: 3px solid #f1f1f1; /* 스크롤바와 트랙 간의 공간 */
+  background-color: #888 !important;
+  border-radius: 10px !important;
+  border: 3px solid #f1f1f1 !important;
 }
 
-.scrollbar-custom::-webkit-scrollbar-thumb:hover {
-  background: #555; /* 스크롤바에 마우스를 올렸을 때 색상 */
+@media (prefers-color-scheme: dark) {
+  .scrollbar-custom::-webkit-scrollbar-track {
+    background: #333 !important;
+  }
+
+  .scrollbar-custom::-webkit-scrollbar-thumb {
+    background-color: #555 !important;
+    border: 3px solid #333 !important;
+  }
 }
 
 /* scrollbar 숨기기 */
@@ -45,4 +53,3 @@
 .grab {
   cursor: grab;
 }
-
