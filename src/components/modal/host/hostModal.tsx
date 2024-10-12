@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
 import { useSnackbar } from 'notistack';
 import { v4 as uuidv4 } from 'uuid';
@@ -27,7 +29,6 @@ const HostModal = ({ onClose, onSave }: HostModalProps) => {
 
   const [isRemote, setIsRemote] = useState<boolean>(false);
   const [hostNm, setHostNm] = useState<string>('');
-  const [ip, setIp] = useState<string>('');
   const [availableNetworks, setAvailableNetworks] = useState<
     { Id: number; Name: string; IPAM: any }[]
   >([]);
@@ -215,7 +216,7 @@ const HostModal = ({ onClose, onSave }: HostModalProps) => {
                   onClick={() => handleColorSelection(color.label)}
                   className={`w-8 h-8 rounded-full cursor-pointer transition-transform duration-200 transform hover:scale-110 ${
                     selectedColor?.label === color.label
-                      ? 'ring-4 ring-offset-2 ring-grey_4'
+                      ? 'ring-2 ring-offset-2 ring-grey_4'
                       : ''
                   }`}
                   style={{ backgroundColor: color.color }}

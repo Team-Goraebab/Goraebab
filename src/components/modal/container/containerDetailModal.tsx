@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import {
   Dialog,
@@ -10,9 +12,15 @@ import {
   Tooltip,
   IconButton,
 } from '@mui/material';
+import { FiPlay, FiRefreshCw, FiXSquare } from 'react-icons/fi';
+
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { formatDateTime } from '@/utils/formatTimestamp';
 import { Button } from '@/components';
+import axios from 'axios';
+import { useSnackbar } from 'notistack';
+import { showSnackbar } from '@/utils/toastUtils';
+import { FaPlay, FaStop } from 'react-icons/fa';
 
 interface ContainerDetailModalProps {
   open: boolean;
@@ -25,6 +33,8 @@ const ContainerDetailModal = ({
   onClose,
   data,
 }: ContainerDetailModalProps) => {
+  const { enqueueSnackbar } = useSnackbar();
+
   const handleCopyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     alert('ID copied to clipboard!');
@@ -35,9 +45,68 @@ const ContainerDetailModal = ({
     return id.length > length ? `${id.substring(0, length)}...` : id;
   };
 
+  const handleAction = async (action: string) => {
+    try {
+      const response = await axios.post(
+        `/api/container/${action}?id=${data?.Id}`
+      );
+      console.log(response);
+      showSnackbar(
+        enqueueSnackbar,
+        `컨테이너가 성공적으로 ${action} 했습니다!`,
+        'success',
+        '#254b7a'
+      );
+    } catch (error) {
+      console.error(`Error while performing ${action}:`, error);
+      alert(`Failed to ${action} container`);
+    }
+  };
+
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
-      <DialogTitle>{`${data?.Name || 'Unknown Container'}`}</DialogTitle>
+      <DialogTitle>
+        {`${data?.Name || 'Unknown Container'}`}
+
+        <div className="flex space-x-2 absolute top-2 right-4">
+          <Tooltip title="Start Container">
+            <IconButton
+              onClick={() => handleAction('start')}
+              color="primary"
+              size="small"
+            >
+              <FaPlay className="text-white w-3 h-3" />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Stop Container">
+            <IconButton
+              onClick={() => handleAction('stop')}
+              color="secondary"
+              size="small"
+            >
+              <FaStop />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Restart Container">
+            <IconButton
+              onClick={() => handleAction('restart')}
+              color="default"
+              size="small"
+            >
+              <FiRefreshCw />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Kill Container">
+            <IconButton
+              onClick={() => handleAction('kill')}
+              color="error"
+              size="small"
+            >
+              <FiXSquare />
+            </IconButton>
+          </Tooltip>
+        </div>
+      </DialogTitle>
       <DialogContent dividers>
         {/* Container General Information */}
         <Box mb={2}>
