@@ -239,7 +239,8 @@ const ContainerCard = ({ data, onDeleteSuccess }: CardDataProps) => {
             <div className="absolute top-4 left-28">
               <OptionModal
                 onTopHandler={handleGetInfo}
-                onMiddleHandler={handleRun}
+                btnVisible={false}
+                // onMiddleHandler={handleRun}
                 onBottomHandler={handleDelete}
               />
             </div>

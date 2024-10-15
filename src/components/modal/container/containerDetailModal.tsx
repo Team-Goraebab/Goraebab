@@ -12,7 +12,7 @@ import {
   Tooltip,
   IconButton,
 } from '@mui/material';
-import { FiPlay, FiRefreshCw, FiXSquare } from 'react-icons/fi';
+import { FiRefreshCw, FiXSquare } from 'react-icons/fi';
 
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { formatDateTime } from '@/utils/formatTimestamp';
@@ -67,43 +67,38 @@ const ContainerDetailModal = ({
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
       <DialogTitle>
         {`${data?.Name || 'Unknown Container'}`}
-
-        <div className="flex space-x-2 absolute top-2 right-4">
-          <Tooltip title="Start Container">
-            <IconButton
-              onClick={() => handleAction('start')}
-              color="primary"
-              size="small"
-            >
-              <FaPlay className="text-white w-3 h-3" />
-            </IconButton>
+        <div className="flex space-x-4 absolute top-4 right-4">
+          <Tooltip title="Start Container" arrow>
+            <div>
+              <FaPlay
+                onClick={() => handleAction('start')}
+                className="text-blue_2 w-4 h-4 cursor-pointer hover:text-blue_3"
+              />
+            </div>
           </Tooltip>
-          <Tooltip title="Stop Container">
-            <IconButton
-              onClick={() => handleAction('stop')}
-              color="secondary"
-              size="small"
-            >
-              <FaStop />
-            </IconButton>
+          <Tooltip title="Stop Container" arrow>
+            <div>
+              <FaStop
+                onClick={() => handleAction('stop')}
+                className="text-blue_2 w-4 h-4 cursor-pointer hover:text-blue_3"
+              />
+            </div>
           </Tooltip>
-          <Tooltip title="Restart Container">
-            <IconButton
-              onClick={() => handleAction('restart')}
-              color="default"
-              size="small"
-            >
-              <FiRefreshCw />
-            </IconButton>
+          <Tooltip title="Restart Container" arrow>
+            <div>
+              <FiRefreshCw
+                onClick={() => handleAction('restart')}
+                className="text-blue_2 w-4 h-4 cursor-pointer hover:text-blue_3"
+              />
+            </div>
           </Tooltip>
-          <Tooltip title="Kill Container">
-            <IconButton
-              onClick={() => handleAction('kill')}
-              color="error"
-              size="small"
-            >
-              <FiXSquare />
-            </IconButton>
+          <Tooltip title="Kill Container" arrow>
+            <div>
+              <FiXSquare
+                onClick={() => handleAction('kill')}
+                className="text-blue_2 w-4 h-4 cursor-pointer hover:text-blue_3"
+              />
+            </div>
           </Tooltip>
         </div>
       </DialogTitle>
