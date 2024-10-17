@@ -29,15 +29,14 @@ const ContainerModal = ({ onClose, onCreate }: ContainerModalProps) => {
   const [networkName, setNetworkName] = useState<string>('bridge');
   const [networkIp, setNetworkIp] = useState<string>('172.17.0.1');
 
-  // 이미지 및 볼륨 데이터를 가져오는 함수
   const loadData = async () => {
     try {
       const volumeData = await fetchData('/api/volume/list');
       const imageData = await fetchData('/api/image/list');
-      setVolumes(volumeData.Volumes || []);
+      setVolumes(volumeData?.Volumes || []);
       setImages(imageData || []);
     } catch (error) {
-      console.error('Error fetching data:', error);
+      throw error;
     }
   };
 
@@ -46,14 +45,15 @@ const ContainerModal = ({ onClose, onCreate }: ContainerModalProps) => {
       try {
         const response = await fetch('/api/network/list');
         const data = await response.json();
-        setAvailableNetworks(data || []);
+        setAvailableNetworks(data?.networks || []); // Ensure we're setting an array
 
-        if (data && data.networks.length > 0) {
-          setNetworkName(data.Name);
-          setNetworkIp(data.IPAM?.Config?.[0]?.Gateway);
+        if (data?.networks && data.networks.length > 0) {
+          setNetworkName(data.networks[0].Name);
+          setNetworkIp(data.networks[0].IPAM?.Config?.[0]?.Gateway || '');
         }
       } catch (error) {
-        console.log('네트워크 목록 에러 :', error);
+        console.error('Error fetching networks:', error);
+        setAvailableNetworks([]); // Set to empty array in case of error
       }
     };
 
@@ -69,12 +69,12 @@ const ContainerModal = ({ onClose, onCreate }: ContainerModalProps) => {
     setSelectedVolumes((prevSelected) =>
       prevSelected.includes(volumeName)
         ? prevSelected.filter((name) => name !== volumeName)
-        : [...prevSelected, volumeName]
+        : [...prevSelected, volumeName],
     );
     setSelectedVolumeInfo((prevSelected: any) =>
       prevSelected.some((vol: any) => vol.id === volume.id)
         ? prevSelected.filter((vol: any) => vol.id !== volume.id)
-        : [...prevSelected, volume]
+        : [...prevSelected, volume],
     );
   };
 
@@ -82,14 +82,14 @@ const ContainerModal = ({ onClose, onCreate }: ContainerModalProps) => {
     const selectedImageName = event.target.value;
     setSelectedImage(selectedImageName);
     const selectedImageData = images.find(
-      (img) => img.Id === selectedImageName
+      (img) => img.Id === selectedImageName,
     );
     setSelectedImageInfo(selectedImageData || null);
   };
 
   const handleNetworkChange = (selectedNetworkName: string) => {
     const selectedNetwork = availableNetworks.find(
-      (net) => net.Name === selectedNetworkName
+      (net) => net.Name === selectedNetworkName,
     );
     setNetworkName(selectedNetworkName);
     setNetworkIp(selectedNetwork?.IPAM?.Config?.[0]?.Gateway || '');
@@ -102,7 +102,7 @@ const ContainerModal = ({ onClose, onCreate }: ContainerModalProps) => {
         enqueueSnackbar,
         '이미지를 선택해주세요.',
         'error',
-        '#FF4853'
+        '#FF4853',
       );
       return;
     }
@@ -110,11 +110,11 @@ const ContainerModal = ({ onClose, onCreate }: ContainerModalProps) => {
     const imageNameWithTag = selectedImageInfo?.RepoTags?.[0];
 
     const newContainer = {
-      image: imageNameWithTag, // 필수: 컨테이너의 이미지를 지정
+      image: imageNameWithTag,
       name,
-      networkName, // 선택: 네트워크 설정 (기본값: bridge)
-      volume: selectedVolumesInfo, // 선택: 볼륨 설정
-      ports, // 선택: 포트 설정
+      networkName,
+      volume: selectedVolumesInfo,
+      ports,
     };
 
     onCreate(newContainer);
@@ -124,12 +124,10 @@ const ContainerModal = ({ onClose, onCreate }: ContainerModalProps) => {
   return (
     <Dialog open={true} onClose={onClose} fullWidth maxWidth="md">
       <div className="relative h-full flex flex-col">
-        {/* 타이틀을 고정 */}
         <div className="sticky top-4 bg-white z-10 pb-4 border-b">
           <h2 className="text-2xl font-bold text-center">Create Container</h2>
         </div>
 
-        {/* 스크롤 가능한 컨텐츠 영역 */}
         <div className="flex-grow overflow-y-auto px-4 pt-6">
           <div className="mb-4">
             <label className="block text-sm font-semibold mb-2">
@@ -144,7 +142,6 @@ const ContainerModal = ({ onClose, onCreate }: ContainerModalProps) => {
             />
           </div>
 
-          {/* 이미지 선택 드롭다운 */}
           <div className="mb-4">
             <label className="block text-sm font-semibold mb-2">
               Select Image
@@ -168,7 +165,6 @@ const ContainerModal = ({ onClose, onCreate }: ContainerModalProps) => {
             </select>
           </div>
 
-          {/* 볼륨 선택 체크박스 */}
           <div className="mb-4">
             <label className="block text-sm font-semibold mb-2">
               Select Volumes
@@ -225,10 +221,9 @@ const ContainerModal = ({ onClose, onCreate }: ContainerModalProps) => {
           </div>
         </div>
 
-        {/* 하단 버튼을 고정 */}
         <div className="sticky bottom-0 bg-white py-4 pr-4 flex justify-end space-x-4 border-t">
-          <Button title="Cancel" onClick={onClose} color="grey" />
-          <Button title="Create" onClick={handleSave} />
+          <Button title="취소" onClick={onClose} color="grey" />
+          <Button title="생성" onClick={handleSave} />
         </div>
       </div>
     </Dialog>

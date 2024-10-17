@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import HostModal from '../modal/host/hostModal';
 import { useHostStore } from '@/store/hostStore';
 import { useSnackbar } from 'notistack';
@@ -10,17 +10,30 @@ import { HiOutlineHome, HiPlus } from 'react-icons/hi';
 
 const AddHostButton = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [availableNetworks] = useState<{ name: string; ip: string }[]>([
-    { name: 'bridge', ip: '172.17.0.1' },
-    { name: 'host', ip: '192.168.1.1' },
-    { name: 'custom-network', ip: '10.0.0.1' },
-  ]);
+  const [availableNetworks, setAvailableNetworks] = useState<
+    { name: string; ip: string }[]
+  >([]);
 
   const { enqueueSnackbar } = useSnackbar();
   const addHost = useHostStore((state) => state.addHost);
   const addConnectedBridgeId = selectedHostStore(
-    (state) => state.addConnectedBridgeId
+    (state) => state.addConnectedBridgeId,
   );
+
+  useEffect(() => {
+    // 네트워크 목록을 API에서 가져오는 함수
+    const fetchNetworks = async () => {
+      try {
+        const response = await fetch('/api/network/list');
+        const data = await response.json();
+        setAvailableNetworks(data.networks || []);
+      } catch (error) {
+        console.error('네트워크 목록을 불러오는데 실패했습니다.', error);
+      }
+    };
+
+    fetchNetworks();
+  }, []);
 
   const handleAddHost = (
     id: string,
@@ -34,7 +47,7 @@ const AddHostButton = () => {
       textColor: string;
     },
     networkName: string,
-    networkIp: string
+    networkIp: string,
   ) => {
     const newHost = {
       id,
@@ -68,22 +81,23 @@ const AddHostButton = () => {
       enqueueSnackbar,
       '호스트가 성공적으로 추가되었습니다!',
       'success',
-      '#254b7a'
+      '#254b7a',
     );
     setIsModalOpen(false);
   };
 
   return (
     <>
-      <div className="fixed top-20 right-[40px] transform translate-x-4 h-[40px] hover:bg-blue_6 bg-blue_5 rounded-lg shadow-lg flex items-center justify-between">
+      <div
+        className="fixed top-20 z-[9] right-[50px] transform translate-x-4 h-[42px] rounded-lg flex items-center justify-between">
         <button
           onClick={() => setIsModalOpen(true)}
-          className="px-4 py-2 text-white text-center rounded-md  transition-all duration-200"
+          className="px-4 py-2.5 text-white bg-blue_6 hover:from-blue-600 hover:to-blue-800 text-center rounded-md transition-all duration-200 ease-in-out transform hover:scale-105 active:scale-95"
         >
           <div className="flex gap-1 items-center">
-            <HiPlus size={20} className="font-bold" />
+            <HiPlus size={20} className="font-pretendard" />
             <span className="text-sm font-medium">New Host</span>
-            <HiOutlineHome size={20} className="font-bold" />
+            <HiOutlineHome size={18} className="ml-2 font-medium" />
           </div>
         </button>
       </div>
