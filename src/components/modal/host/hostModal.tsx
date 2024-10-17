@@ -15,9 +15,19 @@ import {
   Typography,
   Button,
 } from '@mui/material';
-import { showSnackbar } from '@/utils/toastUtils';
 import { colorsOption } from '@/data/color';
 import { ThemeColor } from '@/types/type';
+
+interface Network {
+  Name: string;
+  Id: string;
+  Created: string;
+  Scope: string;
+  Driver: string;
+  IPAM?: {
+    Config?: { Gateway?: string }[];
+  };
+}
 
 interface HostModalProps {
   onClose: () => void;
@@ -30,18 +40,14 @@ interface HostModalProps {
     networkName: string,
     networkIp: string,
   ) => void;
-  availableNetworks: { name: string; ip: string }[];
 }
 
 const HostModal = ({ onClose, onSave }: HostModalProps) => {
   const id = uuidv4();
-  const { enqueueSnackbar } = useSnackbar();
 
   const [isRemote, setIsRemote] = useState<boolean>(false);
   const [hostNm, setHostNm] = useState<string>('');
-  const [availableNetworks, setAvailableNetworks] = useState<
-    { Id: number; Name: string; IPAM: any }[]
-  >([]);
+  const [availableNetworks, setAvailableNetworks] = useState<Network[]>([]);
 
   const [networkName, setNetworkName] = useState<string>('');
   const [networkIp, setNetworkIp] = useState<string>('');
@@ -62,12 +68,13 @@ const HostModal = ({ onClose, onSave }: HostModalProps) => {
     const fetchNetworks = async () => {
       try {
         const response = await fetch('/api/network/list');
-        const data = await response.json();
-        setAvailableNetworks(data?.networks || []);
+        const networks: Network[] = await response.json();
+        setAvailableNetworks(networks);
 
-        if (data?.networks && data.networks.length > 0) {
-          setNetworkName(data.networks[0].Name);
-          setNetworkIp(data.networks[0].IPAM?.Config?.[0]?.Gateway || '');
+        if (networks.length > 0) {
+          const firstNetwork = networks[0];
+          setNetworkName(firstNetwork.Name);
+          setNetworkIp(firstNetwork.IPAM?.Config?.[0]?.Gateway || '');
         }
       } catch (error) {
         console.error('Error fetching networks:', error);
@@ -167,9 +174,9 @@ const HostModal = ({ onClose, onSave }: HostModalProps) => {
               label="Select Network"
               fullWidth
             >
-              {Array.isArray(availableNetworks) && availableNetworks.map((net) => (
-                <MenuItem key={net.Name} value={net.Name}>
-                  {net.Name} (IP: {net.IPAM?.Config?.[0]?.Gateway || 'IP 없음'})
+              {availableNetworks.map((net) => (
+                <MenuItem key={net.Id} value={net.Name}>
+                  {net.Name} (IP: {net.IPAM?.Config && net.IPAM.Config[0].Gateway || 'None'})
                 </MenuItem>
               ))}
             </Select>

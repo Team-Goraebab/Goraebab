@@ -2,12 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { Header, PanButtons, Sidebar } from '@/components';
-import {
-  IMAGE_CARD_DATA,
-  CONTAINER_CARD_DATA,
-  NETWORK_CARD_DATA,
-  VOLUME_CARD_DATA,
-} from '@/data/mock';
 import AddHostButton from '../button/addHostButton';
 import SaveButton from '../button/saveButton';
 import DeleteBlueprintButton from '../button/deleteBlueprintButton';
@@ -30,29 +24,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
 
     return () => clearTimeout(timer);
   }, []);
-  
-  /**
-   * activeId에 따른 카드 데이터 변경
-   */
-  let cardData: any[];
 
-  switch (activeId) {
-    case 1:
-      cardData = CONTAINER_CARD_DATA;
-      break;
-    case 2:
-      cardData = IMAGE_CARD_DATA;
-      break;
-    case 3:
-      cardData = NETWORK_CARD_DATA;
-      break;
-    case 4:
-      cardData = VOLUME_CARD_DATA;
-      break;
-    default:
-      cardData = [];
-      break;
-  }
   const isSimpleLayout =
     pathname.includes('management') || pathname.includes('dashboard');
 
