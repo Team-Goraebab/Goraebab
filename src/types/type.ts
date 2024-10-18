@@ -19,6 +19,7 @@ export interface ContainerInfo {
   Name: string;
   IPv4Address: string;
 }
+
 export interface Network {
   Id: string;
   Name: string;
@@ -42,17 +43,6 @@ export type ThemeColor = {
   borderColor: string;
   textColor: string;
 };
-
-// export type Host = {
-//   id: string;
-//   hostNm: string;
-//   ip: string;
-//   isRemote: boolean;
-//   themeColor: ThemeColor;
-//   networkName: string;
-//   networkIp: string;
-//   className?: string;
-// };
 
 export interface Container {
   id: string;

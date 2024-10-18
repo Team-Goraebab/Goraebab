@@ -23,14 +23,14 @@ interface ImageInfo {
 }
 
 const CardContainer = ({
-  networkName,
-  networkIp,
-  containers,
-  themeColor,
-  onDelete,
-  onSelectNetwork,
-  isSelected,
-}: CardContainerProps) => {
+                         networkName,
+                         networkIp,
+                         containers,
+                         themeColor,
+                         onDelete,
+                         onSelectNetwork,
+                         isSelected,
+                       }: CardContainerProps) => {
   const [droppedImages, setDroppedImages] = useState<ImageInfo[]>([]);
   const [detailData, setDetailData] = useState<any>(null);
   const [containerName, setContainerName] =
@@ -47,14 +47,13 @@ const CardContainer = ({
   const fetchImageDetail = async (name: string) => {
     try {
       const data = await fetch(`/api/image/detail?name=${name}`).then((res) =>
-        res.json()
+        res.json(),
       );
       if (!data) {
         throw new Error('Failed to fetch image detail');
       }
       return data;
     } catch (error) {
-      console.error('Error fetching image detail:', error);
       throw error;
     }
   };
@@ -105,9 +104,9 @@ const CardContainer = ({
   return (
     <>
       <div
-        className={`absolute flex items-center text-xs font-semibold border-2 h-6 px-1 rounded-t-lg content-center`}
+        className={`absolute flex items-center text-xs font-semibold border-2 h-6 px-3 py-4 rounded-t-lg content-center`}
         style={{
-          top: '-1.4rem',
+          top: '-2.14rem',
           left: '1.25rem',
           zIndex: '10',
           borderColor: `${themeColor.borderColor}`,
@@ -122,7 +121,7 @@ const CardContainer = ({
           }}
         >
           <FaPencilAlt
-            className="w-3 h-3 mr-1"
+            className="w-4 h-4 mr-1"
             style={{ color: themeColor.borderColor }}
           />
         </button>
