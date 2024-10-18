@@ -37,8 +37,9 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
 
   const handleHostClick = (id: string, name: string) => {
     setSelectedHostId(selectedHostId === id ? null : id);
-    setSelectedHostName(selectedHostName === name ? null : name); // 호스트 이름 저장
-    clearSelectedNetwork(); // 새로운 호스트 선택 시 네트워크 선택 해제
+    setSelectedHostName(selectedHostName === name ? null : name);
+    // 새로운 호스트 선택 시 네트워크 선택 해제
+    clearSelectedNetwork();
   };
 
   const handleDeleteNetwork = (hostId: string, networkName: string) => {
@@ -46,7 +47,8 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
       selectedNetwork?.hostId === hostId &&
       selectedNetwork?.networkName === networkName
     ) {
-      clearSelectedNetwork(); // 네트워크 삭제 시 선택된 네트워크 해제
+      // 네트워크 삭제 시 선택된 네트워크 해제
+      clearSelectedNetwork();
     }
     deleteNetwork(hostId, networkName);
     deleteConnectedBridgeId(hostId, networkName);
@@ -57,10 +59,13 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
       selectedNetwork?.hostId === hostId &&
       selectedNetwork?.networkName === networkName
     ) {
-      clearSelectedNetwork(); // 이미 선택된 네트워크를 다시 클릭하면 선택 해제
+      // 이미 선택된 네트워크를 다시 클릭하면 선택 해제
+      clearSelectedNetwork();
     } else {
-      setSelectedNetwork(hostId, networkName); // 새로운 네트워크 선택
-      setSelectedHostId(hostId); // 네트워크를 선택하면 해당 호스트도 자동 선택
+      // 새로운 네트워크 선택
+      setSelectedNetwork(hostId, networkName);
+      // 네트워크를 선택하면 해당 호스트도 자동 선택
+      setSelectedHostId(hostId);
     }
   };
 
@@ -107,7 +112,6 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
                     <ConnectBar rotate={180} themeColor={host.themeColor} />
                   </div>
                 )}
-
                 <HostCard
                   id={host.id}
                   hostNm={host.hostNm}
@@ -115,10 +119,9 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
                   isRemote={host.isRemote}
                   onClick={() => handleHostClick(host.id, host.hostNm)}
                   themeColor={host.themeColor}
-                  className={isHostSelected ? 'scale-105 border-blue-500' : ''}
+                  className={isHostSelected ? 'scale-105 border-blue_5' : ''}
                   isSelectedNetwork={isHostSelected}
                 />
-
                 {networks.length > 1 && (
                   <div className="flex items-center">
                     <ConnectBar themeColor={host.themeColor} />

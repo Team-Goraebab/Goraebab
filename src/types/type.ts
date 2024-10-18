@@ -7,6 +7,13 @@ export interface Volume {
   status: string;
 }
 
+export interface VolumeData {
+  Name: string;
+  Driver: string;
+  Mountpoint: string;
+  Scope: string;
+}
+
 export interface Image {
   id: string;
   name: string;
