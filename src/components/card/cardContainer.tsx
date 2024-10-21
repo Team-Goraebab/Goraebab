@@ -6,14 +6,12 @@ import { useDrop } from 'react-dnd';
 import {
   FaTimesCircle,
   FaInfoCircle,
-  FaPencilAlt,
   FaPlusCircle,
   FaChevronUp,
   FaChevronDown,
 } from 'react-icons/fa';
 import { Container, ThemeColor, VolumeData } from '@/types/type';
 import ImageDetailModal from '@/components/modal/image/imageDetailModal';
-import ContainerNameModal from '../modal/container/containerNameModal';
 import SelectVolumeModal from '../modal/volume/selectVolumeModal';
 
 export interface CardContainerProps {
@@ -54,16 +52,14 @@ const CardContainer = ({
   const [droppedImages, setDroppedImages] = useState<ImageInfo[]>([]);
   const [imageToNetwork, setImageToNetwork] = useState<ImageToNetwork[]>([]);
   const [detailData, setDetailData] = useState<any>(null);
-  const [containerName, setContainerName] = useState<string>('container name');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isNameModalOpen, setIsNameModalOpen] = useState(false);
   const [isVolumeModalOpen, setIsVolumeModalOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string>('');
   const [selectedVolumes, setSelectedVolumes] = useState<VolumeData[]>([]);
+  const [expandedImage, setExpandedImage] = useState<string | null>(null);
   const [imageVolumes, setImageVolumes] = useState<{
     [imageId: string]: VolumeData[];
   }>({});
-  const [expandedImage, setExpandedImage] = useState<string | null>(null);
 
   const splitImageNameAndTag = (image: string, id: string): ImageInfo => {
     const [name, tag] = image.split(':');
@@ -105,25 +101,14 @@ const CardContainer = ({
   const handleDeleteImage = (imageId: string) => {
     // 이미지 삭제
     setDroppedImages((prev) => prev.filter((image) => image.id !== imageId));
-
     // imageToNetwork에서 해당 이미지 정보 삭제
     setImageToNetwork((prev) => prev.filter((entry) => entry.id !== imageId));
-
     // imageVolumes에서 해당 이미지의 볼륨 데이터 삭제
     setImageVolumes((prev) => {
       const updatedVolumes = { ...prev };
       delete updatedVolumes[imageId];
       return updatedVolumes;
     });
-  };
-
-  const handleOpenNameModal = () => {
-    setIsNameModalOpen(true);
-  };
-
-  const handleSaveName = (newName: string) => {
-    setContainerName(newName);
-    setIsNameModalOpen(false);
   };
 
   const handleOpenVolumeModal = (imageId: string) => {
@@ -146,30 +131,6 @@ const CardContainer = ({
 
   return (
     <>
-      <div
-        className={`absolute flex items-center text-xs font-semibold border-2 h-6 px-3 py-4 rounded-t-lg content-center`}
-        style={{
-          top: '-2.14rem',
-          left: '1.25rem',
-          zIndex: '10',
-          borderColor: `${themeColor.borderColor}`,
-          color: `${themeColor.textColor}`,
-          backgroundColor: `${themeColor.bgColor}`,
-        }}
-      >
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            handleOpenNameModal();
-          }}
-        >
-          <FaPencilAlt
-            className="w-4 h-4 mr-1"
-            style={{ color: themeColor.borderColor }}
-          />
-        </button>
-        {containerName}
-      </div>
       <div
         ref={ref}
         className={`relative flex flex-col items-center p-6 border bg-white rounded-lg shadow-lg w-[500px] transition-colors duration-200 cursor-pointer ${
@@ -278,7 +239,7 @@ const CardContainer = ({
                       </div>
                       {imageVolumes[image.id]?.length > 0 && (
                         <div className="mt-3 flex justify-between">
-                          <h4 className="text-sm font-semibold text-grey_6 mb-2">
+                          <h4 className="text-sm font-semibold text-grey_6">
                             Volumes ({imageVolumes[image.id].length})
                           </h4>
                           <button
@@ -287,7 +248,7 @@ const CardContainer = ({
                               setExpandedImage(isExpanded ? null : image.id)
                             }
                           >
-                            {isExpanded ? <FaChevronUp /> : <FaChevronDown />}
+                            {isExpanded ? <FaChevronDown /> : <FaChevronUp />}
                           </button>
                         </div>
                       )}
@@ -325,13 +286,6 @@ const CardContainer = ({
           )}
         </div>
       </div>
-      <ContainerNameModal
-        open={isNameModalOpen}
-        containerName={containerName}
-        onClose={() => setIsNameModalOpen(false)}
-        onSave={handleSaveName}
-        onChange={(name) => setContainerName(name)}
-      />
       <ImageDetailModal
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
