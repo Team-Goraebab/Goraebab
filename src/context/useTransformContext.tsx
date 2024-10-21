@@ -16,7 +16,9 @@ interface TransformContextType {
 
 const TransformContext = createContext<TransformContextType | null>(null);
 
-{/* react-zoom-pan-pinch 라이브러리 커스텀 */}
+{
+  /* react-zoom-pan-pinch 라이브러리 커스텀 */
+}
 export const TransformProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
@@ -24,7 +26,7 @@ export const TransformProvider: React.FC<{ children: React.ReactNode }> = ({
   const [isPanning, setPanning] = useState(false);
 
   const handleZoomChange = (scale: number) => {
-    console.log(`Zoom changed to ${scale}`);
+    // console.log(`Zoom changed to ${scale}`);
   };
 
   const handleWheel = (event: React.WheelEvent<HTMLDivElement>) => {

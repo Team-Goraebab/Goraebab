@@ -3,6 +3,7 @@ import axios from 'axios';
 export const createDockerClient = (hostIp?: string) => {
   const isWindows = process.platform === 'win32';
   const effectiveHost = hostIp || 'localhost';
+  console.log('effectiveHost >>>', effectiveHost);
 
   const options = isWindows
     ? { baseURL: `http://${effectiveHost}:2375` }

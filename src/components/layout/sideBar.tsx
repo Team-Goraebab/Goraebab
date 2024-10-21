@@ -15,6 +15,7 @@ import LargeButton from '../button/largeButton';
 import { fetchData } from '@/services/apiUtils';
 import { RxReload } from 'react-icons/rx';
 import ContainerCardGroup from '@/components/card/containerCardGroup';
+import { selectedHostStore } from '@/store/seletedHostStore';
 
 type DataHandlerType = {
   data: any[];
@@ -39,20 +40,14 @@ interface ComponentMapItem {
   helpType: string;
 }
 
-const apiMap: Record<number, { url: string; dataKey?: string }> = {
-  1: { url: '/api/container/list' },
-  2: { url: '/api/image/list' },
-  3: { url: '/api/network/list' },
-  4: { url: '/api/volume/list', dataKey: 'Volumes' },
-};
-
 const loadData = async (
   apiUrl: string,
   setData: React.Dispatch<React.SetStateAction<any[]>>,
-  dataKey?: string,
+  dataKey?: string
 ) => {
   try {
-    const data = await fetchData(apiUrl);
+    const response = await fetch(apiUrl, { cache: 'no-store' });
+    const data = await response.json();
     setData(dataKey ? data?.[dataKey] || [] : data || []);
     console.log(`${dataKey || '데이터'} 정보 :::`, data);
   } catch (error) {
@@ -62,11 +57,20 @@ const loadData = async (
 
 const Sidebar = () => {
   const { activeId } = useMenuStore();
+  const selectedHostIp = selectedHostStore((state) => state.selectedHostIp);
+  console.log('선택한 ip', selectedHostIp);
 
   const [networkData, setNetworkData] = useState<any[]>([]);
   const [volumeData, setVolumeData] = useState<any[]>([]);
   const [containerData, setContainerData] = useState<Container[]>([]);
   const [imageData, setImageData] = useState<any[]>([]);
+
+  const apiMap: Record<number, { url: string; dataKey?: string }> = {
+    1: { url: `/api/container/list?hostIp=${selectedHostIp}` },
+    2: { url: `/api/image/list?hostIp=${selectedHostIp}` },
+    3: { url: `/api/network/list?hostIp=${selectedHostIp}` },
+    4: { url: `/api/volume/list?hostIp=${selectedHostIp}`, dataKey: 'Volumes' },
+  };
 
   const dataHandlers: Record<1 | 2 | 3 | 4, DataHandlerType> = {
     1: { data: containerData, setData: setContainerData },
@@ -83,7 +87,7 @@ const Sidebar = () => {
       await loadData(
         url,
         dataHandlers[activeId as 1 | 2 | 3 | 4].setData,
-        dataKey,
+        dataKey
       );
 
       setTimeout(() => {
@@ -127,8 +131,7 @@ const Sidebar = () => {
   const currentComponent = componentMap[activeId as 1 | 2 | 3 | 4];
 
   const renderNoDataMessage = (message: string) => (
-    <div
-      className="flex flex-col items-center justify-center text-center p-4 border border-dashed border-blue_3 rounded-md bg-blue_0">
+    <div className="flex flex-col items-center justify-center text-center p-4 border border-dashed border-blue_3 rounded-md bg-blue_0">
       <AiOutlineInfoCircle className="text-blue_6 text-2xl mb-2" />
       <p className="font-pretendard font-medium text-blue_6">{message}</p>
     </div>
@@ -148,7 +151,9 @@ const Sidebar = () => {
 
     if (activeId === 1) {
       const groupedContainers = containerData.reduce((acc, container) => {
-        const groupName = container.Labels['com.docker.compose.project'] || container.Names[0].replace(/^\//, '');
+        const groupName =
+          container.Labels['com.docker.compose.project'] ||
+          container.Names[0].replace(/^\//, '');
         if (!acc[groupName]) {
           acc[groupName] = {
             containers: [],
@@ -157,29 +162,31 @@ const Sidebar = () => {
         }
         acc[groupName].containers.push(container);
         return acc;
-      }, {} as Record<string, { containers: Container[], networkMode: string }>);
+      }, {} as Record<string, { containers: Container[]; networkMode: string }>);
 
-
-      return Object.entries(groupedContainers).map(([groupName, { containers }]) => (
-        <ContainerCardGroup
-          key={groupName}
-          projectName={groupName}
-          containers={containers}
-          onDeleteSuccess={handleDeleteSuccess}
-        />
-      ));
-    }
-
-    return data && data.length > 0
-      ? data.map((item, index) => (
-        CardComponent && (
-          <CardComponent
-            key={index}
-            data={item}
+      return Object.entries(groupedContainers).map(
+        ([groupName, { containers }]) => (
+          <ContainerCardGroup
+            key={groupName}
+            projectName={groupName}
+            containers={containers}
             onDeleteSuccess={handleDeleteSuccess}
           />
         )
-      ))
+      );
+    }
+
+    return data && data.length > 0
+      ? data.map(
+          (item, index) =>
+            CardComponent && (
+              <CardComponent
+                key={index}
+                data={item}
+                onDeleteSuccess={handleDeleteSuccess}
+              />
+            )
+        )
       : renderNoDataMessage(noDataMessage);
   };
 
@@ -194,6 +201,11 @@ const Sidebar = () => {
     if (!url) return;
     loadData(url, dataHandlers[activeId as 1 | 2 | 3 | 4].setData, dataKey);
   }, [activeId]);
+
+  useEffect(() => {
+    refreshData();
+    console.log('refresh .......');
+  }, [selectedHostIp]);
 
   return (
     <div className="fixed z-[99] top-0 left-0 w-[300px] flex flex-col h-full bg-white border-r-2 border-grey_2 pt-14">
@@ -221,8 +233,7 @@ const Sidebar = () => {
             onCreate: handleCreate,
           })
         ) : (
-          <LargeButton title={'추가하기'} onClick={() => {
-          }} />
+          <LargeButton title={'추가하기'} onClick={() => {}} />
         )}
       </div>
       <div>
