@@ -21,6 +21,7 @@ import {
 } from '@mui/material';
 import { colorsOption } from '@/data/color';
 import { Network, ThemeColor } from '@/types/type';
+import axios from 'axios';
 
 interface HostModalProps {
   onClose: () => void;
@@ -31,7 +32,7 @@ interface HostModalProps {
     isRemote: boolean,
     themeColor: ThemeColor,
     networkName: string,
-    networkIp: string,
+    networkIp: string
   ) => void;
   availableNetworks: Network[];
 }
@@ -43,10 +44,14 @@ const HostModal = ({ onClose, onSave, availableNetworks }: HostModalProps) => {
   const [hostIp, setHostIp] = useState<string | undefined>(undefined);
   const [networkName, setNetworkName] = useState<string>('');
   const [networkIp, setNetworkIp] = useState<string>('');
+  const [isHostIpConnected, setIsHostIpConnected] = useState<boolean>(false);
+  const [connectionMessage, setConnectionMessage] = useState<string | null>(
+    null
+  );
 
   const defaultColor = colorsOption.find((color) => !color.sub);
   const defaultSubColor = colorsOption.find(
-    (color) => color.label === defaultColor?.label && color.sub,
+    (color) => color.label === defaultColor?.label && color.sub
   );
 
   const [selectedColor, setSelectedColor] = useState<ThemeColor>({
@@ -65,8 +70,13 @@ const HostModal = ({ onClose, onSave, availableNetworks }: HostModalProps) => {
   }, [availableNetworks]);
 
   const isSaveDisabled = useMemo(() => {
-    return !hostNm || !networkName || !networkIp || (isRemote && !hostIp);
-  }, [hostNm, networkName, networkIp, isRemote, hostIp]);
+    if (isRemote) {
+      return (
+        !hostNm || !networkName || !networkIp || !hostIp || !isHostIpConnected
+      );
+    }
+    return !hostNm || !networkName || !networkIp;
+  }, [hostNm, networkName, networkIp, isRemote, hostIp, isHostIpConnected]);
 
   const handleSave = () => {
     if (isSaveDisabled) {
@@ -80,14 +90,14 @@ const HostModal = ({ onClose, onSave, availableNetworks }: HostModalProps) => {
       isRemote,
       selectedColor,
       networkName,
-      networkIp,
+      networkIp
     );
     onClose();
   };
 
   const handleNetworkChange = (selectedNetworkName: string) => {
     const selectedNetwork = availableNetworks.find(
-      (net) => net.Name === selectedNetworkName,
+      (net) => net.Name === selectedNetworkName
     );
     setNetworkName(selectedNetworkName);
     setNetworkIp(selectedNetwork?.IPAM?.Config?.[0]?.Gateway || '');
@@ -95,10 +105,10 @@ const HostModal = ({ onClose, onSave, availableNetworks }: HostModalProps) => {
 
   const handleColorSelection = (colorLabel: string) => {
     const mainColor = colorsOption.find(
-      (color) => color.label === colorLabel && !color.sub,
+      (color) => color.label === colorLabel && !color.sub
     );
     const subColor = colorsOption.find(
-      (color) => color.label === colorLabel && color.sub,
+      (color) => color.label === colorLabel && color.sub
     );
 
     setSelectedColor({
@@ -107,6 +117,32 @@ const HostModal = ({ onClose, onSave, availableNetworks }: HostModalProps) => {
       borderColor: mainColor?.color || '',
       textColor: mainColor?.color || '',
     });
+  };
+
+  async function fetchConnectRemoteDaemon(hostIp: string) {
+    try {
+      const response = await axios.get(`/api/daemon/ping?hostIp=${hostIp}`);
+      console.log('ping api >>', response);
+
+      if (response.status === 200) {
+        setIsHostIpConnected(true);
+        setConnectionMessage('연결 성공');
+      } else {
+        console.error('데몬 연결에 실패했습니다.');
+        setIsHostIpConnected(false);
+        setConnectionMessage('원격 데몬 연결에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('원격 데몬 정보를 가져오는 데 실패했습니다:', error);
+      setIsHostIpConnected(false);
+      setConnectionMessage('원격 데몬 연결에 실패했습니다.');
+    }
+  }
+
+  const handleConnectClick = () => {
+    if (hostIp) {
+      fetchConnectRemoteDaemon(hostIp);
+    }
   };
 
   return (
@@ -134,7 +170,9 @@ const HostModal = ({ onClose, onSave, availableNetworks }: HostModalProps) => {
               onChange={(e) => {
                 setIsRemote(e.target.value === 'remote');
                 if (e.target.value !== 'remote') {
-                  setHostIp(undefined); // Clear hostIp if not remote
+                  setHostIp(undefined);
+                  setIsHostIpConnected(false);
+                  setConnectionMessage(null);
                 }
               }}
             >
@@ -151,14 +189,33 @@ const HostModal = ({ onClose, onSave, availableNetworks }: HostModalProps) => {
             </RadioGroup>
           </FormControl>
           {isRemote && (
-            <TextField
-              label="Host IP"
-              fullWidth
-              value={hostIp || ''}
-              onChange={(e) => setHostIp(e.target.value)}
-              variant="outlined"
-              required
-            />
+            <Box display="flex" alignItems="center" gap={2}>
+              <TextField
+                label="Host IP"
+                fullWidth
+                value={hostIp || ''}
+                onChange={(e) => {
+                  setHostIp(e.target.value);
+                  setIsHostIpConnected(false);
+                  setConnectionMessage(null);
+                }}
+                variant="outlined"
+                required
+                error={
+                  connectionMessage !== null &&
+                  connectionMessage !== '연결 성공'
+                }
+                helperText={connectionMessage}
+              />
+              <Button
+                onClick={handleConnectClick}
+                color="primary"
+                variant="contained"
+                disabled={!hostIp}
+              >
+                연결
+              </Button>
+            </Box>
           )}
           <FormControl fullWidth>
             <InputLabel>Select Network</InputLabel>
