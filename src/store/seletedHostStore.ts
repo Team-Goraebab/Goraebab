@@ -11,18 +11,23 @@ interface BridgeInfo {
 interface SelectedHostStore {
   selectedHostId: string | null;
   selectedHostName: string | null;
+  selectedHostIp: string | null;
   connectedBridgeIds: { [key: string]: BridgeInfo[] };
+  apiUrl: string;
   setSelectedHostId: (id: string | null) => void;
   setSelectedHostName: (name: string | null) => void;
+  setSelectedHostIp: (ip: string | null) => void;
+  setApiUrl: (url: string) => void;
   addConnectedBridgeId: (hostId: string, bridge: BridgeInfo) => void;
   deleteConnectedBridgeId: (hostId: string, networkName: string) => void;
 }
 
-// 선택한 호스트를 저장하는 store
 export const selectedHostStore = create<SelectedHostStore>((set) => ({
   selectedHostId: null,
   selectedHostName: null,
+  selectedHostIp: null,
   connectedBridgeIds: {},
+  apiUrl: '',
 
   // 선택한 호스트 아이디
   setSelectedHostId: (id) =>
@@ -34,6 +39,18 @@ export const selectedHostStore = create<SelectedHostStore>((set) => ({
   setSelectedHostName: (name) =>
     set((state) => ({
       selectedHostName: name,
+    })),
+
+  // 선택한 호스트 아이피
+  setSelectedHostIp: (ip) =>
+    set((state) => ({
+      selectedHostIp: ip,
+    })),
+
+  // API Url 변경
+  setApiUrl: (url) =>
+    set(() => ({
+      apiUrl: url,
     })),
 
   // 브릿지 연결
