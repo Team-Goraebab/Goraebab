@@ -8,10 +8,15 @@ export async function DELETE(req: NextRequest) {
   const noprune = searchParams.get('noprune') === 'true';
 
   if (!id) {
-    return NextResponse.json({ error: 'Image ID is required' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Image ID is required' },
+      { status: 400 }
+    );
   }
 
-  const dockerClient = createDockerClient();
+  const { searchParams } = new URL(req.url);
+  const hostIp = searchParams.get('hostIp') || 'localhost';
+  const dockerClient = createDockerClient(hostIp);
 
   try {
     const response = await dockerClient.delete(`/images/${id}`, {

@@ -3,7 +3,9 @@ import { createDockerClient } from '../../axiosInstance';
 
 export async function DELETE(req: NextRequest) {
   const { id } = await req.json(); // 삭제할 컨테이너 ID
-  const dockerClient = createDockerClient();
+  const { searchParams } = new URL(req.url);
+  const hostIp = searchParams.get('hostIp') || 'localhost';
+  const dockerClient = createDockerClient(hostIp);
 
   try {
     const response = await dockerClient.delete(`/containers/${id}?force=true`);

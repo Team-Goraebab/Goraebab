@@ -12,7 +12,9 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const dockerClient = createDockerClient();
+  const { searchParams } = new URL(req.url);
+  const hostIp = searchParams.get('hostIp') || 'localhost';
+  const dockerClient = createDockerClient(hostIp);
 
   try {
     const response = await dockerClient.post(`/containers/${id}/kill`);

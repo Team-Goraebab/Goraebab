@@ -3,7 +3,9 @@ import { createDockerClient } from '../../axiosInstance';
 
 export async function POST(req: NextRequest) {
   const bodyData = await req.json();
-  const dockerClient = createDockerClient();
+  const { searchParams } = new URL(req.url);
+  const hostIp = searchParams.get('hostIp') || 'localhost';
+  const dockerClient = createDockerClient(hostIp);
   console.log(bodyData);
 
   try {
