@@ -225,11 +225,15 @@ const HostModal = ({ onClose, onSave, availableNetworks }: HostModalProps) => {
               label="Select Network"
               fullWidth
             >
-              {availableNetworks.map((net) => (
-                <MenuItem key={net.Id} value={net.Name}>
-                  {net.Name} (IP: {net.IPAM?.Config?.[0]?.Gateway || 'None'})
-                </MenuItem>
-              ))}
+              {availableNetworks && availableNetworks.length > 0 ? (
+                availableNetworks.map((net) => (
+                  <MenuItem key={net.Id} value={net.Name}>
+                    {net.Name} (IP: {net.IPAM?.Config?.[0]?.Gateway || 'None'})
+                  </MenuItem>
+                ))
+              ) : (
+                <MenuItem disabled>네트워크가 없습니다.</MenuItem>
+              )}
             </Select>
           </FormControl>
           <Box>

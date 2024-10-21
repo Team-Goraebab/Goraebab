@@ -215,24 +215,30 @@ const NetworkCard = ({ data, onDeleteSuccess }: CardDataProps) => {
 
       <div className="p-4">
         <div className="grid gap-4">
-          {networkItems.map((item, index) => (
-            <div key={index} className="flex items-center space-x-3">
-              <div className="p-2 rounded-lg" style={{ backgroundColor: bg1 }}>
-                <item.icon size={16} style={{ color: bg2 }} />
+          {networkItems && networkItems.length > 0 ? (
+            networkItems.map((item, index) => (
+              <div key={index} className="flex items-center space-x-3">
+                <div
+                  className="p-2 rounded-lg"
+                  style={{ backgroundColor: bg1 }}
+                >
+                  <item.icon size={16} style={{ color: bg2 }} />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-xs text-gray-500 font-medium font-pretendard">
+                    {item.label}
+                  </span>
+                  <span className="font-pretendard font-semibold text-sm text-gray-800 truncate max-w-[150px]">
+                    {item.value}
+                  </span>
+                </div>
               </div>
-              <div className="flex flex-col">
-                <span className="text-xs text-gray-500 font-medium font-pretendard">
-                  {item.label}
-                </span>
-                <span className="font-pretendard font-semibold text-sm text-gray-800 truncate max-w-[150px]">
-                  {item.value}
-                </span>
-              </div>
-            </div>
-          ))}
+            ))
+          ) : (
+            <div className="text-center">네트워크 항목이 없습니다.</div>
+          )}
         </div>
       </div>
-
       <Modal
         isOpen={showModal}
         onClose={handleCloseModal}

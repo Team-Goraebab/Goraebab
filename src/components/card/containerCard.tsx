@@ -10,15 +10,21 @@ import { fetchData } from '@/services/apiUtils';
 import ContainerDetailModal from '../modal/container/containerDetailModal';
 import LogModal from '../modal/container/logModal';
 import {
-  FiActivity, FiAlertCircle,
-  FiCalendar, FiCheckCircle,
+  FiActivity,
+  FiAlertCircle,
+  FiCalendar,
+  FiCheckCircle,
   FiChevronDown,
   FiChevronUp,
   FiCpu,
-  FiFileText, FiGlobe,
+  FiFileText,
+  FiGlobe,
   FiHardDrive,
-  FiImage, FiInfo,
-  FiPauseCircle, FiTrash, FiXCircle,
+  FiImage,
+  FiInfo,
+  FiPauseCircle,
+  FiTrash,
+  FiXCircle,
 } from 'react-icons/fi';
 
 interface CardDataProps {
@@ -54,7 +60,11 @@ const ContainerCard = ({ data, onDeleteSuccess }: CardDataProps) => {
 
   const items = [
     { label: 'Name', value: containerName, icon: FiCpu },
-    { label: 'Created', value: formatTimestamp(data.Created) || 'N/A', icon: FiCalendar },
+    {
+      label: 'Created',
+      value: formatTimestamp(data.Created) || 'N/A',
+      icon: FiCalendar,
+    },
     { label: 'Image', value: imageName, icon: FiImage },
     { label: 'Status', value: data.Status || 'N/A', icon: FiActivity },
   ];
@@ -80,9 +90,15 @@ const ContainerCard = ({ data, onDeleteSuccess }: CardDataProps) => {
       default: 'text-gray-700',
     };
 
-    const color = stateColor[state.toLowerCase() as keyof typeof stateColor] || stateColor.default;
+    const color =
+      stateColor[state.toLowerCase() as keyof typeof stateColor] ||
+      stateColor.default;
 
-    return <span className={`font-medium font-pretendard text-sm ${color}`}>{state}</span>;
+    return (
+      <span className={`font-medium font-pretendard text-sm ${color}`}>
+        {state}
+      </span>
+    );
   };
 
   const handleLogsClick = () => {
@@ -109,7 +125,7 @@ const ContainerCard = ({ data, onDeleteSuccess }: CardDataProps) => {
           enqueueSnackbar,
           '컨테이너가 성공적으로 삭제되었습니다!',
           'success',
-          '#254b7a',
+          '#254b7a'
         );
         onDeleteSuccess();
       } else {
@@ -117,7 +133,7 @@ const ContainerCard = ({ data, onDeleteSuccess }: CardDataProps) => {
           enqueueSnackbar,
           `컨테이너 삭제 실패: ${result.error}`,
           'error',
-          '#FF4853',
+          '#FF4853'
         );
       }
     } catch (error) {
@@ -127,7 +143,7 @@ const ContainerCard = ({ data, onDeleteSuccess }: CardDataProps) => {
           enqueueSnackbar,
           `컨테이너 삭제 요청 중 에러: ${error}`,
           'error',
-          '#FF4853',
+          '#FF4853'
         );
       }
     } finally {
@@ -176,7 +192,10 @@ const ContainerCard = ({ data, onDeleteSuccess }: CardDataProps) => {
   }, [cardRef]);
 
   return (
-    <div ref={cardRef} className="bg-white border rounded-lg mb-2 overflow-hidden">
+    <div
+      ref={cardRef}
+      className="bg-white border rounded-lg mb-2 overflow-hidden"
+    >
       <div
         className="flex justify-between items-center px-4 py-2 bg-gray-50 border-b cursor-pointer"
         onClick={() => setIsExpanded(!isExpanded)}
@@ -184,7 +203,9 @@ const ContainerCard = ({ data, onDeleteSuccess }: CardDataProps) => {
         <div className="flex items-center space-x-2 truncate">
           <StatusIcon state={data.State} />
           <StatusText state={data.State} />
-          <span className="font-medium text-sm text-gray-700 truncate">{containerName}</span>
+          <span className="font-medium text-sm text-gray-700 truncate">
+            {containerName}
+          </span>
         </div>
         <div className="flex items-center">
           {isExpanded ? <FiChevronUp size={16} /> : <FiChevronDown size={16} />}
@@ -194,21 +215,29 @@ const ContainerCard = ({ data, onDeleteSuccess }: CardDataProps) => {
       {isExpanded && (
         <div className="p-4">
           <div className="grid gap-4">
-            {items.map((item, index) => (
-              <div key={index} className="flex items-center space-x-3">
-                <div className="p-2 rounded-lg" style={{ backgroundColor: bg1 }}>
-                  <item.icon size={16} style={{ color: bg2 }} />
+            {items && items.length > 0 ? (
+              items.map((item, index) => (
+                <div key={index} className="flex items-center space-x-3">
+                  <div
+                    className="p-2 rounded-lg"
+                    style={{ backgroundColor: bg1 }}
+                  >
+                    <item.icon size={16} style={{ color: bg2 }} />
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-xs text-gray-500 font-medium">
+                      {item.label}
+                    </span>
+                    <span className="font-semibold text-sm text-gray-800 truncate max-w-[150px]">
+                      {item.value}
+                    </span>
+                  </div>
                 </div>
-                <div className="flex flex-col">
-                  <span className="text-xs text-gray-500 font-medium">{item.label}</span>
-                  <span className="font-semibold text-sm text-gray-800 truncate max-w-[150px]">
-                    {item.value}
-                  </span>
-                </div>
-              </div>
-            ))}
+              ))
+            ) : (
+              <div className="text-center">항목이 없습니다.</div>
+            )}
           </div>
-
           <div className="mt-4 flex justify-end space-x-3">
             <button
               onClick={handleLogsClick}

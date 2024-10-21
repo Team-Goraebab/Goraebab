@@ -82,96 +82,100 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
           transform: 'translate(-50%, -50%)',
         }}
       >
-        {hostData.map((host) => {
-          const containers = allContainers[host.id] || [];
-          const networks = connectedBridgeIds[host.id] || [];
-          const isHostSelected =
-            selectedNetwork?.hostId === host.id || selectedHostId === host.id;
-          console.log(networks);
-          return (
-            <div key={host.id} className="flex flex-col items-center">
-              <div className="flex flex-row items-center">
-                {networks.length > 0 && (
-                  <div className="flex items-center">
-                    <CardContainer
-                      networkName={networks[0].name}
-                      networkIp={networks[0].gateway}
-                      containers={containers}
+        {hostData && hostData.length > 0 ? (
+          hostData.map((host) => {
+            const containers = allContainers[host.id] || [];
+            const networks = connectedBridgeIds[host.id] || [];
+            const isHostSelected =
+              selectedNetwork?.hostId === host.id || selectedHostId === host.id;
+            console.log(networks);
+            return (
+              <div key={host.id} className="flex flex-col items-center">
+                <div className="flex flex-row items-center">
+                  {networks.length > 0 && (
+                    <div className="flex items-center">
+                      <CardContainer
+                        networkName={networks[0].name}
+                        networkIp={networks[0].gateway}
+                        containers={containers}
+                        themeColor={host.themeColor}
+                        onDelete={() =>
+                          handleDeleteNetwork(host.id, networks[0].name)
+                        }
+                        onSelectNetwork={() =>
+                          handleSelectNetwork(host.id, networks[0].name)
+                        }
+                        isSelected={
+                          selectedNetwork?.hostId === host.id &&
+                          selectedNetwork?.networkName === networks[0].name
+                        }
+                      />
+                      <ConnectBar rotate={180} themeColor={host.themeColor} />
+                    </div>
+                  )}
+                  <HostCard
+                    id={host.id}
+                    hostNm={host.hostNm}
+                    hostIp={host.hostIp}
+                    isRemote={host.isRemote}
+                    onClick={() => handleHostClick(host.id, host.hostNm)}
+                    themeColor={host.themeColor}
+                    className={isHostSelected ? 'scale-105 border-blue_5' : ''}
+                    isSelectedNetwork={isHostSelected}
+                  />
+                  {networks.length > 1 && (
+                    <div className="flex items-center">
+                      <ConnectBar themeColor={host.themeColor} />
+                      <CardContainer
+                        networkName={networks[1].name}
+                        networkIp={networks[1].gateway}
+                        containers={containers}
+                        themeColor={host.themeColor}
+                        onDelete={() =>
+                          handleDeleteNetwork(host.id, networks[1].name)
+                        }
+                        onSelectNetwork={() =>
+                          handleSelectNetwork(host.id, networks[1].name)
+                        }
+                        isSelected={
+                          selectedNetwork?.hostId === host.id &&
+                          selectedNetwork?.networkName === networks[1].name
+                        }
+                      />
+                    </div>
+                  )}
+                </div>
+                {networks.length > 2 && (
+                  <div className="flex flex-col items-center">
+                    <ConnectBar
+                      rotate={90}
                       themeColor={host.themeColor}
-                      onDelete={() =>
-                        handleDeleteNetwork(host.id, networks[0].name)
-                      }
-                      onSelectNetwork={() =>
-                        handleSelectNetwork(host.id, networks[0].name)
-                      }
-                      isSelected={
-                        selectedNetwork?.hostId === host.id &&
-                        selectedNetwork?.networkName === networks[0].name
-                      }
+                      length={'long'}
                     />
-                    <ConnectBar rotate={180} themeColor={host.themeColor} />
-                  </div>
-                )}
-                <HostCard
-                  id={host.id}
-                  hostNm={host.hostNm}
-                  hostIp={host.hostIp}
-                  isRemote={host.isRemote}
-                  onClick={() => handleHostClick(host.id, host.hostNm)}
-                  themeColor={host.themeColor}
-                  className={isHostSelected ? 'scale-105 border-blue_5' : ''}
-                  isSelectedNetwork={isHostSelected}
-                />
-                {networks.length > 1 && (
-                  <div className="flex items-center">
-                    <ConnectBar themeColor={host.themeColor} />
                     <CardContainer
-                      networkName={networks[1].name}
-                      networkIp={networks[1].gateway}
+                      networkName={networks[2].name}
+                      networkIp={networks[2].gateway}
                       containers={containers}
                       themeColor={host.themeColor}
                       onDelete={() =>
-                        handleDeleteNetwork(host.id, networks[1].name)
+                        handleDeleteNetwork(host.id, networks[2].name)
                       }
                       onSelectNetwork={() =>
-                        handleSelectNetwork(host.id, networks[1].name)
+                        handleSelectNetwork(host.id, networks[2].name)
                       }
                       isSelected={
                         selectedNetwork?.hostId === host.id &&
-                        selectedNetwork?.networkName === networks[1].name
+                        selectedNetwork?.networkName === networks[2].name
                       }
                     />
                   </div>
                 )}
               </div>
-              {networks.length > 2 && (
-                <div className="flex flex-col items-center">
-                  <ConnectBar
-                    rotate={90}
-                    themeColor={host.themeColor}
-                    length={'long'}
-                  />
-                  <CardContainer
-                    networkName={networks[2].name}
-                    networkIp={networks[2].gateway}
-                    containers={containers}
-                    themeColor={host.themeColor}
-                    onDelete={() =>
-                      handleDeleteNetwork(host.id, networks[2].name)
-                    }
-                    onSelectNetwork={() =>
-                      handleSelectNetwork(host.id, networks[2].name)
-                    }
-                    isSelected={
-                      selectedNetwork?.hostId === host.id &&
-                      selectedNetwork?.networkName === networks[2].name
-                    }
-                  />
-                </div>
-              )}
-            </div>
-          );
-        })}
+            );
+          })
+        ) : (
+          <div className="text-center">호스트 데이터가 없습니다.</div>
+        )}
       </div>
     </Draggable>
   );

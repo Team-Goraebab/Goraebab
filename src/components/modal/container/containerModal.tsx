@@ -211,11 +211,16 @@ const ContainerModal = ({ onClose, onCreate }: ContainerModalProps) => {
               onChange={(e) => handleNetworkChange(e.target.value)}
               className="w-full p-3 border border-grey_3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              {availableNetworks.map((net) => (
-                <option key={net.Id} value={net.Name}>
-                  {net.Name} (IP: {net.IPAM?.Config?.[0]?.Gateway || 'IP 없음'})
-                </option>
-              ))}
+              {availableNetworks && availableNetworks.length > 0 ? (
+                availableNetworks.map((net) => (
+                  <option key={net.Id} value={net.Name}>
+                    {net.Name} (IP:{' '}
+                    {net.IPAM?.Config?.[0]?.Gateway || 'IP 없음'})
+                  </option>
+                ))
+              ) : (
+                <option disabled>네트워크가 없습니다.</option>
+              )}
             </select>
           </div>
         </div>
