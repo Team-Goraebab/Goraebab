@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import HostModal from '../modal/host/hostModal';
+import { v4 as uuidv4 } from 'uuid';
 import { useHostStore } from '@/store/hostStore';
 import { useSnackbar } from 'notistack';
 import { showSnackbar } from '@/utils/toastUtils';
@@ -10,6 +11,8 @@ import { HiOutlineHome, HiPlus } from 'react-icons/hi';
 import { Host, Network, ThemeColor } from '@/types/type';
 
 const AddHostButton = () => {
+  const randomId = uuidv4();
+
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [availableNetworks, setAvailableNetworks] = useState<Network[]>([]);
 
@@ -77,6 +80,7 @@ const AddHostButton = () => {
       driver: selectedNetwork.Driver || '',
       subnet: selectedNetwork.IPAM?.Config?.[0]?.Subnet || '',
       scope: selectedNetwork.Scope || '',
+      id: randomId,
     });
 
     showSnackbar(

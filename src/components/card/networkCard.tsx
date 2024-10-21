@@ -7,6 +7,7 @@ import { showSnackbar } from '@/utils/toastUtils';
 import { selectedHostStore } from '@/store/seletedHostStore';
 import { getStatusColors } from '@/utils/statusColorsUtils';
 import { formatDateTime } from '@/utils/formatTimestamp';
+import { v4 as uuidv4 } from 'uuid';
 import { fetchData } from '@/services/apiUtils';
 import NetworkDetailModal from '../modal/network/networkDetailModal';
 import {
@@ -29,6 +30,8 @@ interface CardDataProps {
 
 const NetworkCard = ({ data, onDeleteSuccess }: CardDataProps) => {
   const { enqueueSnackbar } = useSnackbar();
+  const id = uuidv4();
+
   const { selectedHostId, addConnectedBridgeId } = selectedHostStore();
   const { bg1, bg2 } = getStatusColors('primary');
   const [showModal, setShowModal] = useState<boolean>(false);
@@ -132,6 +135,7 @@ const NetworkCard = ({ data, onDeleteSuccess }: CardDataProps) => {
         driver: networkInfo.driver,
         subnet: networkInfo.subnet,
         scope: networkInfo.scope,
+        id: id,
         // connectedContainers: networkInfo.connectedContainers,
       });
 

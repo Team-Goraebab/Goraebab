@@ -47,28 +47,38 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
     clearSelectedNetwork();
   };
 
-  const handleDeleteNetwork = (hostId: string, networkName: string) => {
+  const handleDeleteNetwork = (
+    hostId: string,
+    networkName: string,
+    networkId: string
+  ) => {
     if (
       selectedNetwork?.hostId === hostId &&
-      selectedNetwork?.networkName === networkName
+      selectedNetwork?.networkName === networkName &&
+      selectedNetwork?.networkId === networkId
     ) {
       // 네트워크 삭제 시 선택된 네트워크 해제
       clearSelectedNetwork();
     }
-    deleteNetwork(hostId, networkName);
-    deleteConnectedBridgeId(hostId, networkName);
+    deleteNetwork(hostId, networkName, networkId);
+    deleteConnectedBridgeId(hostId, networkId);
   };
 
-  const handleSelectNetwork = (hostId: string, networkName: string) => {
+  const handleSelectNetwork = (
+    hostId: string,
+    networkName: string,
+    networkId: string
+  ) => {
     if (
       selectedNetwork?.hostId === hostId &&
-      selectedNetwork?.networkName === networkName
+      selectedNetwork?.networkName === networkName &&
+      selectedNetwork?.networkId === networkId
     ) {
       // 이미 선택된 네트워크를 다시 클릭하면 선택 해제
       clearSelectedNetwork();
     } else {
       // 새로운 네트워크 선택
-      setSelectedNetwork(hostId, networkName);
+      setSelectedNetwork(hostId, networkName, networkId);
       // 네트워크를 선택하면 해당 호스트도 자동 선택
       setSelectedHostId(hostId);
     }
@@ -140,14 +150,22 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
                           containers={containers}
                           themeColor={host.themeColor}
                           onDelete={() =>
-                            handleDeleteNetwork(host.id, networks[0].name)
+                            handleDeleteNetwork(
+                              host.id,
+                              networks[0].name,
+                              networks[0].id
+                            )
                           }
                           onSelectNetwork={() =>
-                            handleSelectNetwork(host.id, networks[0].name)
+                            handleSelectNetwork(
+                              host.id,
+                              networks[0].name,
+                              networks[0].id
+                            )
                           }
                           isSelected={
                             selectedNetwork?.hostId === host.id &&
-                            selectedNetwork?.networkName === networks[0].name
+                            selectedNetwork?.networkId === networks[0].id
                           }
                         />
                         <ConnectBar rotate={180} themeColor={host.themeColor} />
@@ -198,14 +216,22 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
                           containers={containers}
                           themeColor={host.themeColor}
                           onDelete={() =>
-                            handleDeleteNetwork(host.id, networks[1].name)
+                            handleDeleteNetwork(
+                              host.id,
+                              networks[1].name,
+                              networks[1].id
+                            )
                           }
                           onSelectNetwork={() =>
-                            handleSelectNetwork(host.id, networks[1].name)
+                            handleSelectNetwork(
+                              host.id,
+                              networks[1].name,
+                              networks[1].id
+                            )
                           }
                           isSelected={
                             selectedNetwork?.hostId === host.id &&
-                            selectedNetwork?.networkName === networks[1].name
+                            selectedNetwork?.networkId === networks[1].id
                           }
                         />
                       </div>
@@ -248,14 +274,22 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
                         containers={containers}
                         themeColor={host.themeColor}
                         onDelete={() =>
-                          handleDeleteNetwork(host.id, networks[2].name)
+                          handleDeleteNetwork(
+                            host.id,
+                            networks[2].name,
+                            networks[2].id
+                          )
                         }
                         onSelectNetwork={() =>
-                          handleSelectNetwork(host.id, networks[2].name)
+                          handleSelectNetwork(
+                            host.id,
+                            networks[2].name,
+                            networks[2].id
+                          )
                         }
                         isSelected={
                           selectedNetwork?.hostId === host.id &&
-                          selectedNetwork?.networkName === networks[2].name
+                          selectedNetwork?.networkId === networks[2].id
                         }
                       />
                     </div>

@@ -14,7 +14,11 @@ interface HostStore {
   networks: Network[];
   addHost: (host: Host) => void;
   deleteHost: (hostId: string) => void;
-  deleteNetwork: (hostId: string, networkId: string) => void;
+  deleteNetwork: (
+    hostId: string,
+    networkName: string,
+    networkId: string
+  ) => void;
   deleteAllHosts: () => void;
 }
 
@@ -37,18 +41,19 @@ export const useHostStore = create<HostStore>((set, get) => ({
     })),
 
   // 네트워크 삭제
-  deleteNetwork: (hostId, networkId) =>
+  deleteNetwork: (hostId, networkName, networkId) =>
     set((state) => {
       const updatedNetworks = state.networks.filter(
-        (network) => network.id !== networkId || network.hostId !== hostId
+        (network) => !(network.id === networkId && network.hostId === hostId)
       );
 
       const updatedHosts = state.hosts.map((host) => {
         if (host.id === hostId) {
           return {
             ...host,
-            networkName: host.networkName === networkId ? '' : host.networkName,
-            networkIp: host.networkIp === networkId ? '' : host.networkIp,
+            networkName:
+              host.networkName === networkName ? '' : host.networkName,
+            networkIp: host.networkIp === networkName ? '' : host.networkIp,
           };
         }
         return host;

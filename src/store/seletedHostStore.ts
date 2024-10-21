@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 
 interface BridgeInfo {
+  id: string;
   name: string;
   gateway: string;
   driver: string;
@@ -63,10 +64,10 @@ export const selectedHostStore = create<SelectedHostStore>((set) => ({
     })),
 
   // 연결된 브릿지 삭제
-  deleteConnectedBridgeId: (hostId, networkName) =>
+  deleteConnectedBridgeId: (hostId, networkId) =>
     set((state) => {
       const updatedBridges = (state.connectedBridgeIds[hostId] || []).filter(
-        (bridge) => bridge.name !== networkName
+        (bridge) => bridge.id !== networkId
       );
       return {
         connectedBridgeIds: {
