@@ -28,6 +28,8 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
     setSelectedHostId,
     selectedHostName,
     setSelectedHostName,
+    selectedHostIp,
+    setSelectedHostIp,
     connectedBridgeIds,
     deleteConnectedBridgeId,
   } = selectedHostStore();
@@ -40,9 +42,10 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
   const [isNameModalOpen, setIsNameModalOpen] = useState(false);
   const [containerName, setContainerName] = useState<string>('');
 
-  const handleHostClick = (id: string, name: string) => {
+  const handleHostClick = (id: string, name: string, ip: string) => {
     setSelectedHostId(selectedHostId === id ? null : id);
     setSelectedHostName(selectedHostName === name ? null : name);
+    setSelectedHostIp(selectedHostIp === ip ? null : ip);
     // 새로운 호스트 선택 시 네트워크 선택 해제
     clearSelectedNetwork();
   };
@@ -176,7 +179,9 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
                       hostNm={host.hostNm}
                       hostIp={host.hostIp}
                       isRemote={host.isRemote}
-                      onClick={() => handleHostClick(host.id, host.hostNm)}
+                      onClick={() =>
+                        handleHostClick(host.id, host.hostNm, host.hostIp)
+                      }
                       themeColor={host.themeColor}
                       className={
                         isHostSelected ? 'scale-105 border-blue_5' : ''
