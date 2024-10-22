@@ -19,13 +19,13 @@ interface ContainerNameModalProps {
   onChange: (name: string) => void;
 }
 
-const ContainerNameModal: React.FC<ContainerNameModalProps> = ({
+const ContainerNameModal = ({
   open,
   containerName,
   onClose,
   onSave,
   onChange,
-}) => {
+}: ContainerNameModalProps) => {
   return (
     <Dialog open={open} onClose={onClose}>
       <DialogTitle>컨테이너 이름</DialogTitle>
