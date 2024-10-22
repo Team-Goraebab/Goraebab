@@ -6,6 +6,8 @@ export async function DELETE(req: NextRequest) {
   const id = searchParams.get('id');
   const force = searchParams.get('force') === 'true';
   const noprune = searchParams.get('noprune') === 'true';
+  const hostIp = searchParams.get('hostIp') || 'localhost';
+  const dockerClient = createDockerClient(hostIp);
 
   if (!id) {
     return NextResponse.json(
@@ -13,10 +15,6 @@ export async function DELETE(req: NextRequest) {
       { status: 400 }
     );
   }
-
-  const { searchParams } = new URL(req.url);
-  const hostIp = searchParams.get('hostIp') || 'localhost';
-  const dockerClient = createDockerClient(hostIp);
 
   try {
     const response = await dockerClient.delete(`/images/${id}`, {

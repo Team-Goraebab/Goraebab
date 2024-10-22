@@ -4,14 +4,12 @@ import { createDockerClient } from '../../axiosInstance';
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const name = searchParams.get('name');
+  const hostIp = searchParams.get('hostIp') || 'localhost';
+  const dockerClient = createDockerClient(hostIp);
 
   if (!name) {
     return NextResponse.json({ error: 'Missing image name' }, { status: 400 });
   }
-
-  const { searchParams } = new URL(req.url);
-  const hostIp = searchParams.get('hostIp') || 'localhost';
-  const dockerClient = createDockerClient(hostIp);
 
   try {
     const response = await dockerClient.get(`/images/${name}/json`);
