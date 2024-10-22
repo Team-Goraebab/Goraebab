@@ -4,14 +4,12 @@ import { createDockerClient } from '../../axiosInstance';
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const id = searchParams.get('id');
+  const hostIp = searchParams.get('hostIp') || 'localhost';
+  const dockerClient = createDockerClient(hostIp);
 
   if (!id) {
     return NextResponse.json({ error: 'Missing network id' }, { status: 400 });
   }
-
-  const { searchParams } = new URL(req.url);
-  const hostIp = searchParams.get('hostIp') || 'localhost';
-  const dockerClient = createDockerClient(hostIp);
 
   try {
     const response = await dockerClient.get(
