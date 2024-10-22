@@ -50,6 +50,8 @@ interface ContainerConfig {
 }
 
 const ImageCard = ({ data, onDeleteSuccess }: CardDataProps) => {
+  console.log('드래그 가능한 이미지 카드', data);
+  console.log('드래그 가능한 이미지 카드 >>>', data.RepoTags[0]);
   const ref = useRef<HTMLDivElement>(null); // useRef 생성
 
   const [{ isDragging }, drag] = useDrag(() => ({
