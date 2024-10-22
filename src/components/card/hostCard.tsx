@@ -37,9 +37,7 @@ const HostCard = ({
   const {
     selectedHostId,
     setSelectedHostId,
-    selectedHostName,
     setSelectedHostName,
-    selectedHostIp,
     setSelectedHostIp,
   } = selectedHostStore();
   const deleteHost = useHostStore((state) => state.deleteHost);
@@ -49,9 +47,17 @@ const HostCard = ({
   };
 
   const handleClick = () => {
-    setSelectedHostId(selectedHostId === id ? null : id);
-    setSelectedHostName(selectedHostName === hostNm ? null : hostNm ?? 'HOST');
-    setSelectedHostIp(selectedHostIp === hostIp ? null : hostIp ?? 'localhost');
+    if (selectedHostId === id) {
+      setSelectedHostId(null);
+      setSelectedHostName(null);
+      setSelectedHostIp('localhost');
+      sessionStorage.setItem('selectedHostIp', 'localhost');
+    } else {
+      setSelectedHostId(id);
+      setSelectedHostName(hostNm ?? 'HOST');
+      setSelectedHostIp(hostIp ?? 'localhost');
+      sessionStorage.setItem('selectedHostIp', hostIp ?? 'localhost');
+    }
   };
 
   // 선택된 호스트 또는 네트워크에 따라 테두리 색상을 설정

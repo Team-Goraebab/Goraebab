@@ -33,6 +33,9 @@ const NetworkCard = ({ data, onDeleteSuccess }: CardDataProps) => {
   const id = uuidv4();
 
   const { selectedHostId, addConnectedBridgeId } = selectedHostStore();
+  const { connectedBridgeIds } = selectedHostStore((state) => ({
+    connectedBridgeIds: state.connectedBridgeIds,
+  }));
   const { bg1, bg2 } = getStatusColors('primary');
   const [showModal, setShowModal] = useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -113,6 +116,18 @@ const NetworkCard = ({ data, onDeleteSuccess }: CardDataProps) => {
 
   const handleConnect = () => {
     if (selectedHostId) {
+      // 현재 호스트에 연결된 네트워크가 3개 이상인지 확인
+      const currentConnections = connectedBridgeIds[selectedHostId] || [];
+      if (currentConnections.length >= 3) {
+        showSnackbar(
+          enqueueSnackbar,
+          '네트워크는 최대 3개까지만 연결할 수 있습니다.',
+          'error',
+          '#FF4853'
+        );
+        return; // 연결을 중단
+      }
+
       const networkInfo = {
         id: data.Id,
         name: data.Name,
@@ -120,13 +135,6 @@ const NetworkCard = ({ data, onDeleteSuccess }: CardDataProps) => {
         subnet: subnet,
         driver: data.Driver,
         scope: data.Scope,
-        // connectedContainers: Object.entries(data.Containers).map(
-        //   ([id, container]) => ({
-        //     id,
-        //     name: container.Name,
-        //     ip: container.IPv4Address,
-        //   })
-        // ),
       };
 
       addConnectedBridgeId(selectedHostId, {
@@ -136,7 +144,6 @@ const NetworkCard = ({ data, onDeleteSuccess }: CardDataProps) => {
         subnet: networkInfo.subnet,
         scope: networkInfo.scope,
         id: id,
-        // connectedContainers: networkInfo.connectedContainers,
       });
 
       showSnackbar(

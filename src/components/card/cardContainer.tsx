@@ -9,10 +9,15 @@ import {
   FaPlusCircle,
   FaChevronUp,
   FaChevronDown,
+  FaEye,
+  FaEyeSlash,
 } from 'react-icons/fa';
+import { BsCloudUpload } from 'react-icons/bs';
+import { MdStorage } from 'react-icons/md';
 import { Container, ThemeColor, VolumeData } from '@/types/type';
 import ImageDetailModal from '@/components/modal/image/imageDetailModal';
 import SelectVolumeModal from '../modal/volume/selectVolumeModal';
+import MountConfigurationModal from '../modal/mount/mountConfigurationModal';
 
 export interface CardContainerProps {
   networkName: string;
@@ -52,11 +57,16 @@ const CardContainer = ({
   const [droppedImages, setDroppedImages] = useState<ImageInfo[]>([]);
   const [imageToNetwork, setImageToNetwork] = useState<ImageToNetwork[]>([]);
   const [detailData, setDetailData] = useState<any>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isVolumeModalOpen, setIsVolumeModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isVolumeModalOpen, setIsVolumeModalOpen] = useState<boolean>(false);
   const [selectedImage, setSelectedImage] = useState<string>('');
   const [selectedVolumes, setSelectedVolumes] = useState<VolumeData[]>([]);
   const [expandedImage, setExpandedImage] = useState<string | null>(null);
+  const [isMountModalOpen, setIsMountModalOpen] = useState<boolean>(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [mountConfigs, setMountConfigs] = useState<{ [key: string]: any[] }>(
+    {}
+  );
   const [imageVolumes, setImageVolumes] = useState<{
     [imageId: string]: VolumeData[];
   }>({});
@@ -129,6 +139,22 @@ const CardContainer = ({
     handleCloseVolumeModal();
   };
 
+  const handleMount = () => {
+    setIsMountModalOpen(true);
+  };
+
+  const handleSaveMountConfig = (mountConfig: any) => {
+    setMountConfigs((prev) => ({
+      ...prev,
+      [networkName]: [...(prev[networkName] || []), mountConfig],
+    }));
+    setIsMountModalOpen(false);
+  };
+
+  const toggleDropdown = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+  };
+
   return (
     <>
       <div
@@ -162,15 +188,70 @@ const CardContainer = ({
         )}
 
         <div
-          className="w-full text-center text-blue_6 border-2 p-3 rounded-md mb-4 text-sm font-semibold"
+          className="w-full flex items-center justify-center text-blue_6 border-2 p-2.5 rounded-md mb-4 text-sm font-semibold space-x-2"
           style={{
             borderColor: `${themeColor.borderColor}`,
             backgroundColor: `${themeColor.bgColor}`,
             color: `${themeColor.textColor}`,
           }}
         >
-          {`${networkName} : ${networkIp}`}
+          <button
+            onClick={handleMount}
+            className="flex items-center justify-center px-2 rounded-full transition-colors duration-200"
+            style={{ color: themeColor.textColor }}
+          >
+            {/* <BsCloudUpload className="w-6 h-6" /> */}
+            <MdStorage className="w-6 h-6" />
+          </button>
+          <span>{`${networkName} : ${networkIp}`}</span>
         </div>
+        {/* <button
+          onClick={toggleDropdown}
+          className="flex items-center font-semibold"
+          style={{
+            borderColor: `${themeColor.borderColor}`,
+            color: `${themeColor.textColor}`,
+          }}
+        >
+          Mounts &nbsp;
+          {isDropdownOpen ? (
+            <FaEye className="w-4 h-4" />
+          ) : (
+            <FaEyeSlash className="w-4 h-4" />
+          )}
+        </button> */}
+
+        {/* {isDropdownOpen &&
+          mountConfigs[networkName] &&
+          mountConfigs[networkName].length > 0 && (
+            <div
+              className="absolute top-full mt-2 w-64 bg-white shadow-lg border rounded-md z-50"
+              style={{
+                borderColor: `${themeColor.borderColor}`,
+              }}
+            >
+              <h4 className="text-sm font-semibold text-grey_6 p-2 border-b">
+                Mounts
+              </h4>
+              <ul className="space-y-2 p-2 max-h-48 overflow-y-auto">
+                {mountConfigs[networkName].map((config, index) => (
+                  <li key={index} className="bg-white p-4">
+                    <div className="text-sm text-grey_7 font-semibold mb-1">
+                      {`Type: ${config.Type}`}
+                    </div>
+                    <div className="text-sm text-grey_7">
+                      <span className="font-semibold">Source:</span>{' '}
+                      {config.Source || 'N/A'}
+                    </div>
+                    <div className="text-sm text-grey_7">
+                      <span className="font-semibold">Destination:</span>{' '}
+                      {config.Destination}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )} */}
         <div className="w-full h-44 scrollbar-hide overflow-y-auto">
           {allImages.length > 0 ? (
             <div className="space-y-4">
@@ -188,8 +269,8 @@ const CardContainer = ({
                             className="font-bold font-pretendard"
                             title={image.name}
                           >
-                            {image.name.length > 20
-                              ? `${image.name.slice(0, 20)}...`
+                            {image.name.length > 13
+                              ? `${image.name.slice(0, 13)}...`
                               : image.name}
                           </span>
 
@@ -297,6 +378,11 @@ const CardContainer = ({
         onClose={handleCloseVolumeModal}
         onSave={handleAddVolume}
         initialSelectedVolumes={selectedVolumes}
+      />
+      <MountConfigurationModal
+        open={isMountModalOpen}
+        onClose={() => setIsMountModalOpen(false)}
+        onSave={handleSaveMountConfig}
       />
     </>
   );
