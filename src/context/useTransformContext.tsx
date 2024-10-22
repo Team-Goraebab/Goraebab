@@ -63,7 +63,7 @@ export const TransformProvider: React.FC<{ children: React.ReactNode }> = ({
         doubleClick={{ mode: 'reset' }}
         initialScale={1}
         maxScale={3}
-        minScale={0.7}
+        minScale={0.55}
         centerOnInit
         panning={{ disabled: !isPanning }}
         onZoomStop={(ref) => handleZoomChange(ref.state.scale)}
