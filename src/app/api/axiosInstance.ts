@@ -1,8 +1,13 @@
 import axios from 'axios';
 
-export const createDockerClient = (hostIp?: string) => {
+export const createDockerClient = (hostIp?: string | null) => {
   const isWindows = process.platform === 'win32';
-  const effectiveHost = hostIp || 'localhost';
+
+  const effectiveHost =
+    hostIp === null || hostIp === undefined
+      ? sessionStorage.getItem('selectedHostIp') || 'localhost'
+      : hostIp;
+
   console.log('effectiveHost >>>', effectiveHost);
 
   const options = isWindows
