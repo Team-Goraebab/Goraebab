@@ -55,12 +55,19 @@ const HostModal = ({ onClose }: HostModalProps) => {
       const response = await fetch(`/api/network/list?hostIp=${hostIp}`);
       const data = await response.json();
       console.log('네트워크 리스트 데이터', data);
-      setAvailableNetworks(data || []);
+
+      if (Array.isArray(data)) {
+        setAvailableNetworks(data);
+      } else {
+        setAvailableNetworks([]);
+        console.error('The fetched data is not an array:', data);
+      }
     } catch (error) {
       console.error('네트워크 목록을 불러오는데 실패했습니다.', error);
       setAvailableNetworks([]);
     }
   };
+
   useEffect(() => {
     fetchNetworks();
   }, [hostIp, isHostIpConnected]);
@@ -87,9 +94,11 @@ const HostModal = ({ onClose }: HostModalProps) => {
       networkIp,
     };
 
-    const selectedNetwork = availableNetworks.find(
-      (network) => network.Name.toLowerCase() === networkName.toLowerCase()
-    );
+    const selectedNetwork = Array.isArray(availableNetworks)
+      ? availableNetworks.find(
+          (network) => network.Name.toLowerCase() === networkName.toLowerCase()
+        )
+      : null;
 
     if (!selectedNetwork) {
       showSnackbar(
