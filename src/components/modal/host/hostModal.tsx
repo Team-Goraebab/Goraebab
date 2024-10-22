@@ -20,34 +20,106 @@ import {
   Button,
 } from '@mui/material';
 import { colorsOption } from '@/data/color';
-import { Network, ThemeColor } from '@/types/type';
+import { Host, Network, ThemeColor } from '@/types/type';
 import axios from 'axios';
+import { useSnackbar } from 'notistack';
+import { showSnackbar } from '@/utils/toastUtils';
+import { useHostStore } from '@/store/hostStore';
+import { selectedHostStore } from '@/store/seletedHostStore';
 
 interface HostModalProps {
   onClose: () => void;
-  onSave: (
-    id: string,
-    hostNm: string,
-    hostIp: string | undefined,
-    isRemote: boolean,
-    themeColor: ThemeColor,
-    networkName: string,
-    networkIp: string
-  ) => void;
-  availableNetworks: Network[];
 }
 
-const HostModal = ({ onClose, onSave, availableNetworks }: HostModalProps) => {
+const HostModal = ({ onClose }: HostModalProps) => {
   const id = uuidv4();
+  const { enqueueSnackbar } = useSnackbar();
+  const addHost = useHostStore((state) => state.addHost);
+  const addConnectedBridgeId = selectedHostStore(
+    (state) => state.addConnectedBridgeId
+  );
+
   const [isRemote, setIsRemote] = useState<boolean>(false);
   const [hostNm, setHostNm] = useState<string>('');
-  const [hostIp, setHostIp] = useState<string | undefined>(undefined);
+  const [hostIp, setHostIp] = useState<string>('');
   const [networkName, setNetworkName] = useState<string>('');
   const [networkIp, setNetworkIp] = useState<string>('');
+  const [availableNetworks, setAvailableNetworks] = useState<Network[]>([]);
   const [isHostIpConnected, setIsHostIpConnected] = useState<boolean>(false);
   const [connectionMessage, setConnectionMessage] = useState<string | null>(
     null
   );
+
+  const fetchNetworks = async () => {
+    try {
+      const response = await fetch(`/api/network/list?hostIp=${hostIp}`);
+      const data = await response.json();
+      console.log('네트워크 리스트 데이터', data);
+      setAvailableNetworks(data || []);
+    } catch (error) {
+      console.error('네트워크 목록을 불러오는데 실패했습니다.', error);
+      setAvailableNetworks([]);
+    }
+  };
+  useEffect(() => {
+    fetchNetworks();
+  }, [hostIp, isHostIpConnected]);
+
+  const handleAddHost = (): void => {
+    if (useHostStore.getState().hosts.length >= 5) {
+      showSnackbar(
+        enqueueSnackbar,
+        '호스트는 최대 5개까지만 추가할 수 있습니다.',
+        'error',
+        '#d32f2f'
+      );
+      return;
+    }
+
+    const newHost: Host = {
+      id,
+      hostNm,
+      hostIp: isRemote ? hostIp : 'localhost',
+      status: true,
+      isRemote,
+      themeColor: selectedColor,
+      networkName,
+      networkIp,
+    };
+
+    const selectedNetwork = availableNetworks.find(
+      (network) => network.Name.toLowerCase() === networkName.toLowerCase()
+    );
+
+    if (!selectedNetwork) {
+      showSnackbar(
+        enqueueSnackbar,
+        '선택된 네트워크를 찾을 수 없습니다.',
+        'error',
+        '#d32f2f'
+      );
+      return;
+    }
+
+    addHost(newHost);
+
+    addConnectedBridgeId(id, {
+      name: selectedNetwork.Name,
+      gateway: selectedNetwork.IPAM?.Config?.[0]?.Gateway || '',
+      driver: selectedNetwork.Driver || '',
+      subnet: selectedNetwork.IPAM?.Config?.[0]?.Subnet || '',
+      scope: selectedNetwork.Scope || '',
+      id: id,
+    });
+
+    showSnackbar(
+      enqueueSnackbar,
+      '호스트가 성공적으로 추가되었습니다!',
+      'success',
+      '#254b7a'
+    );
+    onClose();
+  };
 
   const defaultColor = colorsOption.find((color) => !color.sub);
   const defaultSubColor = colorsOption.find(
@@ -78,23 +150,6 @@ const HostModal = ({ onClose, onSave, availableNetworks }: HostModalProps) => {
     return !hostNm || !networkName || !networkIp;
   }, [hostNm, networkName, networkIp, isRemote, hostIp, isHostIpConnected]);
 
-  const handleSave = () => {
-    if (isSaveDisabled) {
-      return;
-    }
-
-    onSave(
-      id,
-      hostNm,
-      isRemote ? hostIp : undefined,
-      isRemote,
-      selectedColor,
-      networkName,
-      networkIp
-    );
-    onClose();
-  };
-
   const handleNetworkChange = (selectedNetworkName: string) => {
     const selectedNetwork = availableNetworks.find(
       (net) => net.Name === selectedNetworkName
@@ -122,18 +177,14 @@ const HostModal = ({ onClose, onSave, availableNetworks }: HostModalProps) => {
   async function fetchConnectRemoteDaemon(hostIp: string) {
     try {
       const response = await axios.get(`/api/daemon/ping?hostIp=${hostIp}`);
-      console.log('ping api >>', response);
-
       if (response.status === 200) {
         setIsHostIpConnected(true);
         setConnectionMessage('연결 성공');
       } else {
-        console.error('데몬 연결에 실패했습니다.');
         setIsHostIpConnected(false);
         setConnectionMessage('원격 데몬 연결에 실패했습니다.');
       }
     } catch (error) {
-      console.error('원격 데몬 정보를 가져오는 데 실패했습니다:', error);
       setIsHostIpConnected(false);
       setConnectionMessage('원격 데몬 연결에 실패했습니다.');
     }
@@ -170,7 +221,7 @@ const HostModal = ({ onClose, onSave, availableNetworks }: HostModalProps) => {
               onChange={(e) => {
                 setIsRemote(e.target.value === 'remote');
                 if (e.target.value !== 'remote') {
-                  setHostIp(undefined);
+                  setHostIp('localhost');
                   setIsHostIpConnected(false);
                   setConnectionMessage(null);
                 }
@@ -224,6 +275,7 @@ const HostModal = ({ onClose, onSave, availableNetworks }: HostModalProps) => {
               onChange={(e) => handleNetworkChange(e.target.value)}
               label="Select Network"
               fullWidth
+              disabled={isRemote ? !isHostIpConnected : false}
             >
               {availableNetworks && availableNetworks.length > 0 ? (
                 availableNetworks.map((net) => (
@@ -236,6 +288,7 @@ const HostModal = ({ onClose, onSave, availableNetworks }: HostModalProps) => {
               )}
             </Select>
           </FormControl>
+
           <Box>
             <Typography variant="subtitle1" mb={1}>
               Select Color Theme
@@ -270,7 +323,7 @@ const HostModal = ({ onClose, onSave, availableNetworks }: HostModalProps) => {
       <DialogActions sx={{ justifyContent: 'end', p: 3 }}>
         <Button onClick={onClose}>취소</Button>
         <Button
-          onClick={handleSave}
+          onClick={handleAddHost}
           color="primary"
           variant="contained"
           disabled={isSaveDisabled}
