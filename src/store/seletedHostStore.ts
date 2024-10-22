@@ -12,7 +12,7 @@ interface BridgeInfo {
 interface SelectedHostStore {
   selectedHostId: string | null;
   selectedHostName: string | null;
-  selectedHostIp: string | null;
+  selectedHostIp: string;
   connectedBridgeIds: { [key: string]: BridgeInfo[] };
   apiUrl: string;
   setSelectedHostId: (id: string | null) => void;
@@ -26,7 +26,7 @@ interface SelectedHostStore {
 export const selectedHostStore = create<SelectedHostStore>((set) => ({
   selectedHostId: null,
   selectedHostName: null,
-  selectedHostIp: null,
+  selectedHostIp: 'localhost',
   connectedBridgeIds: {},
   apiUrl: '',
 
@@ -44,10 +44,9 @@ export const selectedHostStore = create<SelectedHostStore>((set) => ({
 
   // 선택한 호스트 아이피
   setSelectedHostIp: (ip) =>
-    set((state) => ({
-      selectedHostIp: ip,
+    set(() => ({
+      selectedHostIp: ip || 'localhost',
     })),
-
   // API Url 변경
   setApiUrl: (url) =>
     set(() => ({
@@ -56,12 +55,19 @@ export const selectedHostStore = create<SelectedHostStore>((set) => ({
 
   // 브릿지 연결
   addConnectedBridgeId: (hostId, bridge) =>
-    set((state) => ({
-      connectedBridgeIds: {
-        ...state.connectedBridgeIds,
-        [hostId]: [...(state.connectedBridgeIds[hostId] || []), bridge],
-      },
-    })),
+    set((state) => {
+      const currentBridges = state.connectedBridgeIds[hostId] || [];
+      if (currentBridges.length >= 3) {
+        return state;
+      }
+
+      return {
+        connectedBridgeIds: {
+          ...state.connectedBridgeIds,
+          [hostId]: [...currentBridges, bridge],
+        },
+      };
+    }),
 
   // 연결된 브릿지 삭제
   deleteConnectedBridgeId: (hostId, networkId) =>

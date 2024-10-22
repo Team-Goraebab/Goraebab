@@ -29,9 +29,15 @@ export const useHostStore = create<HostStore>((set, get) => ({
 
   // 호스트 추가
   addHost: (host: Host) =>
-    set((state) => ({
-      hosts: [...state.hosts, host],
-    })),
+    set((state) => {
+      if (state.hosts.length >= 5) {
+        return state;
+      }
+
+      return {
+        hosts: [...state.hosts, host],
+      };
+    }),
 
   // 호스트 삭제
   deleteHost: (hostId) =>
