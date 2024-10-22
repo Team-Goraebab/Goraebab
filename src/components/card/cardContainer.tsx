@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { useDrop } from 'react-dnd';
 import {
@@ -14,22 +14,19 @@ import {
 } from 'react-icons/fa';
 import { BsCloudUpload } from 'react-icons/bs';
 import { MdStorage } from 'react-icons/md';
-import { Image, ThemeColor, VolumeData } from '@/types/type';
+import { Container, ThemeColor, VolumeData } from '@/types/type';
 import ImageDetailModal from '@/components/modal/image/imageDetailModal';
 import SelectVolumeModal from '../modal/volume/selectVolumeModal';
 import MountConfigurationModal from '../modal/mount/mountConfigurationModal';
-import { selectedHostStore } from '@/store/seletedHostStore';
-import { fetchData } from '@/services/apiUtils';
 
 export interface CardContainerProps {
   networkName: string;
   networkIp: string;
-  images: Image[];
+  containers: Container[];
   themeColor: ThemeColor;
   onDelete?: () => void;
   onSelectNetwork?: () => void;
   isSelected?: boolean;
-  hostId: string;
 }
 
 interface ImageInfo {
@@ -48,18 +45,14 @@ interface ImageToNetwork {
 const CardContainer = ({
   networkName,
   networkIp,
-  images,
+  containers,
   themeColor,
   onDelete,
   onSelectNetwork,
   isSelected,
-  hostId,
 }: CardContainerProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const randomId = uuidv4();
-
-  const selectedHostId = selectedHostStore((state) => state.selectedHostId);
-  const selectedHostIp = selectedHostStore((state) => state.selectedHostIp);
 
   const [droppedImages, setDroppedImages] = useState<ImageInfo[]>([]);
   const [imageToNetwork, setImageToNetwork] = useState<ImageToNetwork[]>([]);
@@ -79,17 +72,14 @@ const CardContainer = ({
   }>({});
 
   const splitImageNameAndTag = (image: string, id: string): ImageInfo => {
-    console.log('split', image);
-    const [name, tag] = image.includes(':')
-      ? image.split(':')
-      : [image, 'latest'];
+    const [name, tag] = image.split(':');
     return { id, name, tag };
   };
 
-  const handleGetInfo = async (imageName: string, imageId?: string) => {
+  const handleGetInfo = async (imageName: string) => {
     try {
       const imageDetail = await fetch(
-        `/api/image/detail?name=${imageName}&hostIp=${selectedHostIp}`
+        `/api/image/detail?name=${imageName}`
       ).then((res) => res.json());
       setDetailData(imageDetail);
       setIsModalOpen(true);
@@ -98,20 +88,14 @@ const CardContainer = ({
     }
   };
 
-  console.log(selectedHostId);
-  console.log(hostId);
-
   const [{ isOver }, drop] = useDrop({
     accept: 'IMAGE_CARD',
     drop: (item: { image: string }) => {
-      console.log('Received item in drop:', item);
       const imageId = `${item.image}-${randomId}`;
       const imageInfo = splitImageNameAndTag(item.image, imageId);
-      console.log('Image info after processing:', imageInfo);
       setDroppedImages((prev) => [...prev, imageInfo]);
       setImageToNetwork((prev) => [...prev, { ...imageInfo, networkName }]);
     },
-    canDrop: () => hostId === selectedHostId,
     collect: (monitor) => ({
       isOver: monitor.isOver(),
     }),
@@ -120,11 +104,9 @@ const CardContainer = ({
   drop(ref);
 
   const allImages = [
-    ...images.map((c) => splitImageNameAndTag(c.name, c.id)),
+    ...containers.map((c) => splitImageNameAndTag(c.image.name, c.id)),
     ...droppedImages,
   ];
-
-  console.log('allImages >>>', allImages);
 
   const handleDeleteImage = (imageId: string) => {
     // 이미지 삭제
@@ -308,7 +290,7 @@ const CardContainer = ({
                             className="flex items-center space-x-1 text-sm text-grey_6 hover:text-grey_7"
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleGetInfo(image.name, image.id);
+                              handleGetInfo(image.name);
                             }}
                           >
                             <FaInfoCircle className="w-4 h-4" />
