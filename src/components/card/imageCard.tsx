@@ -50,11 +50,11 @@ interface ContainerConfig {
 }
 
 const ImageCard = ({ data, onDeleteSuccess }: CardDataProps) => {
-  const ref = useRef<HTMLDivElement>(null); // useRef 생성
+  const ref = useRef<HTMLDivElement>(null);
 
   const [{ isDragging }, drag] = useDrag(() => ({
     type: 'IMAGE_CARD',
-    item: { image: data.RepoTags[0] },
+    item: { image: data.RepoTags[0], id: data.Id },
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
@@ -62,7 +62,7 @@ const ImageCard = ({ data, onDeleteSuccess }: CardDataProps) => {
 
   useEffect(() => {
     if (ref.current) {
-      drag(ref); // drag를 ref에 연결
+      drag(ref);
     }
   }, [ref, drag]);
 
@@ -114,7 +114,7 @@ const ImageCard = ({ data, onDeleteSuccess }: CardDataProps) => {
         enqueueSnackbar,
         '이미지가 삭제되었습니다.',
         'success',
-        '#25BD6B'
+        '#4CAF50'
       );
 
       onDeleteSuccess();
@@ -182,7 +182,7 @@ const ImageCard = ({ data, onDeleteSuccess }: CardDataProps) => {
         enqueueSnackbar,
         '컨테이너가 성공적으로 실행되었습니다.',
         'success',
-        '#25BD6B'
+        '#4CAF50'
       );
     } catch (error) {
       console.error('Error running container:', error);

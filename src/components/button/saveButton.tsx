@@ -6,6 +6,8 @@ import { showSnackbar } from '@/utils/toastUtils';
 import { AiOutlineSave } from 'react-icons/ai';
 import { BASE_URL } from '@/app/api/urlPath';
 import { selectedHostStore } from '@/store/seletedHostStore';
+import { useHostStore } from '@/store/hostStore';
+import { useStore } from '@/store/cardStore';
 
 interface BlueprintReqDto {
   name: string;
@@ -15,7 +17,53 @@ interface BlueprintReqDto {
 
 const SaveButton = () => {
   const { enqueueSnackbar } = useSnackbar();
+  const { connectedBridgeIds, selectedHostName } = selectedHostStore(
+    (state) => ({
+      connectedBridgeIds: state.connectedBridgeIds,
+      selectedHostName: state.selectedHostName,
+    })
+  );
 
+  const allContainers = useStore((state) => state.hostContainers);
+  const selectedHostIp = selectedHostStore((state) => state.selectedHostIp);
+
+  const hosts = useHostStore((state) => state.hosts);
+  useEffect(() => {
+    console.log('host data >>>>>', hosts);
+  }, [hosts]);
+
+  const data = hosts.map((host, index) => {
+    const containers = allContainers[host.id] || [];
+    const networks = connectedBridgeIds[host.id] || [];
+    console.log(`Host: ${host.hostNm}, Containers:`, containers);
+    console.log(`Host: ${host.hostNm}, Networks:`, networks);
+
+    // 반환할 데이터가 있다면 여기에서 처리
+    return {
+      hostId: host.id,
+      containers,
+      networks,
+    };
+  });
+
+  // `data` 배열이 제대로 반환되는지 확인
+  console.log('Mapped data >>>>>', data);
+
+  useEffect(() => {
+    console.log('연결된 네트워크:', connectedBridgeIds);
+
+    // 각 호스트에 대해 연결된 네트워크를 호스트 이름으로 묶어 출력
+    Object.entries(connectedBridgeIds).forEach(([hostId, bridges]) => {
+      const hostName = selectedHostName; // 현재 선택된 호스트 이름 가져오기
+      console.log(`호스트 이름: ${hostName || hostId}`);
+
+      bridges.forEach((bridge) => {
+        console.log(
+          `  네트워크 이름: ${bridge.name}, 게이트웨이: ${bridge.gateway}, 드라이버: ${bridge.driver}, 서브넷: ${bridge.subnet}, 스코프: ${bridge.scope}`
+        );
+      });
+    });
+  }, [connectedBridgeIds, selectedHostName]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [blueprintName, setBlueprintName] = useState('');
   const [isDockerRemote, setIsDockerRemote] = useState(false);
@@ -76,7 +124,7 @@ const SaveButton = () => {
           enqueueSnackbar,
           '설계도가 성공적으로 저장되었습니다!',
           'success',
-          '#25BD6B'
+          '#254b7a'
         );
         setIsModalOpen(false);
         setBlueprintName('');
@@ -102,7 +150,7 @@ const SaveButton = () => {
 
   return (
     <>
-      <div className="fixed bottom-8 right-[50px] transform translate-x-4 h-[40px] px-4 bg-white border-gray-300 border text-blue-600 hover:text-white hover:bg-blue-500 active:bg-blue-600 rounded-lg flex items-center justify-center transition duration-200 ease-in-out">
+      <div className="fixed bottom-8 right-[50px] transform translate-x-4 h-[40px] px-4 bg-white border-gray_3 border text-blue_6 hover:text-white hover:bg-blue_5 active:bg-blue_6 rounded-lg flex items-center justify-center transition duration-200 ease-in-out">
         <button
           className="flex items-center gap-2 text-center"
           onClick={handleSave}
@@ -137,7 +185,7 @@ const SaveButton = () => {
             {isDockerRemote && (
               <input
                 type="text"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+                className="w-full px-3 py-2 border border-grey_3 rounded-md focus:outline-none focus:ring-2 focus:ring-blue_5 mb-4"
                 placeholder="Remote URL"
                 value={remoteUrl}
                 onChange={(e) => setRemoteUrl(e.target.value)}
@@ -145,13 +193,13 @@ const SaveButton = () => {
             )}
             <div className="flex justify-end mt-6 gap-2">
               <button
-                className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+                className="px-4 py-2 text-grey_6 hover:text-grey_7 transition-colors"
                 onClick={() => setIsModalOpen(false)}
               >
                 취소
               </button>
               <button
-                className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+                className="px-4 py-2 bg-blue_6 text-white rounded-md hover:bg-blue_5 transition-colors"
                 onClick={handleSubmit}
               >
                 저장

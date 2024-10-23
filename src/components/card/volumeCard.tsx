@@ -88,7 +88,7 @@ const VolumeCard = ({ data, onDeleteSuccess }: VolumeCardProps) => {
           enqueueSnackbar,
           '볼륨이 성공적으로 삭제되었습니다!',
           'success',
-          '#25BD6B'
+          '#4CAF50'
         );
         onDeleteSuccess();
       } else {

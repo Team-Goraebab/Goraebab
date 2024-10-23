@@ -16,6 +16,7 @@ import ImageDetailModal from '@/components/modal/image/imageDetailModal';
 import SelectVolumeModal from '../modal/volume/selectVolumeModal';
 import ConfigurationModal from '../modal/daemon/configurationModal';
 import { selectedHostStore } from '@/store/seletedHostStore';
+import { useSnackbar } from 'notistack';
 
 export interface CardContainerProps {
   networkName: string;
@@ -53,6 +54,7 @@ const CardContainer = ({
 }: CardContainerProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const randomId = uuidv4();
+  const { enqueueSnackbar } = useSnackbar();
 
   const selectedHostIp = selectedHostStore((state) => state.selectedHostIp);
 
@@ -70,6 +72,10 @@ const CardContainer = ({
   const [imageVolumes, setImageVolumes] = useState<{
     [imageId: string]: VolumeData[];
   }>({});
+
+  console.log('configs >>>', configs);
+  console.log('imageVolumes >>>', imageVolumes);
+  console.log('imageToNetwork >>>', imageToNetwork);
 
   const splitImageNameAndTag = (image: string, id: string): ImageInfo => {
     const [name, tag] = image.split(':');
@@ -90,9 +96,20 @@ const CardContainer = ({
 
   const [{ isOver }, drop] = useDrop({
     accept: 'IMAGE_CARD',
-    drop: (item: { image: string }) => {
-      const imageId = `${item.image}-${randomId}`;
-      const imageInfo = splitImageNameAndTag(item.image, imageId);
+    drop: (item: { image: string; id: string }) => {
+      if (droppedImages.length > 0) {
+        enqueueSnackbar('이미지는 하나만 추가할 수 있습니다.', {
+          variant: 'warning',
+          autoHideDuration: 3000,
+          anchorOrigin: {
+            vertical: 'top',
+            horizontal: 'right',
+          },
+        });
+        return;
+      }
+
+      const imageInfo = splitImageNameAndTag(item.image, item.id);
       setDroppedImages((prev) => [...prev, imageInfo]);
       setImageToNetwork((prev) => [...prev, { ...imageInfo, networkName }]);
     },
@@ -270,21 +287,21 @@ const CardContainer = ({
                           </button>
                         </div>
                       </div>
-                      {imageVolumes[image.id]?.length > 0 && (
-                        <div className="mt-3 flex justify-between">
-                          <h4 className="text-sm font-semibold text-grey_6">
-                            Volumes ({imageVolumes[image.id].length})
-                          </h4>
-                          <button
-                            className="text-grey_5 hover:text-grey_6"
-                            onClick={() =>
-                              setExpandedImage(isExpanded ? null : image.id)
-                            }
-                          >
-                            {isExpanded ? <FaChevronDown /> : <FaChevronUp />}
-                          </button>
-                        </div>
-                      )}
+                      {/* {imageVolumes[image.id]?.length > 0 && ( */}
+                      <div className="mt-3 flex justify-between">
+                        <h4 className="text-sm font-semibold text-grey_6">
+                          Volumes ({imageVolumes[image.id]?.length || 0})
+                        </h4>
+                        <button
+                          className="text-grey_5 hover:text-grey_6"
+                          onClick={() =>
+                            setExpandedImage(isExpanded ? null : image.id)
+                          }
+                        >
+                          {isExpanded ? <FaChevronUp /> : <FaChevronDown />}
+                        </button>
+                      </div>
+                      {/* )} */}
                     </div>
                     {isExpanded && imageVolumes[image.id]?.length > 0 && (
                       <div className="bg-gray-50 p-4 rounded-b-lg border-t border-grey_2">

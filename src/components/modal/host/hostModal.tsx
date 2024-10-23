@@ -132,7 +132,7 @@ const HostModal = ({ onClose }: HostModalProps) => {
       enqueueSnackbar,
       '호스트가 성공적으로 추가되었습니다!',
       'success',
-      '#25BD6B'
+      '#4CAF50'
     );
     onClose();
   };

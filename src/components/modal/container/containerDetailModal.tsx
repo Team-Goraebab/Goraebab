@@ -41,7 +41,7 @@ const ContainerDetailModal = ({
       enqueueSnackbar,
       'Container ID copied to clipboard!',
       'info',
-      '#25BD6B'
+      '#4CAF50'
     );
   };
 
@@ -59,7 +59,7 @@ const ContainerDetailModal = ({
         enqueueSnackbar,
         `Container ${action} successfully!`,
         'success',
-        '#25BD6B'
+        '#4CAF50'
       );
     } catch (error) {
       showSnackbar(

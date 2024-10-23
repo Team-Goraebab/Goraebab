@@ -73,7 +73,7 @@ const AddImageButton = ({ onCreate }: AddImageButtonProps) => {
         enqueueSnackbar,
         '이미지가 성공적으로 추가되었습니다!',
         'success',
-        '#25BD6B'
+        '#4CAF50'
       );
 
       setIsModalOpen(false);

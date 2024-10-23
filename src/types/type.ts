@@ -82,3 +82,34 @@ export interface Host {
   themeColor: any;
   networks: HostNetwork[];
 }
+
+export interface NetworkSettings {
+  gateway: string;
+  ipAddress: string;
+}
+
+export interface Port {
+  privatePort: number;
+  publicPort: number;
+}
+
+export interface Mount {
+  name: string;
+  source: string;
+  destination: string;
+  driver: string;
+}
+
+export interface Image {
+  imageId: string;
+  name: string;
+  tag: string;
+}
+
+export interface ContainerSetting {
+  containerName: string;
+  image: Image;
+  networkSettings: NetworkSettings;
+  ports: Port[];
+  mounts: Mount[];
+}
