@@ -181,7 +181,7 @@ const Sidebar = () => {
           (item, index) =>
             CardComponent && (
               <CardComponent
-                key={index}
+                key={`${item.Id}-${selectedHostIp}`}
                 data={item}
                 onDeleteSuccess={handleDeleteSuccess}
               />
@@ -203,6 +203,7 @@ const Sidebar = () => {
   }, [activeId]);
 
   useEffect(() => {
+    setImageData([]);
     refreshData();
     console.log('refresh .......');
   }, [selectedHostIp]);
@@ -212,7 +213,7 @@ const Sidebar = () => {
       <div className="flex justify-between items-center px-6 py-4 bg-gray-100 border-b border-grey_2">
         <h2 className="text-md font-semibold font-pretendard flex items-center">
           {currentComponent?.title || '데이터'}
-          <span className="ml-2 px-2 py-1 bg-blue-400 text-white text-xs font-pretendard rounded-lg">
+          <span className="ml-2 px-2 py-1 bg-blue_4 text-white text-xs font-pretendard rounded-lg">
             {dataHandlers[activeId as 1 | 2 | 3 | 4]?.data.length || 0}
           </span>
         </h2>
