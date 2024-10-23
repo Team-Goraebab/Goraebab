@@ -65,13 +65,20 @@ export interface Container {
   networkId?: string; // 연결된 네트워크 ID
 }
 
+export type HostNetwork = {
+  id: string;
+  name: string;
+  ip: string;
+  hostId: string;
+  containers: string[];
+};
+
 export interface Host {
   id: string;
   hostNm: string;
-  hostIp?: string;
+  hostIp: string;
   status: boolean;
   isRemote: boolean;
-  themeColor: ThemeColor;
-  networkName: string;
-  networkIp: string;
+  themeColor: any;
+  networks: HostNetwork[];
 }
