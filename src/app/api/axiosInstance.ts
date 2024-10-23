@@ -1,4 +1,5 @@
 import axios from 'axios';
+import os from 'os';
 
 export const createDockerClient = (hostIp?: string | null) => {
   const effectiveHost =
@@ -22,10 +23,16 @@ export const createDockerClient = (hostIp?: string | null) => {
 
   const isLocalhost = host === 'localhost' || host === '127.0.0.1';
 
+  // Windows인 경우 다른 소켓 경로 사용
+  const isWindows = os.platform() === 'win32';
+  const dockerSocketPath = isWindows
+    ? '//./pipe/docker_engine'
+    : '/var/run/docker.sock';
+
   const options = isLocalhost
     ? {
       baseURL: 'http://localhost',
-      socketPath: '/var/run/docker.sock',
+      socketPath: dockerSocketPath,
     }
     : {
       baseURL: `http://${host}:${port}`,
