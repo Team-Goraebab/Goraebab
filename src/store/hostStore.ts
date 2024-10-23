@@ -1,17 +1,9 @@
+import { Host, HostNetwork } from '@/types/type';
 import { create } from 'zustand';
-import { Host } from '@/types/type';
-
-type Network = {
-  id: string;
-  name: string;
-  ip: string;
-  hostId: string;
-  containers: string[];
-};
 
 interface HostStore {
   hosts: Host[];
-  networks: Network[];
+  networks: HostNetwork[];
   addHost: (host: Host) => void;
   deleteHost: (hostId: string) => void;
   deleteNetwork: (
@@ -23,6 +15,7 @@ interface HostStore {
 }
 
 // 호스트 및 네트워크 정보를 저장하는 store
+// 상태 관리 로직
 export const useHostStore = create<HostStore>((set, get) => ({
   hosts: [],
   networks: [],
@@ -35,7 +28,7 @@ export const useHostStore = create<HostStore>((set, get) => ({
       }
 
       return {
-        hosts: [...state.hosts, host],
+        hosts: [...state.hosts, { ...host, networks: [] }],
       };
     }),
 
@@ -46,27 +39,40 @@ export const useHostStore = create<HostStore>((set, get) => ({
       networks: state.networks.filter((network) => network.hostId !== hostId),
     })),
 
-  // 네트워크 삭제
-  deleteNetwork: (hostId, networkName, networkId) =>
+  // 네트워크 추가
+  addNetworkToHost: (hostId: string, network: HostNetwork) =>
     set((state) => {
-      const updatedNetworks = state.networks.filter(
-        (network) => !(network.id === networkId && network.hostId === hostId)
-      );
-
       const updatedHosts = state.hosts.map((host) => {
         if (host.id === hostId) {
           return {
             ...host,
-            networkName:
-              host.networkName === networkName ? '' : host.networkName,
-            networkIp: host.networkIp === networkName ? '' : host.networkIp,
+            networks: [...host.networks, network],
           };
         }
         return host;
       });
 
       return {
-        networks: updatedNetworks,
+        hosts: updatedHosts,
+      };
+    }),
+
+  // 네트워크 삭제
+  deleteNetwork: (hostId, networkName, networkId) =>
+    set((state) => {
+      const updatedHosts = state.hosts.map((host) => {
+        if (host.id === hostId) {
+          return {
+            ...host,
+            networks: host.networks.filter(
+              (network) => network.id !== networkId
+            ),
+          };
+        }
+        return host;
+      });
+
+      return {
         hosts: updatedHosts,
       };
     }),
