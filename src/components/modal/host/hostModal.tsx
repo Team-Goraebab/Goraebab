@@ -83,22 +83,10 @@ const HostModal = ({ onClose }: HostModalProps) => {
       return;
     }
 
-    const newHost: Host = {
-      id,
-      hostNm,
-      hostIp: isRemote ? hostIp : 'localhost',
-      status: true,
-      isRemote,
-      themeColor: selectedColor,
-      networkName,
-      networkIp,
-    };
-
-    const selectedNetwork = Array.isArray(availableNetworks)
-      ? availableNetworks.find(
-          (network) => network.Name.toLowerCase() === networkName.toLowerCase()
-        )
-      : null;
+    // 선택한 네트워크 정보 찾기
+    const selectedNetwork = availableNetworks.find(
+      (net) => net.Name === networkName
+    );
 
     if (!selectedNetwork) {
       showSnackbar(
@@ -110,6 +98,25 @@ const HostModal = ({ onClose }: HostModalProps) => {
       return;
     }
 
+    // 새로운 호스트 생성
+    const newHost: Host = {
+      id,
+      hostNm,
+      hostIp: isRemote ? hostIp : 'localhost',
+      status: true,
+      isRemote,
+      themeColor: selectedColor,
+      networks: [
+        {
+          id: selectedNetwork.Id,
+          name: selectedNetwork.Name,
+          ip: selectedNetwork.IPAM?.Config?.[0]?.Gateway || '',
+          hostId: id,
+          containers: [],
+        },
+      ],
+    };
+
     addHost(newHost);
 
     addConnectedBridgeId(id, {
@@ -118,7 +125,7 @@ const HostModal = ({ onClose }: HostModalProps) => {
       driver: selectedNetwork.Driver || '',
       subnet: selectedNetwork.IPAM?.Config?.[0]?.Subnet || '',
       scope: selectedNetwork.Scope || '',
-      id: id,
+      id: selectedNetwork.Id,
     });
 
     showSnackbar(
