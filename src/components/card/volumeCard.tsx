@@ -51,7 +51,11 @@ const VolumeCard = ({ data, onDeleteSuccess }: VolumeCardProps) => {
 
   const volumeItems = [
     { label: 'NAME', value: data.Name, icon: FiCpu },
-    { label: 'CREATED', value: formatDateTime(data.CreatedAt), icon: FiCalendar },
+    {
+      label: 'CREATED',
+      value: formatDateTime(data.CreatedAt),
+      icon: FiCalendar,
+    },
     { label: 'MOUNT POINT', value: data.Mountpoint, icon: FiHardDrive },
     { label: 'CAPACITY', value: data.Scope, icon: FiDisc },
     {
@@ -84,7 +88,7 @@ const VolumeCard = ({ data, onDeleteSuccess }: VolumeCardProps) => {
           enqueueSnackbar,
           '볼륨이 성공적으로 삭제되었습니다!',
           'success',
-          '#254b7a',
+          '#25BD6B'
         );
         onDeleteSuccess();
       } else {
@@ -92,7 +96,7 @@ const VolumeCard = ({ data, onDeleteSuccess }: VolumeCardProps) => {
           enqueueSnackbar,
           `볼륨 삭제 실패: ${result.error}`,
           'error',
-          '#FF4853',
+          '#FF4853'
         );
       }
     } catch (error) {
@@ -101,7 +105,7 @@ const VolumeCard = ({ data, onDeleteSuccess }: VolumeCardProps) => {
         enqueueSnackbar,
         `볼륨 삭제 요청 중 에러: ${error}`,
         'error',
-        '#FF4853',
+        '#FF4853'
       );
     } finally {
       setLoading(false);
@@ -141,7 +145,10 @@ const VolumeCard = ({ data, onDeleteSuccess }: VolumeCardProps) => {
   };
 
   return (
-    <div ref={cardRef} className="relative bg-white border rounded-lg transition-all duration-300 mb-2 overflow-hidden">
+    <div
+      ref={cardRef}
+      className="relative bg-white border rounded-lg transition-all duration-300 mb-2 overflow-hidden"
+    >
       <div className="flex justify-between items-center px-4 py-2 bg-gray-50 border-b">
         <div className="flex items-center space-x-2 truncate">
           <span className="font-pretendard text-sm font-bold text-gray-700 truncate">
@@ -168,8 +175,11 @@ const VolumeCard = ({ data, onDeleteSuccess }: VolumeCardProps) => {
             className="p-2 rounded-full hover:bg-gray-200 transition-colors"
             title="Toggle Details"
           >
-            {isExpanded ? <FiChevronUp size={16} className="text-gray-500" /> :
-              <FiChevronDown size={16} className="text-gray-500" />}
+            {isExpanded ? (
+              <FiChevronUp size={16} className="text-gray-500" />
+            ) : (
+              <FiChevronDown size={16} className="text-gray-500" />
+            )}
           </button>
         </div>
       </div>
@@ -179,11 +189,16 @@ const VolumeCard = ({ data, onDeleteSuccess }: VolumeCardProps) => {
           <div className="grid gap-4">
             {volumeItems.map((item, index) => (
               <div key={index} className="flex items-center space-x-3">
-                <div className="p-2 rounded-lg" style={{ backgroundColor: bg1 }}>
+                <div
+                  className="p-2 rounded-lg"
+                  style={{ backgroundColor: bg1 }}
+                >
                   <item.icon size={16} style={{ color: bg2 }} />
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-xs text-gray-500 font-medium font-pretendard">{item.label}</span>
+                  <span className="text-xs text-gray-500 font-medium font-pretendard">
+                    {item.label}
+                  </span>
                   <span className="font-pretendard font-semibold text-sm text-gray-800 truncate max-w-[150px]">
                     {item.value}
                   </span>

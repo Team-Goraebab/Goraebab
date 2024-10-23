@@ -125,7 +125,7 @@ const ContainerCard = ({ data, onDeleteSuccess }: CardDataProps) => {
           enqueueSnackbar,
           '컨테이너가 성공적으로 삭제되었습니다!',
           'success',
-          '#254b7a'
+          '#25BD6B'
         );
         onDeleteSuccess();
       } else {

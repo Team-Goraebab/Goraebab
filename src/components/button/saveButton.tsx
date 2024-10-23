@@ -76,7 +76,7 @@ const SaveButton = () => {
           enqueueSnackbar,
           '설계도가 성공적으로 저장되었습니다!',
           'success',
-          '#254b7a'
+          '#25BD6B'
         );
         setIsModalOpen(false);
         setBlueprintName('');
