@@ -143,7 +143,7 @@ const NetworkCard = ({ data, onDeleteSuccess }: CardDataProps) => {
         driver: networkInfo.driver,
         subnet: networkInfo.subnet,
         scope: networkInfo.scope,
-        id: id,
+        id: networkInfo.id,
       });
 
       showSnackbar(
