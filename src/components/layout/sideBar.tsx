@@ -12,7 +12,6 @@ import ImageCard from '../card/imageCard';
 import DaemonConnectBar from '../bar/daemonConnectBar';
 import { AiOutlineInfoCircle } from 'react-icons/ai';
 import LargeButton from '../button/largeButton';
-import { fetchData } from '@/services/apiUtils';
 import { RxReload } from 'react-icons/rx';
 import ContainerCardGroup from '@/components/card/containerCardGroup';
 import { selectedHostStore } from '@/store/seletedHostStore';
@@ -43,22 +42,20 @@ interface ComponentMapItem {
 const loadData = async (
   apiUrl: string,
   setData: React.Dispatch<React.SetStateAction<any[]>>,
-  dataKey?: string
+  dataKey?: string,
 ) => {
   try {
     const response = await fetch(apiUrl, { cache: 'no-store' });
     const data = await response.json();
     setData(dataKey ? data?.[dataKey] || [] : data || []);
-    console.log(`${dataKey || '데이터'} 정보 :::`, data);
   } catch (error) {
-    console.error(`${dataKey || '데이터'} 로드 중 에러 발생:`, error);
+    throw error;
   }
 };
 
 const Sidebar = () => {
   const { activeId } = useMenuStore();
   const selectedHostIp = selectedHostStore((state) => state.selectedHostIp);
-  console.log('선택한 ip', selectedHostIp);
 
   const [networkData, setNetworkData] = useState<any[]>([]);
   const [volumeData, setVolumeData] = useState<any[]>([]);
@@ -87,14 +84,14 @@ const Sidebar = () => {
       await loadData(
         url,
         dataHandlers[activeId as 1 | 2 | 3 | 4].setData,
-        dataKey
+        dataKey,
       );
 
       setTimeout(() => {
         loadData(url, dataHandlers[activeId as 1 | 2 | 3 | 4].setData, dataKey);
       }, 2000);
     } catch (error) {
-      console.error('데이터 로드 중 에러 발생:', error);
+      throw error;
     }
   };
 
@@ -131,7 +128,8 @@ const Sidebar = () => {
   const currentComponent = componentMap[activeId as 1 | 2 | 3 | 4];
 
   const renderNoDataMessage = (message: string) => (
-    <div className="flex flex-col items-center justify-center text-center p-4 border border-dashed border-blue_3 rounded-md bg-blue_0">
+    <div
+      className="flex flex-col items-center justify-center text-center p-4 border border-dashed border-blue_3 rounded-md bg-blue_0">
       <AiOutlineInfoCircle className="text-blue_6 text-2xl mb-2" />
       <p className="font-pretendard font-medium text-blue_6">{message}</p>
     </div>
@@ -152,18 +150,18 @@ const Sidebar = () => {
     if (activeId === 1) {
       const groupedContainers = Array.isArray(containerData)
         ? containerData.reduce((acc, container) => {
-            const groupName =
-              container.Labels['com.docker.compose.project'] ||
-              container.Names[0].replace(/^\//, '');
-            if (!acc[groupName]) {
-              acc[groupName] = {
-                containers: [],
-                networkMode: container.HostConfig?.NetworkMode || 'Unknown',
-              };
-            }
-            acc[groupName].containers.push(container);
-            return acc;
-          }, {} as Record<string, { containers: Container[]; networkMode: string }>)
+          const groupName =
+            container.Labels['com.docker.compose.project'] ||
+            container.Names[0].replace(/^\//, '');
+          if (!acc[groupName]) {
+            acc[groupName] = {
+              containers: [],
+              networkMode: container.HostConfig?.NetworkMode || 'Unknown',
+            };
+          }
+          acc[groupName].containers.push(container);
+          return acc;
+        }, {} as Record<string, { containers: Container[]; networkMode: string }>)
         : {};
 
       return Object.entries(groupedContainers).map(
@@ -174,21 +172,21 @@ const Sidebar = () => {
             containers={containers}
             onDeleteSuccess={handleDeleteSuccess}
           />
-        )
+        ),
       );
     }
 
     return data && data.length > 0
       ? data.map(
-          (item) =>
-            CardComponent && (
-              <CardComponent
-                key={`${item.Id}-${selectedHostIp}`}
-                data={item}
-                onDeleteSuccess={handleDeleteSuccess}
-              />
-            )
-        )
+        (item) =>
+          CardComponent && (
+            <CardComponent
+              key={`${item.Id}-${selectedHostIp}`}
+              data={item}
+              onDeleteSuccess={handleDeleteSuccess}
+            />
+          ),
+      )
       : renderNoDataMessage(noDataMessage);
   };
 
@@ -207,7 +205,6 @@ const Sidebar = () => {
   useEffect(() => {
     setImageData([]);
     refreshData();
-    console.log('refresh .......');
   }, [selectedHostIp]);
 
   return (
@@ -236,7 +233,8 @@ const Sidebar = () => {
             onCreate: handleCreate,
           })
         ) : (
-          <LargeButton title={'추가하기'} onClick={() => {}} />
+          <LargeButton title={'추가하기'} onClick={() => {
+          }} />
         )}
       </div>
       <div>

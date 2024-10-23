@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useRef, useState } from 'react';
-import { v4 as uuidv4 } from 'uuid';
 import { useDrop } from 'react-dnd';
 import {
   FaTimesCircle,
@@ -43,17 +42,16 @@ interface ImageToNetwork {
 }
 
 const CardContainer = ({
-  networkName,
-  networkIp,
-  containers,
-  themeColor,
-  onDelete,
-  onSelectNetwork,
-  isSelected,
-  hostIp,
-}: CardContainerProps) => {
+                         networkName,
+                         networkIp,
+                         containers,
+                         themeColor,
+                         onDelete,
+                         onSelectNetwork,
+                         isSelected,
+                         hostIp,
+                       }: CardContainerProps) => {
   const ref = useRef<HTMLDivElement>(null);
-  const randomId = uuidv4();
   const { enqueueSnackbar } = useSnackbar();
 
   const selectedHostIp = selectedHostStore((state) => state.selectedHostIp);
@@ -67,15 +65,10 @@ const CardContainer = ({
   const [selectedVolumes, setSelectedVolumes] = useState<VolumeData[]>([]);
   const [expandedImage, setExpandedImage] = useState<string | null>(null);
   const [isConfigModalOpen, setIsConfigModalOpen] = useState<boolean>(false);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [configs, setConfigs] = useState<{ [key: string]: any[] }>({});
   const [imageVolumes, setImageVolumes] = useState<{
     [imageId: string]: VolumeData[];
   }>({});
-
-  console.log('configs >>>', configs);
-  console.log('imageVolumes >>>', imageVolumes);
-  console.log('imageToNetwork >>>', imageToNetwork);
 
   const splitImageNameAndTag = (image: string, id: string): ImageInfo => {
     const [name, tag] = image.split(':');
@@ -85,7 +78,7 @@ const CardContainer = ({
   const handleGetInfo = async (imageName: string) => {
     try {
       const imageDetail = await fetch(
-        `/api/image/detail?name=${imageName}`
+        `/api/image/detail?name=${imageName}`,
       ).then((res) => res.json());
       setDetailData(imageDetail);
       setIsModalOpen(true);
@@ -167,10 +160,6 @@ const CardContainer = ({
       [networkName]: [...(prev[networkName] || []), config],
     }));
     setIsConfigModalOpen(false);
-  };
-
-  const toggleDropdown = () => {
-    setIsDropdownOpen(!isDropdownOpen);
   };
 
   return (
@@ -330,7 +319,8 @@ const CardContainer = ({
               })}
             </div>
           ) : (
-            <div className="w-full h-44 flex items-center justify-center text-grey_7 p-2 text-sm border-2 border-dashed border-grey_2 rounded-lg">
+            <div
+              className="w-full h-44 flex items-center justify-center text-grey_7 p-2 text-sm border-2 border-dashed border-grey_2 rounded-lg">
               이미지를 드래그해서 놓으세요
             </div>
           )}

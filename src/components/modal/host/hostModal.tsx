@@ -36,7 +36,7 @@ const HostModal = ({ onClose }: HostModalProps) => {
   const { enqueueSnackbar } = useSnackbar();
   const addHost = useHostStore((state) => state.addHost);
   const addConnectedBridgeId = selectedHostStore(
-    (state) => state.addConnectedBridgeId
+    (state) => state.addConnectedBridgeId,
   );
 
   const [isRemote, setIsRemote] = useState<boolean>(false);
@@ -47,14 +47,13 @@ const HostModal = ({ onClose }: HostModalProps) => {
   const [availableNetworks, setAvailableNetworks] = useState<Network[]>([]);
   const [isHostIpConnected, setIsHostIpConnected] = useState<boolean>(false);
   const [connectionMessage, setConnectionMessage] = useState<string | null>(
-    null
+    null,
   );
 
   const fetchNetworks = async () => {
     try {
       const response = await fetch(`/api/network/list?hostIp=${hostIp}`);
       const data = await response.json();
-      console.log('네트워크 리스트 데이터', data);
 
       if (Array.isArray(data)) {
         setAvailableNetworks(data);
@@ -78,14 +77,14 @@ const HostModal = ({ onClose }: HostModalProps) => {
         enqueueSnackbar,
         '호스트는 최대 5개까지만 추가할 수 있습니다.',
         'error',
-        '#d32f2f'
+        '#d32f2f',
       );
       return;
     }
 
     // 선택한 네트워크 정보 찾기
     const selectedNetwork = availableNetworks.find(
-      (net) => net.Name === networkName
+      (net) => net.Name === networkName,
     );
 
     if (!selectedNetwork) {
@@ -93,7 +92,7 @@ const HostModal = ({ onClose }: HostModalProps) => {
         enqueueSnackbar,
         '선택된 네트워크를 찾을 수 없습니다.',
         'error',
-        '#d32f2f'
+        '#d32f2f',
       );
       return;
     }
@@ -132,14 +131,14 @@ const HostModal = ({ onClose }: HostModalProps) => {
       enqueueSnackbar,
       '호스트가 성공적으로 추가되었습니다!',
       'success',
-      '#4CAF50'
+      '#4CAF50',
     );
     onClose();
   };
 
   const defaultColor = colorsOption.find((color) => !color.sub);
   const defaultSubColor = colorsOption.find(
-    (color) => color.label === defaultColor?.label && color.sub
+    (color) => color.label === defaultColor?.label && color.sub,
   );
 
   const [selectedColor, setSelectedColor] = useState<ThemeColor>({
@@ -168,7 +167,7 @@ const HostModal = ({ onClose }: HostModalProps) => {
 
   const handleNetworkChange = (selectedNetworkName: string) => {
     const selectedNetwork = availableNetworks.find(
-      (net) => net.Name === selectedNetworkName
+      (net) => net.Name === selectedNetworkName,
     );
     setNetworkName(selectedNetworkName);
     setNetworkIp(selectedNetwork?.IPAM?.Config?.[0]?.Gateway || '');
@@ -176,10 +175,10 @@ const HostModal = ({ onClose }: HostModalProps) => {
 
   const handleColorSelection = (colorLabel: string) => {
     const mainColor = colorsOption.find(
-      (color) => color.label === colorLabel && !color.sub
+      (color) => color.label === colorLabel && !color.sub,
     );
     const subColor = colorsOption.find(
-      (color) => color.label === colorLabel && color.sub
+      (color) => color.label === colorLabel && color.sub,
     );
 
     setSelectedColor({
