@@ -7,8 +7,6 @@ export const createDockerClient = (hostIp?: string | null) => {
       ? sessionStorage.getItem('selectedHostIp') || 'localhost'
       : hostIp;
 
-  console.log('effectiveHost >>>', effectiveHost);
-
   // IP 주소와 포트를 정규식으로 파싱
   const ipPortRegex = /^((?:\d{1,3}\.){3}\d{1,3})(?::(\d+))?$/;
   const match = effectiveHost.match(ipPortRegex);
@@ -38,6 +36,5 @@ export const createDockerClient = (hostIp?: string | null) => {
       baseURL: `http://${host}:${port}`,
     };
 
-  console.log('Docker client options:', options);
   return axios.create(options);
 };
