@@ -25,6 +25,7 @@ export interface CardContainerProps {
   onDelete?: () => void;
   onSelectNetwork?: () => void;
   isSelected?: boolean;
+  hostIp: string;
 }
 
 interface ImageInfo {
@@ -48,9 +49,12 @@ const CardContainer = ({
   onDelete,
   onSelectNetwork,
   isSelected,
+  hostIp,
 }: CardContainerProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const randomId = uuidv4();
+
+  const selectedHostIp = selectedHostStore((state) => state.selectedHostIp);
 
   const [droppedImages, setDroppedImages] = useState<ImageInfo[]>([]);
   const [imageToNetwork, setImageToNetwork] = useState<ImageToNetwork[]>([]);
@@ -92,6 +96,7 @@ const CardContainer = ({
       setDroppedImages((prev) => [...prev, imageInfo]);
       setImageToNetwork((prev) => [...prev, { ...imageInfo, networkName }]);
     },
+    canDrop: () => hostIp === selectedHostIp,
     collect: (monitor) => ({
       isOver: monitor.isOver(),
     }),

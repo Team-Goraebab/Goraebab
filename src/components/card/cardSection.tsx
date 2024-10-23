@@ -189,6 +189,7 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
                             selectedNetwork?.hostId === host.id &&
                             selectedNetwork?.networkId === networks[0].id
                           }
+                          hostIp={host.hostIp}
                         />
                         <ConnectBar rotate={180} themeColor={host.themeColor} />
                       </div>
@@ -259,6 +260,7 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
                             selectedNetwork?.hostId === host.id &&
                             selectedNetwork?.networkId === networks[1].id
                           }
+                          hostIp={host.hostIp}
                         />
                       </div>
                     )}
@@ -319,6 +321,7 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
                           selectedNetwork?.hostId === host.id &&
                           selectedNetwork?.networkId === networks[2].id
                         }
+                        hostIp={host.hostIp}
                       />
                     </div>
                   )}
