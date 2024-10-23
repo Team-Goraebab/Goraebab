@@ -150,19 +150,21 @@ const Sidebar = () => {
     const data = dataHandlers[activeId as 1 | 2 | 3 | 4]?.data;
 
     if (activeId === 1) {
-      const groupedContainers = containerData.reduce((acc, container) => {
-        const groupName =
-          container.Labels['com.docker.compose.project'] ||
-          container.Names[0].replace(/^\//, '');
-        if (!acc[groupName]) {
-          acc[groupName] = {
-            containers: [],
-            networkMode: container.HostConfig?.NetworkMode || 'Unknown',
-          };
-        }
-        acc[groupName].containers.push(container);
-        return acc;
-      }, {} as Record<string, { containers: Container[]; networkMode: string }>);
+      const groupedContainers = Array.isArray(containerData)
+        ? containerData.reduce((acc, container) => {
+            const groupName =
+              container.Labels['com.docker.compose.project'] ||
+              container.Names[0].replace(/^\//, '');
+            if (!acc[groupName]) {
+              acc[groupName] = {
+                containers: [],
+                networkMode: container.HostConfig?.NetworkMode || 'Unknown',
+              };
+            }
+            acc[groupName].containers.push(container);
+            return acc;
+          }, {} as Record<string, { containers: Container[]; networkMode: string }>)
+        : {};
 
       return Object.entries(groupedContainers).map(
         ([groupName, { containers }]) => (
@@ -178,7 +180,7 @@ const Sidebar = () => {
 
     return data && data.length > 0
       ? data.map(
-          (item, index) =>
+          (item) =>
             CardComponent && (
               <CardComponent
                 key={`${item.Id}-${selectedHostIp}`}
