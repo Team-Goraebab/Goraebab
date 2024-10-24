@@ -2,7 +2,9 @@ import { createDockerClient } from '@/app/api/axiosInstance';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
-  const dockerClient = createDockerClient();
+  const { searchParams } = new URL(req.url);
+  const hostIp = searchParams.get('hostIp') || 'localhost';
+  const dockerClient = createDockerClient(hostIp);
 
   try {
     const response = await dockerClient.post('/system/prune?force=true');

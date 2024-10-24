@@ -1,16 +1,18 @@
+import { nextui } from '@nextui-org/theme';
 import type { Config } from 'tailwindcss';
 
 const config: Config = {
-  darkMode: 'class', // 다크 모드를 class 기반으로 설정
   content: [
     './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
+    './node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}',
   ],
   theme: {
     extend: {
       fontFamily: {
         pretendard: ['var(--font-pretendard)'],
+        montserrat: ['var(--font-montserrat)'],
       },
       colors: {
         primary: '#254b7a',
@@ -22,6 +24,7 @@ const config: Config = {
         grey_2: '#D2D2D2',
         grey_3: '#999999',
         grey_4: '#7F7F7F',
+        grey_5: '#5F5F5F',
         grey_6: '#4E4E4E',
         grey_7: '#3E3E3E',
         blue_0: '#e6ecf5',
@@ -78,6 +81,7 @@ const config: Config = {
       },
     },
   },
-  plugins: [],
+  darkMode: 'class',
+  plugins: [nextui()],
 };
 export default config;

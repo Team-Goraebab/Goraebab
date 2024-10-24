@@ -3,8 +3,10 @@ import { createDockerClient } from '../../axiosInstance';
 
 export async function POST(req: NextRequest) {
   const bodyData = await req.json();
-  const dockerClient = createDockerClient();
-  console.log(bodyData);
+  const { searchParams } = new URL(req.url);
+  const hostIp = searchParams.get('hostIp') || 'localhost';
+  const dockerClient = createDockerClient(hostIp);
+
   try {
     // 이름을 URL 파라미터로 전달
     const response = await dockerClient.post(

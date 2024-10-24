@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createDockerClient } from '../../axiosInstance';
 
 export async function POST(req: NextRequest) {
-  const dockerClient = createDockerClient();
+  const { searchParams } = new URL(req.url);
+  const hostIp = searchParams.get('hostIp') || 'localhost';
+  const dockerClient = createDockerClient(hostIp);
   const bodyData = await req.json();
 
   try {

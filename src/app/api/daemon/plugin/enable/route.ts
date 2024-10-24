@@ -4,7 +4,9 @@ import { createDockerClient } from '../../../axiosInstance';
 // 플러그인 활성화
 export async function POST(req: NextRequest) {
   const { name } = await req.json();
-  const dockerClient = createDockerClient();
+  const { searchParams } = new URL(req.url);
+  const hostIp = searchParams.get('hostIp') || 'localhost';
+  const dockerClient = createDockerClient(hostIp);
 
   if (!name) {
     return NextResponse.json(

@@ -1,6 +1,5 @@
 'use client';
 
-import { getStatusColors } from '@/utils/statusColorsUtils';
 import React from 'react';
 import { IconType } from 'react-icons';
 
@@ -23,16 +22,23 @@ const ManagementCard = ({
             <Icon className="text-4xl text-blue_4" />
             {title}
           </h3>
-          {cardData.map((item, index) => (
-            <div key={index} className="flex items-center mt-[5px] space-x-3.5">
-              <span className="text-sm py-1 w-[80px] rounded-md font-bold text-center text-blue_6 bg-blue_1 dark:text-blue_6 dark:bg-blue_1">
-                {item.label}
-              </span>
-              <span className="font-semibold text-sm truncate max-w-[150px]">
-                {item.value}
-              </span>
-            </div>
-          ))}
+          {cardData && cardData.length > 0 ? (
+            cardData.map((item, index) => (
+              <div
+                key={index}
+                className="flex items-center mt-[5px] space-x-3.5"
+              >
+                <span className="text-sm py-1 w-[80px] rounded-md font-bold text-center text-blue_6 bg-blue_1 dark:text-blue_6 dark:bg-blue_1">
+                  {item.label}
+                </span>
+                <span className="font-semibold text-sm truncate max-w-[150px]">
+                  {item.value}
+                </span>
+              </div>
+            ))
+          ) : (
+            <div className="text-center">데이터가 없습니다.</div>
+          )}
         </div>
       </div>
     </div>

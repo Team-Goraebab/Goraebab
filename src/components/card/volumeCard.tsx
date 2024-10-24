@@ -1,13 +1,22 @@
-'use client';
-
-import React, { useState, useEffect, useRef } from 'react';
-import { Modal, OptionModal } from '@/components';
+import React, { useState, useRef } from 'react';
+import { Modal } from '@/components';
 import { getStatusColors } from '@/utils/statusColorsUtils';
 import { useSnackbar } from 'notistack';
 import { showSnackbar } from '@/utils/toastUtils';
 import { formatDateTime } from '@/utils/formatTimestamp';
 import { fetchData } from '@/services/apiUtils';
 import VolumeDetailModal from '../modal/volume/volumeDetailModal';
+import {
+  FiInfo,
+  FiTrash,
+  FiHardDrive,
+  FiCpu,
+  FiCalendar,
+  FiDisc,
+  FiBox,
+  FiChevronDown,
+  FiChevronUp,
+} from 'react-icons/fi';
 
 interface VolumeProps {
   id: string;
@@ -30,41 +39,37 @@ interface VolumeCardProps {
   onDeleteSuccess: () => void;
 }
 
-/**
- * @param data 볼륨 데이터
- * @returns 볼륨 카드 UI
- */
 const VolumeCard = ({ data, onDeleteSuccess }: VolumeCardProps) => {
   const { enqueueSnackbar } = useSnackbar();
   const { bg1, bg2 } = getStatusColors('primary');
-  const [showOptions, setShowOptions] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [detailData, setDetailData] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
   const volumeItems = [
-    { label: 'NAME', value: data.Name },
-    { label: 'CREATED', value: formatDateTime(data.CreatedAt) },
-    { label: 'MOUNT POINT', value: data.Mountpoint },
-    { label: 'CAPACITY', value: data.Scope },
+    { label: 'NAME', value: data.Name, icon: FiCpu },
+    {
+      label: 'CREATED',
+      value: formatDateTime(data.CreatedAt),
+      icon: FiCalendar,
+    },
+    { label: 'MOUNT POINT', value: data.Mountpoint, icon: FiHardDrive },
+    { label: 'CAPACITY', value: data.Scope, icon: FiDisc },
     {
       label: 'CONTAINERS',
       value:
         (data.connectedContainers || [])
           .map((container) => `${container.name} (${container.ip})`)
           .join(', ') || 'No connected',
+      icon: FiBox,
     },
   ];
 
-  const handleOptionClick = () => {
-    setShowOptions(!showOptions);
-  };
-
   const handleDelete = () => {
     setShowModal(true);
-    setShowOptions(false);
   };
 
   const handleConfirmDelete = async () => {
@@ -83,7 +88,7 @@ const VolumeCard = ({ data, onDeleteSuccess }: VolumeCardProps) => {
           enqueueSnackbar,
           '볼륨이 성공적으로 삭제되었습니다!',
           'success',
-          '#254b7a'
+          '#4CAF50'
         );
         onDeleteSuccess();
       } else {
@@ -96,14 +101,12 @@ const VolumeCard = ({ data, onDeleteSuccess }: VolumeCardProps) => {
       }
     } catch (error) {
       console.error('볼륨 삭제 중 에러:', error);
-      {
-        showSnackbar(
-          enqueueSnackbar,
-          `볼륨 삭제 요청 중 에러: ${error}`,
-          'error',
-          '#FF4853'
-        );
-      }
+      showSnackbar(
+        enqueueSnackbar,
+        `볼륨 삭제 요청 중 에러: ${error}`,
+        'error',
+        '#FF4853'
+      );
     } finally {
       setLoading(false);
       setShowModal(false);
@@ -130,68 +133,82 @@ const VolumeCard = ({ data, onDeleteSuccess }: VolumeCardProps) => {
   const handleGetInfo = async () => {
     try {
       const volumeDetail = await fetchVolumeDetail(data.Name);
-      console.log('볼륨 상세 정보:', volumeDetail);
       setDetailData(volumeDetail);
-      setShowOptions(false);
       setIsModalOpen(true);
     } catch (error) {
       console.log(error);
     }
   };
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (cardRef.current && !cardRef.current.contains(event.target as Node)) {
-        setShowOptions(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [cardRef]);
+  const toggleAccordion = () => {
+    setIsExpanded(!isExpanded);
+  };
 
   return (
     <div
       ref={cardRef}
-      className="relative flex items-start px-3 pt-1 pb-3 bg-grey_0 shadow rounded-lg mb-4"
+      className="relative bg-white border rounded-lg transition-all duration-300 mb-2 overflow-hidden"
     >
-      <div
-        className="absolute left-0 top-0 bottom-0 w-2.5 rounded-l-lg"
-        style={{ backgroundColor: bg2 }}
-      />
-      <div className="ml-4 flex flex-col w-full">
-        <div className="flex justify-end text-grey_4 text-sm mb-3 relative">
-          <span
-            className="font-semibold text-xs cursor-pointer"
-            onClick={handleOptionClick}
-          >
-            •••
+      <div className="flex justify-between items-center px-4 py-2 bg-gray-50 border-b">
+        <div className="flex items-center space-x-2 truncate">
+          <span className="font-pretendard text-sm font-bold text-gray-700 truncate">
+            {data.Name}
           </span>
-          {showOptions && (
-            <div className="absolute top-4 left-28">
-              <OptionModal
-                onTopHandler={handleGetInfo}
-                onBottomHandler={handleDelete}
-                btnVisible={false}
-              />
-            </div>
-          )}
         </div>
-        {volumeItems.map((item, index) => (
-          <div key={index} className="flex items-center mt-[5px] space-x-3.5">
-            <span
-              className="text-xs py-1 w-[75px] rounded-md font-bold text-center"
-              style={{ backgroundColor: bg1, color: bg2 }}
-            >
-              {item.label}
-            </span>
-            <span className="font-semibold text-xs truncate max-w-[130px]">
-              {item.value}
-            </span>
-          </div>
-        ))}
+        <div className="flex">
+          <button
+            onClick={handleGetInfo}
+            className="p-2 rounded-full hover:bg-gray-200 transition-colors"
+            title="Volume Info"
+          >
+            <FiInfo className="text-gray-500" size={16} />
+          </button>
+          <button
+            onClick={handleDelete}
+            className="p-2 rounded-full hover:bg-gray-200 transition-colors"
+            title="Delete Volume"
+          >
+            <FiTrash className="text-gray-500" size={16} />
+          </button>
+          <button
+            onClick={toggleAccordion}
+            className="p-2 rounded-full hover:bg-gray-200 transition-colors"
+            title="Toggle Details"
+          >
+            {isExpanded ? (
+              <FiChevronUp size={16} className="text-gray-500" />
+            ) : (
+              <FiChevronDown size={16} className="text-gray-500" />
+            )}
+          </button>
+        </div>
       </div>
+
+      {isExpanded && (
+        <div className="p-4">
+          <div className="grid gap-4">
+            {volumeItems.map((item, index) => (
+              <div key={index} className="flex items-center space-x-3">
+                <div
+                  className="p-2 rounded-lg"
+                  style={{ backgroundColor: bg1 }}
+                >
+                  <item.icon size={16} style={{ color: bg2 }} />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-xs text-gray-500 font-medium font-pretendard">
+                    {item.label}
+                  </span>
+                  <span className="font-pretendard font-semibold text-sm text-gray-800 truncate max-w-[150px]">
+                    {item.value}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       <Modal
         isOpen={showModal}
         onClose={handleCloseModal}
