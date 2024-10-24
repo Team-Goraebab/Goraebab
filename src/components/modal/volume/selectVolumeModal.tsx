@@ -56,12 +56,12 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
 }));
 
 const SelectVolumeModal = ({
-                             open,
-                             imageName,
-                             onClose,
-                             onSave,
-                             initialSelectedVolumes,
-                           }: SelectVolumeModalProps) => {
+  open,
+  imageName,
+  onClose,
+  onSave,
+  initialSelectedVolumes,
+}: SelectVolumeModalProps) => {
   const [volumes, setVolumes] = useState<any[]>([]);
   const [selectedVolumes, setSelectedVolumes] = useState<string[]>([]);
 
@@ -83,13 +83,13 @@ const SelectVolumeModal = ({
     setSelectedVolumes((prev) =>
       prev.includes(volumeName)
         ? prev.filter((v) => v !== volumeName)
-        : [...prev, volumeName],
+        : [...prev, volumeName]
     );
   };
 
   const handleSave = () => {
     const selectedVolumeData = volumes.filter((v) =>
-      selectedVolumes.includes(v.Name),
+      selectedVolumes.includes(v.Name)
     );
     onSave(selectedVolumeData);
     onClose();
@@ -111,13 +111,18 @@ const SelectVolumeModal = ({
         {volumes.length > 0 ? (
           <StyledPaper elevation={0}>
             <List disablePadding>
-              {volumes.map((volume) => (
+              {volumes.map((volume, index) => (
                 <ListItem
-                  key={volume.Id}
+                  key={index}
                   dense
                   component="div"
                   onClick={() => handleVolumeChange(volume.Name)}
-                  sx={{ cursor: 'pointer', overflow: 'hidden', paddingX: 4, paddingY: 1 }}
+                  sx={{
+                    cursor: 'pointer',
+                    overflow: 'hidden',
+                    paddingX: 4,
+                    paddingY: 1,
+                  }}
                 >
                   <ListItemIcon>
                     <Checkbox
@@ -128,9 +133,17 @@ const SelectVolumeModal = ({
                     />
                   </ListItemIcon>
                   <ListItemText
-                    primary={<Typography variant="subtitle1" className="truncate">{volume.Name}</Typography>}
+                    primary={
+                      <Typography variant="subtitle1" className="truncate">
+                        {volume.Name}
+                      </Typography>
+                    }
                     secondary={
-                      <Typography variant="body2" color="text.secondary" className="font-pretendard">
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        className="font-pretendard"
+                      >
                         Driver: {volume.Driver}
                       </Typography>
                     }
@@ -146,9 +159,7 @@ const SelectVolumeModal = ({
         )}
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>
-          취소
-        </Button>
+        <Button onClick={onClose}>취소</Button>
         <Button
           onClick={handleSave}
           color="primary"
