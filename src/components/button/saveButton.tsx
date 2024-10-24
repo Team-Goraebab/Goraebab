@@ -1,13 +1,10 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useSnackbar } from 'notistack';
 import { showSnackbar } from '@/utils/toastUtils';
 import { AiOutlineSave } from 'react-icons/ai';
-import { BASE_URL } from '@/app/api/urlPath';
-import { selectedHostStore } from '@/store/seletedHostStore';
-import { useHostStore } from '@/store/hostStore';
-import { useStore } from '@/store/cardStore';
+import { useBlueprintStore } from '@/store/blueprintStore';
 
 interface BlueprintReqDto {
   name: string;
@@ -17,46 +14,8 @@ interface BlueprintReqDto {
 
 const SaveButton = () => {
   const { enqueueSnackbar } = useSnackbar();
-  const { connectedBridgeIds, selectedHostName } = selectedHostStore(
-    (state) => ({
-      connectedBridgeIds: state.connectedBridgeIds,
-      selectedHostName: state.selectedHostName,
-    }),
-  );
+  const mappedData = useBlueprintStore((state) => state.mappedData);
 
-  const allContainers = useStore((state) => state.hostContainers);
-  const selectedHostIp = selectedHostStore((state) => state.selectedHostIp);
-
-  const hosts = useHostStore((state) => state.hosts);
-
-  useEffect(() => {
-    console.log('host data >>>>>', hosts);
-  }, [hosts]);
-
-  const data = hosts.map((host, index) => {
-    const containers = allContainers[host.id] || [];
-    const networks = connectedBridgeIds[host.id] || [];
-    // 반환할 데이터가 있다면 여기에서 처리
-    return {
-      hostId: host.id,
-      containers,
-      networks,
-    };
-  });
-
-  useEffect(() => {
-    // 각 호스트에 대해 연결된 네트워크를 호스트 이름으로 묶어 출력
-    Object.entries(connectedBridgeIds).forEach(([hostId, bridges]) => {
-      const hostName = selectedHostName; // 현재 선택된 호스트 이름 가져오기
-      console.log(`호스트 이름: ${hostName || hostId}`);
-
-      bridges.forEach((bridge) => {
-        console.log(
-          `  네트워크 이름: ${bridge.name}, 게이트웨이: ${bridge.gateway}, 드라이버: ${bridge.driver}, 서브넷: ${bridge.subnet}, 스코프: ${bridge.scope}`,
-        );
-      });
-    });
-  }, [connectedBridgeIds, selectedHostName]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [blueprintName, setBlueprintName] = useState('');
   const [isDockerRemote, setIsDockerRemote] = useState(false);
@@ -67,84 +26,92 @@ const SaveButton = () => {
   };
 
   const handleSubmit = async () => {
-    const mainContent = document.querySelector('main')?.innerHTML;
-    if (!mainContent) {
+    if (!mappedData || !Array.isArray(mappedData)) {
       showSnackbar(
         enqueueSnackbar,
-        '저장할 내용이 없습니다.',
+        '매핑된 데이터가 유효하지 않습니다.',
         'error',
-        '#FF4848',
+        '#FF4853'
       );
       return;
     }
-
-    const formData = new FormData();
-
-    // Create blueprintReqDto object
-    const blueprintReqDto: BlueprintReqDto = {
-      name: blueprintName,
-      isDockerRemote: isDockerRemote,
-    };
-
-    if (isDockerRemote && remoteUrl) {
-      blueprintReqDto.remoteUrl = remoteUrl;
-    }
-
-    console.log('JSON 데이터:', JSON.stringify(blueprintReqDto, null, 2));
-    // Convert blueprintReqDto to JSON and append as a Blob
-    const jsonBlob = new Blob([JSON.stringify(blueprintReqDto)], {
-      type: 'application/json',
-    });
-    formData.append('blueprintReqDto', jsonBlob);
-
-    // Append the HTML content as a Blob with correct content type
-    const contentBlob = new Blob([mainContent], {
-      type: 'multipart/form-data',
-    });
-    formData.append('data', contentBlob, `${blueprintName}.html`);
-
     try {
-      const response = await fetch(`${BASE_URL}/blueprints`, {
+      const requestBody = {
+        blueprintName,
+        processedData: {
+          host: mappedData.map((host) => ({
+            name: host.hostNm,
+            isLocal: !isDockerRemote,
+            ip: isDockerRemote ? remoteUrl : null,
+            network: host.networks.map((network) => ({
+              name: network.name,
+              driver: network.driver || 'bridge',
+              ipam: {
+                config: [
+                  {
+                    subnet: network.subnet || '',
+                  },
+                ],
+              },
+              containers: network.containers.map((container) => ({
+                containerName: container.containerName || null,
+                image: {
+                  imageId: container.image.imageId,
+                  name: container.image.name,
+                  tag: container.image.tag,
+                },
+                networkSettings: container.networkSettings,
+                ports: container.ports,
+                mounts: container.mounts,
+                env: container.env || [],
+                cmd: container.cmd || [],
+              })),
+            })),
+            volume: host.imageVolumes.map((volume: any) => ({
+              name: volume.Name,
+              driver: volume.Driver,
+            })),
+          })),
+        },
+      };
+
+      // API 요청 보내기
+      const res = await fetch('/api/blueprint/create', {
         method: 'POST',
-        body: formData,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestBody),
       });
 
-      // Check if the response is in JSON format
-      const contentType = response.headers.get('Content-Type');
-
-      if (response.ok) {
+      const result = await res.json();
+      if (res.ok) {
         showSnackbar(
           enqueueSnackbar,
-          '설계도가 성공적으로 저장되었습니다!',
+          '설계도를 성공적으로 전송했습니다!',
           'success',
-          '#254b7a',
+          '#4CAF50'
         );
-        setIsModalOpen(false);
-        setBlueprintName('');
-        setIsDockerRemote(false);
-        setRemoteUrl('');
-      } else if (contentType && contentType.includes('application/json')) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || '서버 응답 오류');
       } else {
-        const errorText = await response.text(); // HTML이나 텍스트 응답 처리
-        throw new Error(`서버 오류: ${errorText}`);
+        showSnackbar(
+          enqueueSnackbar,
+          `설계도 전송 실패: ${result.error}`,
+          'error',
+          '#FF4853'
+        );
       }
     } catch (error) {
-      console.error('Error:', error);
+      console.error('설계도 전송 실패 중 에러:', error);
       showSnackbar(
         enqueueSnackbar,
-        `설계도 저장 중 오류가 발생했습니다: ${error}`,
+        '설계도 전송 실패 중 에러가 발생했습니다.',
         'error',
-        '#FF4848',
+        '#FF4853'
       );
     }
   };
 
   return (
     <>
-      <div
-        className="fixed bottom-8 right-[50px] transform translate-x-4 h-[40px] px-4 bg-white border-gray_3 border text-blue_6 hover:text-white hover:bg-blue_5 active:bg-blue_6 rounded-lg flex items-center justify-center transition duration-200 ease-in-out">
+      <div className="fixed bottom-8 right-[50px] transform translate-x-4 h-[40px] px-4 bg-white border-gray_3 border text-blue_6 hover:text-white hover:bg-blue_5 active:bg-blue_6 rounded-lg flex items-center justify-center transition duration-200 ease-in-out">
         <button
           className="flex items-center gap-2 text-center"
           onClick={handleSave}
