@@ -10,9 +10,6 @@ const Main = () => {
   const [isHandMode, setIsHandMode] = React.useState(false);
 
   const hosts = useHostStore((state) => state.hosts);
-  useEffect(() => {
-    console.log('host data >>>>>', hosts);
-  }, [hosts]);
 
   useHandModeSubscription((newIsHandMode) => {
     setIsHandMode(newIsHandMode);
