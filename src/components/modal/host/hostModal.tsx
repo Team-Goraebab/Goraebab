@@ -214,9 +214,9 @@ const HostModal = ({ onClose }: HostModalProps) => {
   return (
     <Dialog open={true} onClose={onClose} fullWidth maxWidth="sm">
       <DialogTitle>
-        <Typography variant="h5" textAlign="center" fontWeight="bold">
+        <div className='font-bold text-x'>
           Create New Host
-        </Typography>
+        </div>
       </DialogTitle>
       <DialogContent>
         <Box display="flex" flexDirection="column" gap={3} mt={2}>
