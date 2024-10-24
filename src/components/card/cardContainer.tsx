@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useDrop } from 'react-dnd';
 import {
   FaTimesCircle,
@@ -16,6 +16,8 @@ import SelectVolumeModal from '../modal/volume/selectVolumeModal';
 import ConfigurationModal from '../modal/daemon/configurationModal';
 import { selectedHostStore } from '@/store/seletedHostStore';
 import { useSnackbar } from 'notistack';
+import { useHostStore } from '@/store/hostStore';
+import { useStore } from '@/store/cardStore';
 
 export interface CardContainerProps {
   networkName: string;
@@ -26,6 +28,8 @@ export interface CardContainerProps {
   onSelectNetwork?: () => void;
   isSelected?: boolean;
   hostIp: string;
+  networkUniqueId: string;
+  containerName: string;
 }
 
 interface ImageInfo {
@@ -42,19 +46,26 @@ interface ImageToNetwork {
 }
 
 const CardContainer = ({
-                         networkName,
-                         networkIp,
-                         containers,
-                         themeColor,
-                         onDelete,
-                         onSelectNetwork,
-                         isSelected,
-                         hostIp,
-                       }: CardContainerProps) => {
+  networkName,
+  networkIp,
+  containers,
+  themeColor,
+  onDelete,
+  onSelectNetwork,
+  isSelected,
+  hostIp,
+  networkUniqueId,
+  containerName,
+}: CardContainerProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const { enqueueSnackbar } = useSnackbar();
 
   const selectedHostIp = selectedHostStore((state) => state.selectedHostIp);
+  const hosts = useHostStore((state) => state.hosts);
+  const allContainers = useStore((state) => state.hostContainers);
+  const connectedBridgeIds = selectedHostStore(
+    (state) => state.connectedBridgeIds
+  );
 
   const [droppedImages, setDroppedImages] = useState<ImageInfo[]>([]);
   const [imageToNetwork, setImageToNetwork] = useState<ImageToNetwork[]>([]);
@@ -65,10 +76,63 @@ const CardContainer = ({
   const [selectedVolumes, setSelectedVolumes] = useState<VolumeData[]>([]);
   const [expandedImage, setExpandedImage] = useState<string | null>(null);
   const [isConfigModalOpen, setIsConfigModalOpen] = useState<boolean>(false);
-  const [configs, setConfigs] = useState<{ [key: string]: any[] }>({});
-  const [imageVolumes, setImageVolumes] = useState<{
-    [imageId: string]: VolumeData[];
+  const [configs, setConfigs] = useState<{
+    [networkUniqueId: string]: any[];
   }>({});
+  const [imageVolumes, setImageVolumes] = useState<{
+    [networkUniqueId: string]: {
+      [imageId: string]: VolumeData[];
+    };
+  }>({});
+
+  const defaultVolumeData: VolumeData[] = [
+    {
+      Name: '',
+      Driver: '',
+      Mountpoint: '',
+      Scope: '',
+    },
+  ];
+
+  // 네트워크 유니크 아이디로 데이터를 매핑
+  const mappedData = hosts.map((host) => {
+    const networks = connectedBridgeIds[host.id] || [];
+
+    const mappedNetworks = networks.map((network) => {
+      const networkId = network.id;
+      const networkConfigs = configs[networkUniqueId] || null;
+      const networkContainerName =
+        containerName === networkId ? containerName : null;
+
+      const networkImageVolumes =
+        imageVolumes[networkUniqueId]?.[droppedImages[0]?.id] || [];
+
+      return {
+        ...network,
+        hostId: host.id,
+        containerName: containerName,
+        configs: networkConfigs,
+        droppedImages: droppedImages,
+        imageVolumes: networkImageVolumes,
+      };
+    });
+
+    return {
+      ...host,
+      networks: mappedNetworks,
+    };
+  });
+
+  // 매핑된 데이터를 출력해서 확인
+  console.log('Mapped data >>>>>', mappedData);
+
+  const volumes = imageVolumes[droppedImages[0]?.id] || defaultVolumeData;
+  // console.log('imageToNetwork >>>', imageToNetwork);
+  // console.log('droppedImages >>>', droppedImages);
+  // console.log('configs >>>', configs);
+  // console.log('containerName >>>', containerName);
+  // console.log('imageVolumes >>>', volumes);
+  // console.log('host data >>>>>', hosts);
 
   const splitImageNameAndTag = (image: string, id: string): ImageInfo => {
     const [name, tag] = image.split(':');
@@ -78,7 +142,7 @@ const CardContainer = ({
   const handleGetInfo = async (imageName: string) => {
     try {
       const imageDetail = await fetch(
-        `/api/image/detail?name=${imageName}`,
+        `/api/image/detail?name=${imageName}`
       ).then((res) => res.json());
       setDetailData(imageDetail);
       setIsModalOpen(true);
@@ -134,7 +198,7 @@ const CardContainer = ({
 
   const handleOpenVolumeModal = (imageId: string) => {
     setSelectedImage(imageId);
-    setSelectedVolumes(imageVolumes[imageId] || []);
+    setSelectedVolumes(imageVolumes[networkUniqueId]?.[imageId] || []);
     setIsVolumeModalOpen(true);
   };
 
@@ -145,7 +209,10 @@ const CardContainer = ({
   const handleAddVolume = (volumeData: VolumeData[]) => {
     setImageVolumes((prev) => ({
       ...prev,
-      [selectedImage]: volumeData,
+      [networkUniqueId]: {
+        ...(prev[networkUniqueId] || {}),
+        [selectedImage]: volumeData,
+      },
     }));
     handleCloseVolumeModal();
   };
@@ -157,7 +224,7 @@ const CardContainer = ({
   const handleSaveConfig = (config: any) => {
     setConfigs((prev) => ({
       ...prev,
-      [networkName]: [...(prev[networkName] || []), config],
+      [networkUniqueId]: config,
     }));
     setIsConfigModalOpen(false);
   };
@@ -276,10 +343,12 @@ const CardContainer = ({
                           </button>
                         </div>
                       </div>
-                      {/* {imageVolumes[image.id]?.length > 0 && ( */}
                       <div className="mt-3 flex justify-between">
                         <h4 className="text-sm font-semibold text-grey_6">
-                          Volumes ({imageVolumes[image.id]?.length || 0})
+                          Volumes (
+                          {imageVolumes[networkUniqueId]?.[image.id]?.length ||
+                            0}
+                          )
                         </h4>
                         <button
                           className="text-grey_5 hover:text-grey_6"
@@ -290,37 +359,38 @@ const CardContainer = ({
                           {isExpanded ? <FaChevronUp /> : <FaChevronDown />}
                         </button>
                       </div>
-                      {/* )} */}
                     </div>
-                    {isExpanded && imageVolumes[image.id]?.length > 0 && (
-                      <div className="bg-gray-50 p-4 rounded-b-lg border-t border-grey_2">
-                        <ul className="space-y-2">
-                          {imageVolumes[image.id].map((vol, volIndex) => (
-                            <li
-                              key={volIndex}
-                              className="flex items-center justify-between"
-                            >
-                              <span
-                                className="text-sm text-grey_6 truncate max-w-[300px]"
-                                title={vol.Name}
-                              >
-                                {vol.Name}
-                              </span>
-                              <span className="text-xs text-grey_5 bg-grey_2 px-2 py-1 rounded">
-                                {vol.Driver}
-                              </span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
+                    {isExpanded &&
+                      imageVolumes[networkUniqueId]?.[image.id]?.length > 0 && (
+                        <div className="bg-gray-50 p-4 rounded-b-lg border-t border-grey_2">
+                          <ul className="space-y-2">
+                            {imageVolumes[networkUniqueId][image.id].map(
+                              (vol, volIndex) => (
+                                <li
+                                  key={volIndex}
+                                  className="flex items-center justify-between"
+                                >
+                                  <span
+                                    className="text-sm text-grey_6 truncate max-w-[300px]"
+                                    title={vol.Name}
+                                  >
+                                    {vol.Name}
+                                  </span>
+                                  <span className="text-xs text-grey_5 bg-grey_2 px-2 py-1 rounded">
+                                    {vol.Driver}
+                                  </span>
+                                </li>
+                              )
+                            )}
+                          </ul>
+                        </div>
+                      )}
                   </div>
                 );
               })}
             </div>
           ) : (
-            <div
-              className="w-full h-44 flex items-center justify-center text-grey_7 p-2 text-sm border-2 border-dashed border-grey_2 rounded-lg">
+            <div className="w-full h-44 flex items-center justify-center text-grey_7 p-2 text-sm border-2 border-dashed border-grey_2 rounded-lg">
               이미지를 드래그해서 놓으세요
             </div>
           )}

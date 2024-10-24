@@ -36,16 +36,16 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
   const { selectedNetwork, setSelectedNetwork, clearSelectedNetwork } =
     useSelectedNetworkStore();
 
+  console.log('선택한 네트워크 3333', selectedNetwork);
+
   const allContainers = useStore((state) => state.hostContainers);
   const deleteNetwork = useHostStore((state) => state.deleteNetwork);
 
   const [isNameModalOpen, setIsNameModalOpen] = useState(false);
+  const [editingUniqueId, setEditingUniqueId] = useState<string | null>(null);
   const [containerNames, setContainerNames] = useState<{
-    [key: string]: string;
+    [uniqueId: string]: string;
   }>({});
-  const [editingContainerId, setEditingContainerId] = useState<string | null>(
-    null
-  );
 
   const handleHostClick = (id: string, name: string, ip: string) => {
     const newSelectedHostId = selectedHostId === id ? null : id;
@@ -61,39 +61,22 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
     clearSelectedNetwork();
   };
 
-  const handleDeleteNetwork = (
-    hostId: string,
-    networkName: string,
-    networkId: string
-  ) => {
-    if (
-      selectedNetwork?.hostId === hostId &&
-      selectedNetwork?.networkName === networkName &&
-      selectedNetwork?.networkId === networkId
-    ) {
-      // 네트워크 삭제 시 선택된 네트워크 해제
-      clearSelectedNetwork();
-    }
-    deleteNetwork(hostId, networkName, networkId);
-    deleteConnectedBridgeId(hostId, networkId);
-  };
-
   const handleSelectNetwork = (
     hostId: string,
     hostIp: string,
     networkName: string,
-    networkId: string
+    networkId: string,
+    uniqueId: string
   ) => {
     if (
       selectedNetwork?.hostId === hostId &&
-      selectedNetwork?.networkName === networkName &&
-      selectedNetwork?.networkId === networkId
+      selectedNetwork?.uniqueId === uniqueId
     ) {
       // 이미 선택된 네트워크를 다시 클릭하면 선택 해제
       clearSelectedNetwork();
     } else {
       // 새로운 네트워크 선택
-      setSelectedNetwork(hostId, networkName, networkId);
+      setSelectedNetwork(hostId, networkName, networkId, uniqueId);
       sessionStorage.setItem('selectedHostIp', hostIp);
       // 네트워크를 선택하면 해당 호스트도 자동 선택
       setSelectedHostId(hostId);
@@ -101,21 +84,41 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
     }
   };
 
-  const handleOpenNameModal = (containerId: string) => {
-    setEditingContainerId(containerId);
+  const handleDeleteNetwork = (
+    hostId: string,
+    networkName: string,
+    networkId: string,
+    uniqueId: string
+  ) => {
+    if (
+      selectedNetwork?.hostId === hostId &&
+      selectedNetwork?.networkName === networkName &&
+      selectedNetwork?.networkId === networkId &&
+      selectedNetwork?.uniqueId === uniqueId
+    ) {
+      // 네트워크 삭제 시 선택된 네트워크 해제
+      clearSelectedNetwork();
+    }
+    deleteNetwork(hostId, uniqueId);
+    deleteConnectedBridgeId(hostId, uniqueId);
+  };
+
+  const handleOpenNameModal = (uniqueId: string) => {
+    setEditingUniqueId(uniqueId);
     setIsNameModalOpen(true);
   };
 
   const handleSaveName = (newName: string) => {
-    if (editingContainerId) {
+    if (editingUniqueId) {
       setContainerNames((prevNames) => ({
         ...prevNames,
-        [editingContainerId]: newName,
+        [editingUniqueId]: newName,
       }));
     }
     setIsNameModalOpen(false);
-    setEditingContainerId(null);
+    setEditingUniqueId(null);
   };
+
   return (
     <>
       <Draggable disabled={!isHandMode}>
@@ -135,6 +138,7 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
               const isHostSelected =
                 selectedNetwork?.hostId === host.id ||
                 selectedHostId === host.id;
+              console.log(containerNames[networks[0].uniqueId]);
               return (
                 <div key={host.id} className="flex flex-col items-center">
                   <div className="flex flex-row items-center">
@@ -154,7 +158,7 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleOpenNameModal(networks[0].id);
+                              handleOpenNameModal(networks[0].uniqueId);
                             }}
                           >
                             <FaPencilAlt
@@ -162,19 +166,21 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
                               style={{ color: host.themeColor.borderColor }}
                             />
                           </button>
-                          {containerNames[networks[0].id] ||
+                          {containerNames[networks[0].uniqueId] ||
                             'container 이름을 설정하세요'}
                         </div>
                         <CardContainer
                           networkName={networks[0].name}
                           networkIp={networks[0].gateway}
                           containers={containers}
+                          containerName={containerNames[networks[0].uniqueId]}
                           themeColor={host.themeColor}
                           onDelete={() =>
                             handleDeleteNetwork(
                               host.id,
                               networks[0].name,
-                              networks[0].id
+                              networks[0].id,
+                              networks[0].uniqueId
                             )
                           }
                           onSelectNetwork={() =>
@@ -182,14 +188,15 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
                               host.id,
                               host.hostIp,
                               networks[0].name,
-                              networks[0].id
+                              networks[0].id,
+                              networks[0].uniqueId
                             )
                           }
                           isSelected={
-                            selectedNetwork?.hostId === host.id &&
-                            selectedNetwork?.networkId === networks[0].id
+                            selectedNetwork?.uniqueId === networks[0].uniqueId
                           }
                           hostIp={host.hostIp}
+                          networkUniqueId={networks[0].uniqueId}
                         />
                         <ConnectBar rotate={180} themeColor={host.themeColor} />
                       </div>
@@ -225,7 +232,7 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleOpenNameModal(networks[1].id);
+                              handleOpenNameModal(networks[1].uniqueId);
                             }}
                           >
                             <FaPencilAlt
@@ -233,19 +240,21 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
                               style={{ color: host.themeColor.borderColor }}
                             />
                           </button>
-                          {containerNames[networks[1].id] ||
+                          {containerNames[networks[1].uniqueId] ||
                             'container 이름을 설정하세요'}
                         </div>
                         <CardContainer
                           networkName={networks[1].name}
                           networkIp={networks[1].gateway}
                           containers={containers}
+                          containerName={containerNames[networks[1].uniqueId]}
                           themeColor={host.themeColor}
                           onDelete={() =>
                             handleDeleteNetwork(
                               host.id,
                               networks[1].name,
-                              networks[1].id
+                              networks[1].id,
+                              networks[1].uniqueId
                             )
                           }
                           onSelectNetwork={() =>
@@ -253,14 +262,15 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
                               host.id,
                               host.hostIp,
                               networks[1].name,
-                              networks[1].id
+                              networks[1].id,
+                              networks[1].uniqueId
                             )
                           }
                           isSelected={
-                            selectedNetwork?.hostId === host.id &&
-                            selectedNetwork?.networkId === networks[1].id
+                            selectedNetwork?.uniqueId === networks[1].uniqueId
                           }
                           hostIp={host.hostIp}
+                          networkUniqueId={networks[1].uniqueId}
                         />
                       </div>
                     )}
@@ -286,7 +296,7 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleOpenNameModal(networks[2].id);
+                            handleOpenNameModal(networks[2].uniqueId);
                           }}
                         >
                           <FaPencilAlt
@@ -294,19 +304,21 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
                             style={{ color: host.themeColor.borderColor }}
                           />
                         </button>
-                        {containerNames[networks[2].id] ||
+                        {containerNames[networks[2].uniqueId] ||
                           'container 이름을 설정하세요'}
                       </div>
                       <CardContainer
                         networkName={networks[2].name}
                         networkIp={networks[2].gateway}
                         containers={containers}
+                        containerName={containerNames[networks[2].uniqueId]}
                         themeColor={host.themeColor}
                         onDelete={() =>
                           handleDeleteNetwork(
                             host.id,
                             networks[2].name,
-                            networks[2].id
+                            networks[2].id,
+                            networks[2].uniqueId
                           )
                         }
                         onSelectNetwork={() =>
@@ -314,14 +326,15 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
                             host.id,
                             host.hostIp,
                             networks[2].name,
-                            networks[2].id
+                            networks[2].id,
+                            networks[2].uniqueId
                           )
                         }
                         isSelected={
-                          selectedNetwork?.hostId === host.id &&
-                          selectedNetwork?.networkId === networks[2].id
+                          selectedNetwork?.uniqueId === networks[2].uniqueId
                         }
                         hostIp={host.hostIp}
+                        networkUniqueId={networks[2].uniqueId}
                       />
                     </div>
                   )}
@@ -336,15 +349,15 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
       <ContainerNameModal
         open={isNameModalOpen}
         containerName={
-          editingContainerId ? containerNames[editingContainerId] || '' : ''
+          editingUniqueId ? containerNames[editingUniqueId] || '' : ''
         }
         onClose={() => setIsNameModalOpen(false)}
         onSave={handleSaveName}
         onChange={(name) => {
-          if (editingContainerId) {
+          if (editingUniqueId) {
             setContainerNames((prevNames) => ({
               ...prevNames,
-              [editingContainerId]: name,
+              [editingUniqueId]: name,
             }));
           }
         }}
