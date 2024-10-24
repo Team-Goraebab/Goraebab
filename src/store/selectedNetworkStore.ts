@@ -2,15 +2,16 @@ import { create } from 'zustand';
 
 interface SelectedNetworkState {
   selectedNetwork: {
-    [x: string]: string;
     hostId: string;
     networkName: string;
     networkId: string;
+    uniqueId: string;
   } | null;
   setSelectedNetwork: (
     hostId: string,
     networkName: string,
-    networkId: string
+    networkId: string,
+    uniqueId: string
   ) => void;
   clearSelectedNetwork: () => void;
 }
@@ -21,8 +22,9 @@ const useSelectedNetworkStore = create<SelectedNetworkState>((set) => ({
   setSelectedNetwork: (
     hostId: string,
     networkName: string,
-    networkId: string
-  ) => set({ selectedNetwork: { hostId, networkName, networkId } }),
+    networkId: string,
+    uniqueId: string
+  ) => set({ selectedNetwork: { hostId, networkName, networkId, uniqueId } }),
   clearSelectedNetwork: () => set({ selectedNetwork: null }),
 }));
 

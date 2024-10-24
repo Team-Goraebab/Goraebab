@@ -1,7 +1,9 @@
 import { create } from 'zustand';
+import { v4 as uuidv4 } from 'uuid';
 
 interface BridgeInfo {
   id: string;
+  uniqueId: string;
   name: string;
   gateway: string;
   driver: string;
@@ -20,7 +22,7 @@ interface SelectedHostStore {
   setSelectedHostIp: (ip: string | null) => void;
   setApiUrl: (url: string) => void;
   addConnectedBridgeId: (hostId: string, bridge: BridgeInfo) => void;
-  deleteConnectedBridgeId: (hostId: string, networkName: string) => void;
+  deleteConnectedBridgeId: (hostId: string, uniqueId: string) => void;
 }
 
 export const selectedHostStore = create<SelectedHostStore>((set) => ({
@@ -61,19 +63,21 @@ export const selectedHostStore = create<SelectedHostStore>((set) => ({
         return state;
       }
 
+      const bridgeWithuniqueId = { ...bridge, uniqueId: uuidv4() };
+
       return {
         connectedBridgeIds: {
           ...state.connectedBridgeIds,
-          [hostId]: [...currentBridges, bridge],
+          [hostId]: [...currentBridges, bridgeWithuniqueId],
         },
       };
     }),
 
   // 연결된 브릿지 삭제
-  deleteConnectedBridgeId: (hostId, networkId) =>
+  deleteConnectedBridgeId: (hostId, uniqueId) =>
     set((state) => {
       const updatedBridges = (state.connectedBridgeIds[hostId] || []).filter(
-        (bridge) => bridge.id !== networkId
+        (bridge) => bridge.uniqueId !== uniqueId
       );
       return {
         connectedBridgeIds: {
