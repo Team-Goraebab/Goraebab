@@ -3,13 +3,26 @@
 import React, { useRef, useState } from 'react';
 import { useDrop } from 'react-dnd';
 import {
-  FaTimesCircle,
-  FaInfoCircle,
-  FaPlusCircle,
-  FaChevronUp,
-  FaChevronDown,
-} from 'react-icons/fa';
-import { MdStorage } from 'react-icons/md';
+  Card,
+  CardHeader,
+  CardBody,
+  Button,
+  Chip,
+  Tooltip,
+  Accordion,
+  AccordionItem,
+  ScrollShadow,
+  Input,
+} from '@nextui-org/react';
+import {
+  PlusCircle,
+  XCircle,
+  ChevronUp,
+  ChevronDown,
+  HardDrive,
+  InfoIcon,
+  Edit2,
+} from 'lucide-react';
 import { Container, ThemeColor, VolumeData } from '@/types/type';
 import ImageDetailModal from '@/components/modal/image/imageDetailModal';
 import SelectVolumeModal from '../modal/volume/selectVolumeModal';
@@ -26,6 +39,8 @@ export interface CardContainerProps {
   onSelectNetwork?: () => void;
   isSelected?: boolean;
   hostIp: string;
+  containerNames?: { [key: string]: string };
+  onContainerNameChange?: (containerId: string, name: string) => void;
 }
 
 interface ImageInfo {
@@ -50,10 +65,11 @@ const CardContainer = ({
                          onSelectNetwork,
                          isSelected,
                          hostIp,
+                         containerNames = {},
+                         onContainerNameChange,
                        }: CardContainerProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const { enqueueSnackbar } = useSnackbar();
-
   const selectedHostIp = selectedHostStore((state) => state.selectedHostIp);
 
   const [droppedImages, setDroppedImages] = useState<ImageInfo[]>([]);
@@ -63,12 +79,13 @@ const CardContainer = ({
   const [isVolumeModalOpen, setIsVolumeModalOpen] = useState<boolean>(false);
   const [selectedImage, setSelectedImage] = useState<string>('');
   const [selectedVolumes, setSelectedVolumes] = useState<VolumeData[]>([]);
-  const [expandedImage, setExpandedImage] = useState<string | null>(null);
   const [isConfigModalOpen, setIsConfigModalOpen] = useState<boolean>(false);
   const [configs, setConfigs] = useState<{ [key: string]: any[] }>({});
   const [imageVolumes, setImageVolumes] = useState<{
     [imageId: string]: VolumeData[];
   }>({});
+  const [editingName, setEditingName] = useState<{ [key: string]: string }>({});
+  const [isEditing, setIsEditing] = useState<{ [key: string]: boolean }>({});
 
   const splitImageNameAndTag = (image: string, id: string): ImageInfo => {
     const [name, tag] = image.split(':');
@@ -83,7 +100,7 @@ const CardContainer = ({
       setDetailData(imageDetail);
       setIsModalOpen(true);
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 
@@ -120,11 +137,8 @@ const CardContainer = ({
   ];
 
   const handleDeleteImage = (imageId: string) => {
-    // 이미지 삭제
     setDroppedImages((prev) => prev.filter((image) => image.id !== imageId));
-    // imageToNetwork에서 해당 이미지 정보 삭제
     setImageToNetwork((prev) => prev.filter((entry) => entry.id !== imageId));
-    // imageVolumes에서 해당 이미지의 볼륨 데이터 삭제
     setImageVolumes((prev) => {
       const updatedVolumes = { ...prev };
       delete updatedVolumes[imageId];
@@ -132,200 +146,267 @@ const CardContainer = ({
     });
   };
 
-  const handleOpenVolumeModal = (imageId: string) => {
-    setSelectedImage(imageId);
-    setSelectedVolumes(imageVolumes[imageId] || []);
-    setIsVolumeModalOpen(true);
-  };
-
-  const handleCloseVolumeModal = () => {
-    setIsVolumeModalOpen(false);
-  };
-
-  const handleAddVolume = (volumeData: VolumeData[]) => {
-    setImageVolumes((prev) => ({
+  const handleStartEditing = (imageId: string) => {
+    setIsEditing((prev) => ({ ...prev, [imageId]: true }));
+    setEditingName((prev) => ({
       ...prev,
-      [selectedImage]: volumeData,
+      [imageId]: containerNames[imageId] || '',
     }));
-    handleCloseVolumeModal();
   };
 
-  const handleConfig = () => {
-    setIsConfigModalOpen(true);
+  const handleSaveName = (imageId: string) => {
+    if (onContainerNameChange) {
+      onContainerNameChange(imageId, editingName[imageId] || '');
+    }
+    setIsEditing((prev) => ({ ...prev, [imageId]: false }));
   };
 
-  const handleSaveConfig = (config: any) => {
-    setConfigs((prev) => ({
-      ...prev,
-      [networkName]: [...(prev[networkName] || []), config],
-    }));
-    setIsConfigModalOpen(false);
+  const handleButtonClick = (e: React.MouseEvent, action: () => void) => {
+    action();
   };
 
   return (
     <>
-      <div
+      <Card
         ref={ref}
-        className={`relative flex flex-col items-center p-6 border bg-white rounded-lg shadow-lg w-[500px] transition-colors duration-200 cursor-pointer ${
-          isOver ? 'bg-grey_1' : ''
+        className={`w-[500px] transition-all duration-200 ${
+          isOver ? 'bg-content2' : ''
         }`}
         style={{
-          borderColor: isSelected ? themeColor.textColor : '',
-          borderWidth: isSelected ? '2px' : '',
+          borderColor: isSelected ? themeColor.textColor : undefined,
+          borderWidth: isSelected ? '2px' : undefined,
         }}
-        onClick={onSelectNetwork}
+        onPress={onSelectNetwork}
+        shadow="sm"
       >
-        {onDelete && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onDelete?.();
-            }}
-            className="absolute top-4 right-4 hover:text-grey_5 text-white duration-200 hover:scale-105"
-          >
-            <FaTimesCircle
-              className="w-5 h-5 text-white"
+        <CardHeader className="flex justify-between items-center px-6 pt-6">
+          <div className="flex items-center gap-3">
+            <Button
+              isIconOnly
+              size="sm"
+              variant="light"
+              onPress={(e) => handleButtonClick(e as any, () => setIsConfigModalOpen(true))}
+            >
+              <HardDrive
+                className="w-5 h-5"
+                style={{ color: themeColor.textColor }}
+              />
+            </Button>
+            <Chip
+              className="h-8 px-3"
               style={{
-                color: themeColor.borderColor,
-                backgroundColor: 'white',
-                borderRadius: 10,
+                backgroundColor: themeColor.bgColor,
+                color: themeColor.textColor,
+                borderColor: themeColor.borderColor,
               }}
-            />
-          </button>
-        )}
-        <div
-          className="w-full flex items-center justify-center text-blue_6 border-2 p-2.5 rounded-md mb-4 text-sm font-semibold space-x-2"
-          style={{
-            borderColor: `${themeColor.borderColor}`,
-            backgroundColor: `${themeColor.bgColor}`,
-            color: `${themeColor.textColor}`,
-          }}
-        >
-          <button
-            onClick={handleConfig}
-            className="flex items-center justify-center px-2 rounded-full transition-colors duration-200"
-            style={{ color: themeColor.textColor }}
-          >
-            <MdStorage className="w-6 h-6" />
-          </button>
-          <span>{`${networkName} : ${networkIp}`}</span>
-        </div>
-        <div className="w-full h-44 scrollbar-hide overflow-y-auto">
-          {allImages.length > 0 ? (
-            <div className="space-y-4">
-              {allImages.map((image, index) => {
-                const isExpanded = expandedImage === image.id;
-                return (
-                  <div
-                    key={image.id}
-                    className="bg-white border border-grey_2 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200"
-                  >
-                    <div className="p-4">
-                      <div className="flex justify-between items-center">
-                        <div className="flex flex-row items-center gap-2">
-                          <span
-                            className="font-bold font-pretendard"
-                            title={image.name}
-                          >
-                            {image.name.length > 13
-                              ? `${image.name.slice(0, 13)}...`
-                              : image.name}
-                          </span>
-
-                          <span
-                            className="px-2 py-1 text-xs font-semibold rounded-md inline-block"
-                            style={{
-                              borderColor: `${themeColor.borderColor}`,
-                              backgroundColor: `${themeColor.bgColor}`,
-                              color: `${themeColor.textColor}`,
-                            }}
-                          >
-                            {image.tag}
-                          </span>
-                        </div>
-                        <div className="flex space-x-2 items-center">
-                          <button
-                            className="flex items-center space-x-1 text-sm text-grey_6 hover:text-grey_7"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleGetInfo(image.name);
-                            }}
-                          >
-                            <FaInfoCircle className="w-4 h-4" />
-                            <span>정보</span>
-                          </button>
-                          <button
-                            className="flex items-center space-x-1 text-sm text-grey_6 hover:text-grey_7"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleOpenVolumeModal(image.id);
-                            }}
-                          >
-                            <FaPlusCircle className="w-4 h-4" />
-                            <span>볼륨 추가</span>
-                          </button>
-                          <button
-                            className="flex items-center space-x-1 text-sm text-red-500 hover:text-red_6"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDeleteImage(image.id);
-                            }}
-                          >
-                            <FaTimesCircle className="w-4 h-4" />
-                            <span>삭제</span>
-                          </button>
-                        </div>
-                      </div>
-                      {/* {imageVolumes[image.id]?.length > 0 && ( */}
-                      <div className="mt-3 flex justify-between">
-                        <h4 className="text-sm font-semibold text-grey_6">
-                          Volumes ({imageVolumes[image.id]?.length || 0})
-                        </h4>
-                        <button
-                          className="text-grey_5 hover:text-grey_6"
-                          onClick={() =>
-                            setExpandedImage(isExpanded ? null : image.id)
-                          }
-                        >
-                          {isExpanded ? <FaChevronUp /> : <FaChevronDown />}
-                        </button>
-                      </div>
-                      {/* )} */}
-                    </div>
-                    {isExpanded && imageVolumes[image.id]?.length > 0 && (
-                      <div className="bg-gray-50 p-4 rounded-b-lg border-t border-grey_2">
-                        <ul className="space-y-2">
-                          {imageVolumes[image.id].map((vol, volIndex) => (
-                            <li
-                              key={volIndex}
-                              className="flex items-center justify-between"
-                            >
-                              <span
-                                className="text-sm text-grey_6 truncate max-w-[300px]"
-                                title={vol.Name}
-                              >
-                                {vol.Name}
-                              </span>
-                              <span className="text-xs text-grey_5 bg-grey_2 px-2 py-1 rounded">
-                                {vol.Driver}
-                              </span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          ) : (
-            <div
-              className="w-full h-44 flex items-center justify-center text-grey_7 p-2 text-sm border-2 border-dashed border-grey_2 rounded-lg">
-              이미지를 드래그해서 놓으세요
-            </div>
+              variant="bordered"
+              size="lg"
+            >
+              {`${networkName} : ${networkIp}`}
+            </Chip>
+          </div>
+          {onDelete && (
+            <Button
+              isIconOnly
+              size="sm"
+              variant="light"
+              onPress={(e) => handleButtonClick(e as any, onDelete)}
+              className="text-danger hover:text-danger-400"
+            >
+              <XCircle className="w-5 h-5" />
+            </Button>
           )}
-        </div>
-      </div>
+        </CardHeader>
+
+        <CardBody className="px-6 pb-6">
+          {allImages.length > 0 ? (
+            <ScrollShadow className="max-h-[400px]">
+              <div className="space-y-4">
+                {allImages.map((image) => (
+                  <Card
+                    key={image.id}
+                    shadow="none"
+                    className="border border-content3 transition-colors hover:border-content4"
+                  >
+                    <CardBody className="p-4">
+                      <div className="flex flex-col gap-3">
+                        <div className="flex justify-between items-center">
+                          <div className="flex items-center gap-2">
+                            <span
+                              className="font-semibold truncate max-w-[150px]"
+                              title={image.name}
+                            >
+                              {image.name}
+                            </span>
+                            <Chip
+                              size="sm"
+                              variant="flat"
+                              style={{
+                                backgroundColor: themeColor.bgColor,
+                                color: themeColor.textColor,
+                              }}
+                            >
+                              {image.tag}
+                            </Chip>
+                          </div>
+                          <div className="flex gap-1">
+                            <Tooltip content="이미지 정보">
+                              <Button
+                                size="sm"
+                                variant="light"
+                                isIconOnly
+                                onPress={(e) =>
+                                  handleButtonClick(e as any, () =>
+                                    handleGetInfo(image.name),
+                                  )
+                                }
+                                className="hover:bg-default-100"
+                              >
+                                <InfoIcon className="w-4 h-4" />
+                              </Button>
+                            </Tooltip>
+                            <Tooltip content="볼륨 추가">
+                              <Button
+                                size="sm"
+                                variant="light"
+                                isIconOnly
+                                onPress={(e) =>
+                                  handleButtonClick(e as any, () => {
+                                    setSelectedImage(image.id);
+                                    setSelectedVolumes(imageVolumes[image.id] || []);
+                                    setIsVolumeModalOpen(true);
+                                  })
+                                }
+                                className="hover:bg-default-100"
+                              >
+                                <PlusCircle className="w-4 h-4" />
+                              </Button>
+                            </Tooltip>
+                            <Tooltip content="삭제" color="danger">
+                              <Button
+                                size="sm"
+                                variant="light"
+                                isIconOnly
+                                onPress={(e) =>
+                                  handleButtonClick(e as any, () =>
+                                    handleDeleteImage(image.id),
+                                  )
+                                }
+                                className="hover:bg-danger-100 text-danger"
+                              >
+                                <XCircle className="w-4 h-4" />
+                              </Button>
+                            </Tooltip>
+                          </div>
+                        </div>
+
+                        {/* Container Name Section */}
+                        <div className="flex items-center gap-2">
+                          {isEditing[image.id] ? (
+                            <div className="flex-1">
+                              <Input
+                                size="sm"
+                                placeholder="컨테이너 이름 입력"
+                                value={editingName[image.id] || ''}
+                                onChange={(e) =>
+                                  setEditingName((prev) => ({
+                                    ...prev,
+                                    [image.id]: e.target.value,
+                                  }))
+                                }
+                                onBlur={() => handleSaveName(image.id)}
+                                onKeyPress={(e) => {
+                                  if (e.key === 'Enter') {
+                                    handleSaveName(image.id);
+                                  }
+                                }}
+                                autoFocus
+                              />
+                            </div>
+                          ) : (
+                            <div className="flex-1 flex items-center gap-2">
+                              <span className="text-sm text-default-600">
+                                {containerNames[image.id] || '컨테이너 이름 없음'}
+                              </span>
+                              <Button
+                                size="sm"
+                                variant="light"
+                                isIconOnly
+                                onPress={(e) =>
+                                  handleButtonClick(e as any, () =>
+                                    handleStartEditing(image.id),
+                                  )
+                                }
+                              >
+                                <Edit2 className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+
+                        {imageVolumes[image.id]?.length > 0 && (
+                          <Accordion
+                            className="px-0"
+                            variant="light"
+                            selectionMode="multiple"
+                          >
+                            <AccordionItem
+                              title={
+                                <span className="text-small font-medium">
+                                  Volumes ({imageVolumes[image.id]?.length || 0})
+                                </span>
+                              }
+                              indicator={({ isOpen }) =>
+                                isOpen ? (
+                                  <ChevronUp className="w-4 h-4" />
+                                ) : (
+                                  <ChevronDown className="w-4 h-4" />
+                                )
+                              }
+                            >
+                              <div className="space-y-2">
+                                {imageVolumes[image.id].map((vol, idx) => (
+                                  <div
+                                    key={idx}
+                                    className="flex justify-between items-center py-1"
+                                  >
+                                    <span className="text-sm text-default-600 truncate max-w-[300px]">
+                                      {vol.Name}
+                                    </span>
+                                    <Chip
+                                      size="sm"
+                                      variant="flat"
+                                      className="bg-default-100"
+                                    >
+                                      {vol.Driver}
+                                    </Chip>
+                                  </div>
+                                ))}
+                              </div>
+                            </AccordionItem>
+                          </Accordion>
+                        )}
+                      </div>
+                    </CardBody>
+                  </Card>
+                ))}
+              </div>
+            </ScrollShadow>
+          ) : (
+            <Card
+              shadow="none"
+              className="h-44 flex items-center justify-center border-2 border-dashed border-default-200 bg-default-50"
+            >
+              <CardBody>
+                <p className="text-default-500 text-sm">
+                  이미지를 드래그해서 놓으세요
+                </p>
+              </CardBody>
+            </Card>
+          )}
+        </CardBody>
+      </Card>
+
       <ImageDetailModal
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -334,14 +415,26 @@ const CardContainer = ({
       <SelectVolumeModal
         open={isVolumeModalOpen}
         imageName={selectedImage}
-        onClose={handleCloseVolumeModal}
-        onSave={handleAddVolume}
+        onClose={() => setIsVolumeModalOpen(false)}
+        onSave={(volumeData) => {
+          setImageVolumes((prev) => ({
+            ...prev,
+            [selectedImage]: volumeData,
+          }));
+          setIsVolumeModalOpen(false);
+        }}
         initialSelectedVolumes={selectedVolumes}
       />
       <ConfigurationModal
         open={isConfigModalOpen}
         onClose={() => setIsConfigModalOpen(false)}
-        onSave={handleSaveConfig}
+        onSave={(config) => {
+          setConfigs((prev) => ({
+            ...prev,
+            [networkName]: [...(prev[networkName] || []), config],
+          }));
+          setIsConfigModalOpen(false);
+        }}
       />
     </>
   );
