@@ -136,7 +136,6 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
               const isHostSelected =
                 selectedNetwork?.hostId === host.id ||
                 selectedHostId === host.id;
-              console.log(containerNames[networks[0].uniqueId]);
               return (
                 <div key={host.id} className="flex flex-col items-center">
                   <div className="flex flex-row items-center">
