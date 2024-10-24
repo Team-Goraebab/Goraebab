@@ -110,6 +110,8 @@ const HostModal = ({ onClose }: HostModalProps) => {
           name: selectedNetwork.Name,
           ip: selectedNetwork.IPAM?.Config?.[0]?.Gateway || '',
           hostId: id,
+          driver: selectedNetwork.Driver,
+          subnet: selectedNetwork.IPAM?.Config?.[0]?.Subnet || '',
           networkUniqueId: uuidv4(),
           containers: [],
         },

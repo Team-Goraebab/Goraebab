@@ -18,6 +18,7 @@ import { selectedHostStore } from '@/store/seletedHostStore';
 import { useSnackbar } from 'notistack';
 import { useHostStore } from '@/store/hostStore';
 import { useStore } from '@/store/cardStore';
+import { useBlueprintStore } from '@/store/blueprintStore';
 
 export interface CardContainerProps {
   networkName: string;
@@ -60,12 +61,14 @@ const CardContainer = ({
   const ref = useRef<HTMLDivElement>(null);
   const { enqueueSnackbar } = useSnackbar();
 
+  const { setMappedData } = useBlueprintStore();
   const selectedHostIp = selectedHostStore((state) => state.selectedHostIp);
   const hosts = useHostStore((state) => state.hosts);
   const allContainers = useStore((state) => state.hostContainers);
   const connectedBridgeIds = selectedHostStore(
     (state) => state.connectedBridgeIds
   );
+  const mappedData = useBlueprintStore((state) => state.mappedData);
 
   const [droppedImages, setDroppedImages] = useState<ImageInfo[]>([]);
   const [imageToNetwork, setImageToNetwork] = useState<ImageToNetwork[]>([]);
@@ -95,35 +98,50 @@ const CardContainer = ({
   ];
 
   // 네트워크 유니크 아이디로 데이터를 매핑
-  const mappedData = hosts.map((host) => {
-    const networks = connectedBridgeIds[host.id] || [];
+  useEffect(() => {
+    const mappedData = hosts.map((host) => {
+      const networks = connectedBridgeIds[host.id] || [];
 
-    const mappedNetworks = networks.map((network) => {
-      const networkId = network.id;
-      const networkConfigs = configs[networkUniqueId] || null;
-      const networkContainerName =
-        containerName === networkId ? containerName : null;
+      const mappedNetworks = networks.map((network) => {
+        const networkConfigs = configs[network.uniqueId] || [];
+        const networkImageVolumes =
+          imageVolumes[network.uniqueId]?.[droppedImages[0]?.id] || [];
 
-      const networkImageVolumes =
-        imageVolumes[networkUniqueId]?.[droppedImages[0]?.id] || [];
+        return {
+          id: network.id,
+          name: network.name,
+          gateway: network.gateway,
+          driver: network.driver,
+          subnet: network.subnet,
+          scope: network.scope,
+          hostId: host.id,
+          networkUniqueId: network.uniqueId,
+          ip: network.gateway,
+          containers: [],
+          containerName: containerName,
+          configs: networkConfigs,
+          droppedImages: droppedImages,
+          imageVolumes: networkImageVolumes,
+        };
+      });
 
       return {
-        ...network,
-        hostId: host.id,
-        containerName: containerName,
-        configs: networkConfigs,
-        droppedImages: droppedImages,
-        imageVolumes: networkImageVolumes,
+        ...host,
+        networks: mappedNetworks,
       };
     });
 
-    return {
-      ...host,
-      networks: mappedNetworks,
-    };
-  });
+    setMappedData(mappedData);
+  }, [
+    hosts,
+    connectedBridgeIds,
+    configs,
+    droppedImages,
+    imageVolumes,
+    containerName,
+    setMappedData,
+  ]);
 
-  // 매핑된 데이터를 출력해서 확인
   console.log('Mapped data >>>>>', mappedData);
 
   const volumes = imageVolumes[droppedImages[0]?.id] || defaultVolumeData;
