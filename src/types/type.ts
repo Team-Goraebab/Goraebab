@@ -70,6 +70,7 @@ export type HostNetwork = {
   name: string;
   ip: string;
   hostId: string;
+  networkUniqueId: string;
   containers: string[];
 };
 
