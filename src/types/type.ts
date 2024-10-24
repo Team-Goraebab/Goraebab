@@ -74,6 +74,13 @@ export type HostNetwork = {
   driver: string;
   subnet: string;
   containers: any[];
+  containerName?: string;
+  droppedImages?: Image[];
+  networkSettings?: NetworkSettings;
+  ports?: Port[];
+  mounts?: Mount[];
+  env?: string;
+  cmd?: string;
 };
 
 export interface Host {

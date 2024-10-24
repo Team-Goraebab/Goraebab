@@ -26,16 +26,17 @@ const SaveButton = () => {
   };
 
   const handleSubmit = async () => {
-    if (!mappedData || !Array.isArray(mappedData)) {
-      showSnackbar(
-        enqueueSnackbar,
-        '매핑된 데이터가 유효하지 않습니다.',
-        'error',
-        '#FF4853'
-      );
-      return;
-    }
     try {
+      if (!mappedData || !Array.isArray(mappedData)) {
+        showSnackbar(
+          enqueueSnackbar,
+          '매핑된 데이터가 유효하지 않습니다.',
+          'error',
+          '#FF4853'
+        );
+        return;
+      }
+
       const requestBody = {
         blueprintName,
         processedData: {
@@ -43,39 +44,46 @@ const SaveButton = () => {
             name: host.hostNm,
             isLocal: !isDockerRemote,
             ip: isDockerRemote ? remoteUrl : null,
-            network: host.networks.map((network) => ({
-              name: network.name,
-              driver: network.driver || 'bridge',
-              ipam: {
-                config: [
-                  {
-                    subnet: network.subnet || '',
+            network: Array.isArray(host.networks)
+              ? host.networks.map((network) => ({
+                  name: network.name,
+                  driver: network.driver || 'bridge',
+                  ipam: {
+                    config: [
+                      {
+                        subnet: network.subnet || '',
+                      },
+                    ],
                   },
-                ],
-              },
-              containers: network.containers.map((container) => ({
-                containerName: container.containerName || null,
-                image: {
-                  imageId: container.image.imageId,
-                  name: container.image.name,
-                  tag: container.image.tag,
-                },
-                networkSettings: container.networkSettings,
-                ports: container.ports,
-                mounts: container.mounts,
-                env: container.env || [],
-                cmd: container.cmd || [],
-              })),
-            })),
-            volume: host.imageVolumes.map((volume: any) => ({
-              name: volume.Name,
-              driver: volume.Driver,
-            })),
+                  containers: [
+                    {
+                      containerName: network.containerName || null,
+                      image: {
+                        imageId: network.droppedImages?.[0]?.id || '',
+                        name: network.droppedImages?.[0]?.name || '',
+                        tag: network.droppedImages?.[0]?.tag || '',
+                      },
+                      networkSettings: network.networkSettings || {},
+                      ports: network.ports || [],
+                      mounts: network.mounts || [],
+                      env: network.env || [],
+                      cmd: network.cmd || [],
+                    },
+                  ],
+                }))
+              : [],
+            volume: Array.isArray(host.imageVolumes)
+              ? host.imageVolumes.map((volume) => ({
+                  name: volume.Name,
+                  driver: volume.Driver,
+                }))
+              : [],
           })),
         },
       };
 
-      // API 요청 보내기
+      console.log(requestBody);
+
       const res = await fetch('/api/blueprint/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

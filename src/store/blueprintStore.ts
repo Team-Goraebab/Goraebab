@@ -3,7 +3,7 @@ import { Host } from '@/types/type';
 
 interface BlueprintStore {
   mappedData: Host[];
-  setMappedData: (data: Host[]) => void;
+  setMappedData: (data: any[]) => void;
 }
 
 export const useBlueprintStore = create<BlueprintStore>((set) => ({
