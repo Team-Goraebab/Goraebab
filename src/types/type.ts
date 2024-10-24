@@ -71,7 +71,9 @@ export type HostNetwork = {
   ip: string;
   hostId: string;
   networkUniqueId: string;
-  containers: string[];
+  driver: string;
+  subnet: string;
+  containers: any[];
 };
 
 export interface Host {
@@ -82,6 +84,7 @@ export interface Host {
   isRemote: boolean;
   themeColor: any;
   networks: HostNetwork[];
+  imageVolumes?: any;
 }
 
 export interface NetworkSettings {
@@ -94,11 +97,20 @@ export interface Port {
   publicPort: number;
 }
 
+// export interface Mount {
+//   name: string;
+//   source: string;
+//   destination: string;
+//   driver: string;
+// }
+
 export interface Mount {
+  type: 'volume' | 'bind';
   name: string;
   source: string;
   destination: string;
   driver: string;
+  mode: string;
 }
 
 export interface Image {
@@ -114,3 +126,14 @@ export interface ContainerSetting {
   ports: Port[];
   mounts: Mount[];
 }
+
+export type EnvVar = string;
+
+export type Cmd = string;
+
+export type ExtendedHostNetwork = HostNetwork & {
+  containerName: string;
+  configs: ContainerSetting[];
+  droppedImages: Image[];
+  imageVolumes: VolumeData[];
+};
