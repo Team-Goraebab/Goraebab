@@ -4,6 +4,8 @@ import { createDockerClient } from '../../axiosInstance';
 export async function POST(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const id = searchParams.get('id');
+  const hostIp = searchParams.get('hostIp') || 'localhost';
+  const dockerClient = createDockerClient(hostIp);
 
   if (!id) {
     return NextResponse.json(
@@ -11,8 +13,6 @@ export async function POST(req: NextRequest) {
       { status: 400 }
     );
   }
-
-  const dockerClient = createDockerClient();
 
   try {
     const response = await dockerClient.post(`/containers/${id}/start`);

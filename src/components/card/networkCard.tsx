@@ -7,28 +7,35 @@ import { showSnackbar } from '@/utils/toastUtils';
 import { selectedHostStore } from '@/store/seletedHostStore';
 import { getStatusColors } from '@/utils/statusColorsUtils';
 import { formatDateTime } from '@/utils/formatTimestamp';
+import { v4 as uuidv4 } from 'uuid';
 import { fetchData } from '@/services/apiUtils';
 import NetworkDetailModal from '../modal/network/networkDetailModal';
-import { FiInfo, FiTrash, FiLink, FiCpu, FiCalendar, FiHardDrive, FiSend, FiBox } from 'react-icons/fi';
+import {
+  FiInfo,
+  FiTrash,
+  FiLink,
+  FiCpu,
+  FiCalendar,
+  FiHardDrive,
+  FiSend,
+  FiBox,
+} from 'react-icons/fi';
 import { FaNetworkWired } from 'react-icons/fa';
-
-interface NetworkProps {
-  Id: string;
-  Name: string;
-  Created: string;
-  Driver: string;
-  Containers: { [key: string]: { Name: string; IPv4Address: string } };
-  IPAM?: { Config?: { Subnet: string; Gateway: string }[] };
-}
+import { Network } from '@/types/type';
 
 interface CardDataProps {
-  data: NetworkProps;
+  data: Network;
   onDeleteSuccess: () => void;
 }
 
 const NetworkCard = ({ data, onDeleteSuccess }: CardDataProps) => {
   const { enqueueSnackbar } = useSnackbar();
+  const id = uuidv4();
+
   const { selectedHostId, addConnectedBridgeId } = selectedHostStore();
+  const { connectedBridgeIds } = selectedHostStore((state) => ({
+    connectedBridgeIds: state.connectedBridgeIds,
+  }));
   const { bg1, bg2 } = getStatusColors('primary');
   const [showModal, setShowModal] = useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -36,7 +43,7 @@ const NetworkCard = ({ data, onDeleteSuccess }: CardDataProps) => {
   const [loading, setLoading] = useState<boolean>(false);
 
   const connectedContainers = Object.values(data.Containers || {}).map(
-    (container) => `${container.Name} (${container.IPv4Address})`,
+    (container) => `${container.Name} (${container.IPv4Address})`
   );
 
   const subnet = data.IPAM?.Config?.[0]?.Subnet || 'No Subnet';
@@ -50,7 +57,10 @@ const NetworkCard = ({ data, onDeleteSuccess }: CardDataProps) => {
     { label: 'Gateway', value: gateway, icon: FiSend },
     {
       label: 'Containers',
-      value: connectedContainers.length > 0 ? connectedContainers.join(', ') : 'No connected',
+      value:
+        connectedContainers.length > 0
+          ? connectedContainers.join(', ')
+          : 'No connected',
       icon: FiBox,
     },
   ];
@@ -75,7 +85,7 @@ const NetworkCard = ({ data, onDeleteSuccess }: CardDataProps) => {
           enqueueSnackbar,
           '네트워크가 성공적으로 삭제되었습니다!',
           'success',
-          '#254b7a',
+          '#4CAF50'
         );
         onDeleteSuccess();
       } else {
@@ -83,7 +93,7 @@ const NetworkCard = ({ data, onDeleteSuccess }: CardDataProps) => {
           enqueueSnackbar,
           `네트워크 삭제 실패: ${result.error}`,
           'error',
-          '#FF4853',
+          '#FF4853'
         );
       }
     } catch (error) {
@@ -92,7 +102,7 @@ const NetworkCard = ({ data, onDeleteSuccess }: CardDataProps) => {
         enqueueSnackbar,
         `네트워크 삭제 요청 중 에러: ${error}`,
         'error',
-        '#FF4853',
+        '#FF4853'
       );
     } finally {
       setLoading(false);
@@ -106,34 +116,49 @@ const NetworkCard = ({ data, onDeleteSuccess }: CardDataProps) => {
 
   const handleConnect = () => {
     if (selectedHostId) {
+      // 현재 호스트에 연결된 네트워크가 3개 이상인지 확인
+      const currentConnections = connectedBridgeIds[selectedHostId] || [];
+      if (currentConnections.length >= 3) {
+        showSnackbar(
+          enqueueSnackbar,
+          '네트워크는 최대 3개까지만 연결할 수 있습니다.',
+          'error',
+          '#FF4853'
+        );
+        return; // 연결을 중단
+      }
+
       const networkInfo = {
         id: data.Id,
         name: data.Name,
         gateway: gateway,
         subnet: subnet,
         driver: data.Driver,
-        connectedContainers: Object.entries(data.Containers).map(
-          ([id, container]) => ({
-            id,
-            name: container.Name,
-            ip: container.IPv4Address,
-          }),
-        ),
+        scope: data.Scope,
       };
 
-      addConnectedBridgeId(selectedHostId, networkInfo);
+      addConnectedBridgeId(selectedHostId, {
+        name: networkInfo.name,
+        gateway: networkInfo.gateway,
+        driver: networkInfo.driver,
+        subnet: networkInfo.subnet,
+        scope: networkInfo.scope,
+        id: networkInfo.id,
+        uniqueId: uuidv4(),
+      });
+
       showSnackbar(
         enqueueSnackbar,
         '네트워크가 성공적으로 연결되었습니다.',
         'success',
-        '#254b7a',
+        '#4CAF50'
       );
     } else {
       showSnackbar(
         enqueueSnackbar,
         '호스트를 선택해주세요.',
         'error',
-        '#FF4853',
+        '#FF4853'
       );
     }
   };
@@ -162,7 +187,7 @@ const NetworkCard = ({ data, onDeleteSuccess }: CardDataProps) => {
         enqueueSnackbar,
         '네트워크 정보를 가져오는데 실패했습니다.',
         'error',
-        '#FF4853',
+        '#FF4853'
       );
     }
   };
@@ -202,22 +227,30 @@ const NetworkCard = ({ data, onDeleteSuccess }: CardDataProps) => {
 
       <div className="p-4">
         <div className="grid gap-4">
-          {networkItems.map((item, index) => (
-            <div key={index} className="flex items-center space-x-3">
-              <div className="p-2 rounded-lg" style={{ backgroundColor: bg1 }}>
-                <item.icon size={16} style={{ color: bg2 }} />
+          {networkItems && networkItems.length > 0 ? (
+            networkItems.map((item, index) => (
+              <div key={index} className="flex items-center space-x-3">
+                <div
+                  className="p-2 rounded-lg"
+                  style={{ backgroundColor: bg1 }}
+                >
+                  <item.icon size={16} style={{ color: bg2 }} />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-xs text-gray-500 font-medium font-pretendard">
+                    {item.label}
+                  </span>
+                  <span className="font-pretendard font-semibold text-sm text-gray-800 truncate max-w-[150px]">
+                    {item.value}
+                  </span>
+                </div>
               </div>
-              <div className="flex flex-col">
-                <span className="text-xs text-gray-500 font-medium font-pretendard">{item.label}</span>
-                <span className="font-pretendard font-semibold text-sm text-gray-800 truncate max-w-[150px]">
-                  {item.value}
-                </span>
-              </div>
-            </div>
-          ))}
+            ))
+          ) : (
+            <div className="text-center">네트워크 항목이 없습니다.</div>
+          )}
         </div>
       </div>
-
       <Modal
         isOpen={showModal}
         onClose={handleCloseModal}

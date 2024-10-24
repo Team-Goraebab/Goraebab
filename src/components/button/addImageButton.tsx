@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import { useSnackbar } from 'notistack';
 import { showSnackbar } from '@/utils/toastUtils';
 import ImageModal from '../modal/image/imageModal';
-import { useImageStore } from '@/store/imageStore';
 import LargeButton from './largeButton';
 
 interface AddImageButtonProps {
@@ -15,7 +14,6 @@ const AddImageButton = ({ onCreate }: AddImageButtonProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
-  const addImage = useImageStore((state) => state.addImage);
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
@@ -70,13 +68,12 @@ const AddImageButton = ({ onCreate }: AddImageButtonProps) => {
         dockerImageInfo,
       };
       onCreate(imageData);
-      addImage(imageData);
 
       showSnackbar(
         enqueueSnackbar,
         '이미지가 성공적으로 추가되었습니다!',
         'success',
-        '#254b7a'
+        '#4CAF50'
       );
 
       setIsModalOpen(false);
@@ -86,13 +83,12 @@ const AddImageButton = ({ onCreate }: AddImageButtonProps) => {
         enqueueSnackbar,
         '이미지 추가 중 오류가 발생했습니다.',
         'error',
-        '#254b7a'
+        '#FF0000'
       );
     } finally {
       setIsLoading(false);
     }
   };
-
 
   return (
     <>

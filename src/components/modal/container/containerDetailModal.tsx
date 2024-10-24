@@ -29,10 +29,10 @@ interface ContainerDetailModalProps {
 }
 
 const ContainerDetailModal = ({
-                                open,
-                                onClose,
-                                data,
-                              }: ContainerDetailModalProps) => {
+  open,
+  onClose,
+  data,
+}: ContainerDetailModalProps) => {
   const { enqueueSnackbar } = useSnackbar();
 
   const handleCopyToClipboard = (text: string) => {
@@ -41,7 +41,7 @@ const ContainerDetailModal = ({
       enqueueSnackbar,
       'Container ID copied to clipboard!',
       'info',
-      '#254b7a',
+      '#4CAF50'
     );
   };
 
@@ -53,34 +53,46 @@ const ContainerDetailModal = ({
   const handleAction = async (action: string) => {
     try {
       const response = await axios.post(
-        `/api/container/${action}?id=${data?.Id}`,
+        `/api/container/${action}?id=${data?.Id}`
       );
       showSnackbar(
         enqueueSnackbar,
         `Container ${action} successfully!`,
         'success',
-        '#254b7a',
+        '#4CAF50'
       );
     } catch (error) {
       showSnackbar(
         enqueueSnackbar,
         `Failed to ${action} container`,
         'error',
-        '#d32f2f',
+        '#d32f2f'
       );
     }
   };
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="md" PaperProps={{
-      sx: {
-        borderRadius: 3,
-        padding: 3,
-        backgroundColor: '#f9fafb',
-        boxShadow: '0px 8px 20px rgba(0, 0, 0, 0.1)',
-      },
-    }}>
-      <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      fullWidth
+      maxWidth="md"
+      PaperProps={{
+        sx: {
+          borderRadius: 3,
+          padding: 3,
+          backgroundColor: '#f9fafb',
+          boxShadow: '0px 8px 20px rgba(0, 0, 0, 0.1)',
+        },
+      }}
+    >
+      <DialogTitle
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
+      >
         <Typography variant="h6" sx={{ fontWeight: 600, color: '#333' }}>
           {`${data?.Name || 'Unknown Container'}`}
         </Typography>
@@ -109,7 +121,10 @@ const ContainerDetailModal = ({
       </DialogTitle>
       <DialogContent dividers>
         <Box mb={3}>
-          <Typography variant="subtitle1" sx={{ fontWeight: 500, color: '#333', mb: 1 }}>
+          <Typography
+            variant="subtitle1"
+            sx={{ fontWeight: 500, color: '#333', mb: 1 }}
+          >
             General Information
           </Typography>
           <Box display="flex" justifyContent="space-between" mb={2}>
@@ -117,11 +132,18 @@ const ContainerDetailModal = ({
               <Typography variant="body2" sx={{ color: '#666', mr: 1 }}>
                 Container ID:
               </Typography>
-              <Typography variant="body2" sx={{ fontWeight: 500, color: '#333' }}>
+              <Typography
+                variant="body2"
+                sx={{ fontWeight: 500, color: '#333' }}
+              >
                 {truncateId(data?.Id)}
               </Typography>
               <Tooltip title="Copy ID">
-                <IconButton onClick={() => handleCopyToClipboard(data?.Id)} size="small" sx={{ ml: 1 }}>
+                <IconButton
+                  onClick={() => handleCopyToClipboard(data?.Id)}
+                  size="small"
+                  sx={{ ml: 1 }}
+                >
                   <ContentCopyIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
@@ -141,7 +163,10 @@ const ContainerDetailModal = ({
         </Box>
         <Divider />
         <Box my={3}>
-          <Typography variant="subtitle1" sx={{ fontWeight: 500, color: '#333', mb: 1 }}>
+          <Typography
+            variant="subtitle1"
+            sx={{ fontWeight: 500, color: '#333', mb: 1 }}
+          >
             Host Configuration
           </Typography>
           <Box display="flex" justifyContent="space-between">
@@ -163,7 +188,10 @@ const ContainerDetailModal = ({
         </Box>
         <Divider />
         <Box my={3}>
-          <Typography variant="subtitle1" sx={{ fontWeight: 500, color: '#333', mb: 1 }}>
+          <Typography
+            variant="subtitle1"
+            sx={{ fontWeight: 500, color: '#333', mb: 1 }}
+          >
             Network Settings
           </Typography>
           <Box display="flex" justifyContent="space-between">
@@ -177,7 +205,10 @@ const ContainerDetailModal = ({
         </Box>
         <Divider />
         <Box my={3}>
-          <Typography variant="subtitle1" sx={{ fontWeight: 500, color: '#333', mb: 1 }}>
+          <Typography
+            variant="subtitle1"
+            sx={{ fontWeight: 500, color: '#333', mb: 1 }}
+          >
             State Information
           </Typography>
           <Box display="flex" justifyContent="space-between">
@@ -199,7 +230,9 @@ const ContainerDetailModal = ({
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} sx={{ borderRadius: 2, mt: 2 }}>닫기</Button>
+        <Button onClick={onClose} sx={{ borderRadius: 2, mt: 2 }}>
+          닫기
+        </Button>
       </DialogActions>
     </Dialog>
   );

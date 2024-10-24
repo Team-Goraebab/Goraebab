@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Tooltip } from 'react-tooltip';
 import { MENU_ITEMS } from '@/data/menu';
 import { useMenuStore } from '@/store/menuStore';
@@ -12,6 +12,7 @@ import HelpModal from '../modal/helpModal';
 
 const Header = () => {
   const router = useRouter();
+  const pathname = usePathname();
   const navRef = useRef<HTMLDivElement>(null);
 
   const { activeId, setActiveId } = useMenuStore();
@@ -19,33 +20,55 @@ const Header = () => {
   const [barLeft, setBarLeft] = useState<number>(0);
   const [isHelpOpen, setIsHelpOpen] = useState<boolean>(false);
 
+  const handleHelp = () => {
+    setIsHelpOpen(true);
+  };
+
+  const isRightSidePath = pathname === '/management';
+
   const handleNavigation = (path: string, id: number) => {
     setActiveId(id);
     router.push(path);
   };
 
-  const handleHelp = () => {
-    setIsHelpOpen(true);
-  };
-
   useEffect(() => {
     if (navRef.current) {
-      const activeIndex = MENU_ITEMS.findIndex((item) => item.id === activeId);
-      if (activeIndex !== -1) {
+      if (isRightSidePath) {
+        const activeIndex = MENU_ITEMS.findIndex(
+          (item) => item.id === activeId
+        );
+        if (activeIndex !== -1) {
+          const activeItem = navRef.current.children[activeIndex];
+          if (activeItem) {
+            setBarWidth(activeItem.clientWidth);
+            setBarLeft(
+              activeItem.getBoundingClientRect().left -
+                navRef.current.getBoundingClientRect().left
+            );
+          }
+        }
+      } else {
+        const activeIndex = MENU_ITEMS.findIndex(
+          (item) => item.id === activeId
+        );
         const activeItem = navRef.current.children[activeIndex];
         if (activeItem) {
           setBarWidth(activeItem.clientWidth);
           setBarLeft(
             activeItem.getBoundingClientRect().left -
-            navRef.current.getBoundingClientRect().left,
+              navRef.current.getBoundingClientRect().left
           );
         }
       }
     }
-  }, [activeId]);
+  }, [activeId, isRightSidePath]);
+
+  window.onbeforeunload = () => {
+    sessionStorage.removeItem('selectedHostIp');
+  };
 
   return (
-    <header className="fixed w-full py-4 px-8 bg-blue_5 text-white z-[999]">
+    <header className="fixed w-full py-4 px-8 bg-blue_6 text-white z-[999]">
       <div className="mx-auto flex justify-between items-center relative">
         <div>
           <Image
@@ -65,7 +88,7 @@ const Header = () => {
               onClick={() => handleNavigation(item.path, item.id)}
               className={`flex flex-col items-center cursor-pointer font-semibold text-sm transition-colors duration-300 ${
                 activeId === item.id
-                  ? 'text-blue-400'
+                  ? 'text-blue_3'
                   : 'text-white hover:text-white'
               }`}
               data-tooltip-id={`tooltip-${item.name}`}
@@ -75,21 +98,23 @@ const Header = () => {
               <Tooltip id={`tooltip-${item.name}`} />
             </div>
           ))}
-          <div
-            className="absolute bottom-0 h-1 bg-blue-400 rounded-tl rounded-tr transition-all duration-500"
-            style={{
-              width: `${barWidth}px`,
-              left: `${barLeft - 24}px`,
-              top: 36,
-            }}
-          />
+          {!isRightSidePath && (
+            <div
+              className="absolute bottom-0 h-1 bg-blue_3 rounded-tl rounded-tr transition-all duration-300"
+              style={{
+                width: `${barWidth}px`,
+                left: `${barLeft - 24}px`,
+                top: 36,
+              }}
+            />
+          )}
         </nav>
         <div className="flex-grow" />
         <div className="flex items-center space-x-4">
           <div
             onClick={() => handleNavigation('/management', 6)}
             className={`cursor-pointer transition-colors duration-300 ${
-              activeId === 6 ? 'text-blue-400' : 'text-white hover:text-white'
+              activeId === 6 ? 'text-blue_3' : 'text-white hover:text-white'
             }`}
           >
             <FiSettings
@@ -98,6 +123,16 @@ const Header = () => {
             />
             <Tooltip id="management-tooltip" content="Management" />
           </div>
+          {isRightSidePath && (
+            <div
+              className="absolute bottom-0 h-1 bg-blue_3 rounded-tl rounded-tr transition-all duration-300"
+              style={{
+                width: `${barWidth}px`,
+                right: '35px',
+                top: 36,
+              }}
+            />
+          )}
           <div
             onClick={handleHelp}
             className="cursor-pointer text-white hover:text-white transition-colors duration-300"

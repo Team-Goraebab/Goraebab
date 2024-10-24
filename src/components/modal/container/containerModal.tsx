@@ -45,7 +45,7 @@ const ContainerModal = ({ onClose, onCreate }: ContainerModalProps) => {
       try {
         const response = await fetch('/api/network/list');
         const data = await response.json();
-        setAvailableNetworks(data?.networks || []); // Ensure we're setting an array
+        setAvailableNetworks(data?.networks || []);
 
         if (data?.networks && data.networks.length > 0) {
           setNetworkName(data.networks[0].Name);
@@ -53,14 +53,13 @@ const ContainerModal = ({ onClose, onCreate }: ContainerModalProps) => {
         }
       } catch (error) {
         console.error('Error fetching networks:', error);
-        setAvailableNetworks([]); // Set to empty array in case of error
+        setAvailableNetworks([]);
       }
     };
 
     fetchNetworks();
   }, []);
 
-  // 컴포넌트 마운트 시 데이터 로드
   useEffect(() => {
     loadData();
   }, []);
@@ -69,12 +68,12 @@ const ContainerModal = ({ onClose, onCreate }: ContainerModalProps) => {
     setSelectedVolumes((prevSelected) =>
       prevSelected.includes(volumeName)
         ? prevSelected.filter((name) => name !== volumeName)
-        : [...prevSelected, volumeName],
+        : [...prevSelected, volumeName]
     );
     setSelectedVolumeInfo((prevSelected: any) =>
       prevSelected.some((vol: any) => vol.id === volume.id)
         ? prevSelected.filter((vol: any) => vol.id !== volume.id)
-        : [...prevSelected, volume],
+        : [...prevSelected, volume]
     );
   };
 
@@ -82,14 +81,14 @@ const ContainerModal = ({ onClose, onCreate }: ContainerModalProps) => {
     const selectedImageName = event.target.value;
     setSelectedImage(selectedImageName);
     const selectedImageData = images.find(
-      (img) => img.Id === selectedImageName,
+      (img) => img.Id === selectedImageName
     );
     setSelectedImageInfo(selectedImageData || null);
   };
 
   const handleNetworkChange = (selectedNetworkName: string) => {
     const selectedNetwork = availableNetworks.find(
-      (net) => net.Name === selectedNetworkName,
+      (net) => net.Name === selectedNetworkName
     );
     setNetworkName(selectedNetworkName);
     setNetworkIp(selectedNetwork?.IPAM?.Config?.[0]?.Gateway || '');
@@ -102,7 +101,7 @@ const ContainerModal = ({ onClose, onCreate }: ContainerModalProps) => {
         enqueueSnackbar,
         '이미지를 선택해주세요.',
         'error',
-        '#FF4853',
+        '#FF4853'
       );
       return;
     }
@@ -212,11 +211,16 @@ const ContainerModal = ({ onClose, onCreate }: ContainerModalProps) => {
               onChange={(e) => handleNetworkChange(e.target.value)}
               className="w-full p-3 border border-grey_3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              {availableNetworks.map((net) => (
-                <option key={net.Id} value={net.Name}>
-                  {net.Name} (IP: {net.IPAM?.Config?.[0]?.Gateway || 'IP 없음'})
-                </option>
-              ))}
+              {availableNetworks && availableNetworks.length > 0 ? (
+                availableNetworks.map((net) => (
+                  <option key={net.Id} value={net.Name}>
+                    {net.Name} (IP:{' '}
+                    {net.IPAM?.Config?.[0]?.Gateway || 'IP 없음'})
+                  </option>
+                ))
+              ) : (
+                <option disabled>네트워크가 없습니다.</option>
+              )}
             </select>
           </div>
         </div>

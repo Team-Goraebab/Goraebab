@@ -3,7 +3,9 @@ import { createDockerClient } from '../../axiosInstance';
 
 export async function DELETE(req: NextRequest) {
   const { name } = await req.json();
-  const dockerClient = createDockerClient();
+  const { searchParams } = new URL(req.url);
+  const hostIp = searchParams.get('hostIp') || 'localhost';
+  const dockerClient = createDockerClient(hostIp);
 
   try {
     const response = await dockerClient.delete(`/volumes/${name}`);

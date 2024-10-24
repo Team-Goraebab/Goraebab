@@ -26,8 +26,8 @@ const ConnectBar = ({ rotate, length, themeColor }: ContainerBarProps) => {
         className="h-[1px] mt-3"
         style={{
           backgroundColor: `${themeColor.borderColor}`,
-          width: `${length}` === 'long' ? '72px' : '24px',
-          marginRight: `${length}` === 'long' ? '55px' : '0px',
+          width: `${length}` === 'long' ? '108px' : '24px',
+          marginRight: `${length}` === 'long' ? '90px' : '0px',
         }}
       />
     </div>

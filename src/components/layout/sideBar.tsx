@@ -12,9 +12,9 @@ import ImageCard from '../card/imageCard';
 import DaemonConnectBar from '../bar/daemonConnectBar';
 import { AiOutlineInfoCircle } from 'react-icons/ai';
 import LargeButton from '../button/largeButton';
-import { fetchData } from '@/services/apiUtils';
 import { RxReload } from 'react-icons/rx';
 import ContainerCardGroup from '@/components/card/containerCardGroup';
+import { selectedHostStore } from '@/store/seletedHostStore';
 
 type DataHandlerType = {
   data: any[];
@@ -39,34 +39,35 @@ interface ComponentMapItem {
   helpType: string;
 }
 
-const apiMap: Record<number, { url: string; dataKey?: string }> = {
-  1: { url: '/api/container/list' },
-  2: { url: '/api/image/list' },
-  3: { url: '/api/network/list' },
-  4: { url: '/api/volume/list', dataKey: 'Volumes' },
-};
-
 const loadData = async (
   apiUrl: string,
   setData: React.Dispatch<React.SetStateAction<any[]>>,
   dataKey?: string,
 ) => {
   try {
-    const data = await fetchData(apiUrl);
+    const response = await fetch(apiUrl, { cache: 'no-store' });
+    const data = await response.json();
     setData(dataKey ? data?.[dataKey] || [] : data || []);
-    console.log(`${dataKey || '데이터'} 정보 :::`, data);
   } catch (error) {
-    console.error(`${dataKey || '데이터'} 로드 중 에러 발생:`, error);
+    throw error;
   }
 };
 
 const Sidebar = () => {
   const { activeId } = useMenuStore();
+  const selectedHostIp = selectedHostStore((state) => state.selectedHostIp);
 
   const [networkData, setNetworkData] = useState<any[]>([]);
   const [volumeData, setVolumeData] = useState<any[]>([]);
   const [containerData, setContainerData] = useState<Container[]>([]);
   const [imageData, setImageData] = useState<any[]>([]);
+
+  const apiMap: Record<number, { url: string; dataKey?: string }> = {
+    1: { url: `/api/container/list?hostIp=${selectedHostIp}` },
+    2: { url: `/api/image/list?hostIp=${selectedHostIp}` },
+    3: { url: `/api/network/list?hostIp=${selectedHostIp}` },
+    4: { url: `/api/volume/list?hostIp=${selectedHostIp}`, dataKey: 'Volumes' },
+  };
 
   const dataHandlers: Record<1 | 2 | 3 | 4, DataHandlerType> = {
     1: { data: containerData, setData: setContainerData },
@@ -90,7 +91,7 @@ const Sidebar = () => {
         loadData(url, dataHandlers[activeId as 1 | 2 | 3 | 4].setData, dataKey);
       }, 2000);
     } catch (error) {
-      console.error('데이터 로드 중 에러 발생:', error);
+      throw error;
     }
   };
 
@@ -147,39 +148,45 @@ const Sidebar = () => {
     const data = dataHandlers[activeId as 1 | 2 | 3 | 4]?.data;
 
     if (activeId === 1) {
-      const groupedContainers = containerData.reduce((acc, container) => {
-        const groupName = container.Labels['com.docker.compose.project'] || container.Names[0].replace(/^\//, '');
-        if (!acc[groupName]) {
-          acc[groupName] = {
-            containers: [],
-            networkMode: container.HostConfig?.NetworkMode || 'Unknown',
-          };
-        }
-        acc[groupName].containers.push(container);
-        return acc;
-      }, {} as Record<string, { containers: Container[], networkMode: string }>);
+      const groupedContainers = Array.isArray(containerData)
+        ? containerData.reduce((acc, container) => {
+          const groupName =
+            container.Labels['com.docker.compose.project'] ||
+            container.Names[0].replace(/^\//, '');
+          if (!acc[groupName]) {
+            acc[groupName] = {
+              containers: [],
+              networkMode: container.HostConfig?.NetworkMode || 'Unknown',
+            };
+          }
+          acc[groupName].containers.push(container);
+          return acc;
+        }, {} as Record<string, { containers: Container[]; networkMode: string }>)
+        : {};
 
-
-      return Object.entries(groupedContainers).map(([groupName, { containers }]) => (
-        <ContainerCardGroup
-          key={groupName}
-          projectName={groupName}
-          containers={containers}
-          onDeleteSuccess={handleDeleteSuccess}
-        />
-      ));
+      return Object.entries(groupedContainers).map(
+        ([groupName, { containers }]) => (
+          <ContainerCardGroup
+            key={groupName}
+            projectName={groupName}
+            containers={containers}
+            onDeleteSuccess={handleDeleteSuccess}
+          />
+        ),
+      );
     }
 
     return data && data.length > 0
-      ? data.map((item, index) => (
-        CardComponent && (
-          <CardComponent
-            key={index}
-            data={item}
-            onDeleteSuccess={handleDeleteSuccess}
-          />
-        )
-      ))
+      ? data.map(
+        (item) =>
+          CardComponent && (
+            <CardComponent
+              key={`${item.Id}-${selectedHostIp}`}
+              data={item}
+              onDeleteSuccess={handleDeleteSuccess}
+            />
+          ),
+      )
       : renderNoDataMessage(noDataMessage);
   };
 
@@ -195,12 +202,17 @@ const Sidebar = () => {
     loadData(url, dataHandlers[activeId as 1 | 2 | 3 | 4].setData, dataKey);
   }, [activeId]);
 
+  useEffect(() => {
+    setImageData([]);
+    refreshData();
+  }, [selectedHostIp]);
+
   return (
     <div className="fixed z-[99] top-0 left-0 w-[300px] flex flex-col h-full bg-white border-r-2 border-grey_2 pt-14">
       <div className="flex justify-between items-center px-6 py-4 bg-gray-100 border-b border-grey_2">
         <h2 className="text-md font-semibold font-pretendard flex items-center">
           {currentComponent?.title || '데이터'}
-          <span className="ml-2 px-2 py-1 bg-blue-400 text-white text-xs font-pretendard rounded-lg">
+          <span className="ml-2 px-2 py-1 bg-blue_4 text-white text-xs font-pretendard rounded-lg">
             {dataHandlers[activeId as 1 | 2 | 3 | 4]?.data.length || 0}
           </span>
         </h2>

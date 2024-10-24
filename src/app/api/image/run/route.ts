@@ -13,7 +13,9 @@ interface ContainerConfig {
 
 export async function POST(req: NextRequest) {
   const bodyData: ContainerConfig = await req.json();
-  const dockerClient = createDockerClient();
+  const { searchParams } = new URL(req.url);
+  const hostIp = searchParams.get('hostIp') || 'localhost';
+  const dockerClient = createDockerClient(hostIp);
 
   const fetchNetworks = async () => {
     try {
@@ -32,7 +34,10 @@ export async function POST(req: NextRequest) {
   const networks = await fetchNetworks();
   const network = networks.find((net: any) => {
     // IPAM 및 Config 배열이 null이거나 존재하지 않는 경우를 제외하고 Gateway를 비교
-    return net.IPAM?.Config?.[0] && net.IPAM?.Config?.[0]?.Gateway === bodyData.networkIp;
+    return (
+      net.IPAM?.Config?.[0] &&
+      net.IPAM?.Config?.[0]?.Gateway === bodyData.networkIp
+    );
   });
 
   // 네트워크가 없으면 bridge로 설정
@@ -45,9 +50,12 @@ export async function POST(req: NextRequest) {
         Image: bodyData.image,
         HostConfig: {
           NetworkMode: networkMode,
-          Mounts: bodyData.volumes?.split(',')
+          Mounts: bodyData.volumes
+            ?.split(',')
             .map((vol) => {
-              const [source, target] = vol.split(':').map((part) => part.trim());
+              const [source, target] = vol
+                .split(':')
+                .map((part) => part.trim());
               if (source && target) {
                 return {
                   Target: target,
@@ -57,47 +65,61 @@ export async function POST(req: NextRequest) {
               }
               return null;
             })
-            .filter((mount): mount is NonNullable<typeof mount> => mount !== null),
-          PortBindings: bodyData.ports?.split(',').reduce<Record<string, Array<{ HostPort: string }>>>((acc, port) => {
-            const [hostPort, containerPort] = port.split(':');
-            acc[`${containerPort}/tcp`] = [{ HostPort: hostPort }];
+            .filter(
+              (mount): mount is NonNullable<typeof mount> => mount !== null
+            ),
+          PortBindings: bodyData.ports
+            ?.split(',')
+            .reduce<Record<string, Array<{ HostPort: string }>>>(
+              (acc, port) => {
+                const [hostPort, containerPort] = port.split(':');
+                acc[`${containerPort}/tcp`] = [{ HostPort: hostPort }];
+                return acc;
+              },
+              {}
+            ),
+        },
+        ExposedPorts: bodyData.ports
+          ?.split(',')
+          .reduce<Record<string, {}>>((acc, port) => {
+            const containerPort = port.split(':')[1];
+            acc[`${containerPort}/tcp`] = {};
             return acc;
           }, {}),
-        },
-        ExposedPorts: bodyData.ports?.split(',').reduce<Record<string, {}>>((acc, port) => {
-          const containerPort = port.split(':')[1];
-          acc[`${containerPort}/tcp`] = {};
-          return acc;
-        }, {}),
-        Env: bodyData.env?.split(',').filter((envVar) => envVar.includes('=')).map((envVar) => {
-          const [key, ...values] = envVar.split('=');
-          return `${key.trim()}=${values.join('=').trim()}`;
-        }),
-      },
+        Env: bodyData.env
+          ?.split(',')
+          .filter((envVar) => envVar.includes('='))
+          .map((envVar) => {
+            const [key, ...values] = envVar.split('=');
+            return `${key.trim()}=${values.join('=').trim()}`;
+          }),
+      }
     );
 
     const containerId = createResponse.data.Id;
 
     await dockerClient.post(`/containers/${containerId}/start`);
 
-    return NextResponse.json({
-      message: 'Container created and started successfully',
-      containerId: containerId,
-    }, { status: 200 });
-
+    return NextResponse.json(
+      {
+        message: 'Container created and started successfully',
+        containerId: containerId,
+      },
+      { status: 200 }
+    );
   } catch (error) {
     console.error('Error running container:', error);
 
     if (error instanceof Error && 'response' in error) {
       return NextResponse.json(
         { error: (error as any).response.data.message },
-        { status: 500 },
+        { status: 500 }
       );
     }
 
     return NextResponse.json(
       { error: 'Failed to run container' },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

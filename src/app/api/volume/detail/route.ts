@@ -4,12 +4,12 @@ import { createDockerClient } from '../../axiosInstance';
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const name = searchParams.get('name');
+  const hostIp = searchParams.get('hostIp') || 'localhost';
+  const dockerClient = createDockerClient(hostIp);
 
   if (!name) {
     return NextResponse.json({ error: 'Missing volume name' }, { status: 400 });
   }
-
-  const dockerClient = createDockerClient();
 
   try {
     const response = await dockerClient.get(`/volumes/${name}`);

@@ -1,8 +1,10 @@
+'use client';
+
 import React, { useState } from 'react';
 import { useSnackbar } from 'notistack';
 import { showSnackbar } from '@/utils/toastUtils';
 import { AiOutlineSave } from 'react-icons/ai';
-import { BASE_URL } from '@/app/api/urlPath';
+import { useBlueprintStore } from '@/store/blueprintStore';
 
 interface BlueprintReqDto {
   name: string;
@@ -10,8 +12,10 @@ interface BlueprintReqDto {
   remoteUrl?: string;
 }
 
-const SaveButton: React.FC = () => {
+const SaveButton = () => {
   const { enqueueSnackbar } = useSnackbar();
+  const mappedData = useBlueprintStore((state) => state.mappedData);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [blueprintName, setBlueprintName] = useState('');
   const [isDockerRemote, setIsDockerRemote] = useState(false);
@@ -22,74 +26,100 @@ const SaveButton: React.FC = () => {
   };
 
   const handleSubmit = async () => {
-    const mainContent = document.querySelector('main')?.innerHTML;
-    if (!mainContent) {
-      showSnackbar(enqueueSnackbar, '저장할 내용이 없습니다.', 'error', '#FF4848');
-      return;
-    }
-
-    const formData = new FormData();
-
-    // Create blueprintReqDto object
-    const blueprintReqDto: BlueprintReqDto = {
-      name: blueprintName,
-      isDockerRemote: isDockerRemote,
-    };
-
-    if (isDockerRemote && remoteUrl) {
-      blueprintReqDto.remoteUrl = remoteUrl;
-    }
-
-    // Convert blueprintReqDto to JSON and append as a Blob
-    const jsonBlob = new Blob([JSON.stringify(blueprintReqDto)], { type: 'application/json' });
-    formData.append('blueprintReqDto', jsonBlob);
-
-    // Append the HTML content as a Blob with correct content type
-    const contentBlob = new Blob([mainContent], { type: 'multipart/form-data' });
-    formData.append('data', contentBlob, `${blueprintName}.html`);
-
     try {
-      const response = await fetch(`${BASE_URL}/blueprints`, {
-        method: 'POST',
-        body: formData,
-      });
-
-      // Check if the response is in JSON format
-      const contentType = response.headers.get('Content-Type');
-
-      if (response.ok) {
+      if (!mappedData || !Array.isArray(mappedData)) {
         showSnackbar(
           enqueueSnackbar,
-          '설계도가 성공적으로 저장되었습니다!',
-          'success',
-          '#254b7a',
+          '매핑된 데이터가 유효하지 않습니다.',
+          'error',
+          '#FF4853'
         );
-        setIsModalOpen(false);
-        setBlueprintName('');
-        setIsDockerRemote(false);
-        setRemoteUrl('');
-      } else if (contentType && contentType.includes('application/json')) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || '서버 응답 오류');
+        return;
+      }
+
+      const requestBody = {
+        blueprintName,
+        processedData: {
+          host: mappedData.map((host) => ({
+            name: host.hostNm,
+            isLocal: !isDockerRemote,
+            ip: isDockerRemote ? remoteUrl : null,
+            network: Array.isArray(host.networks)
+              ? host.networks.map((network) => ({
+                  name: network.name,
+                  driver: network.driver || 'bridge',
+                  ipam: {
+                    config: [
+                      {
+                        subnet: network.subnet || '',
+                      },
+                    ],
+                  },
+                  containers: [
+                    {
+                      containerName: network.containerName || null,
+                      image: {
+                        imageId: network.droppedImages?.[0]?.id || '',
+                        name: network.droppedImages?.[0]?.name || '',
+                        tag: network.droppedImages?.[0]?.tag || '',
+                      },
+                      networkSettings: network.networkSettings || {},
+                      ports: network.ports || [],
+                      mounts: network.mounts || [],
+                      env: network.env || [],
+                      cmd: network.cmd || [],
+                    },
+                  ],
+                }))
+              : [],
+            volume: Array.isArray(host.imageVolumes)
+              ? host.imageVolumes.map((volume) => ({
+                  name: volume.Name,
+                  driver: volume.Driver,
+                }))
+              : [],
+          })),
+        },
+      };
+
+      console.log(requestBody);
+
+      const res = await fetch('/api/blueprint/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestBody),
+      });
+
+      const result = await res.json();
+      if (res.ok) {
+        showSnackbar(
+          enqueueSnackbar,
+          '설계도를 성공적으로 전송했습니다!',
+          'success',
+          '#4CAF50'
+        );
       } else {
-        const errorText = await response.text();  // HTML이나 텍스트 응답 처리
-        throw new Error(`서버 오류: ${errorText}`);
+        showSnackbar(
+          enqueueSnackbar,
+          `설계도 전송 실패: ${result.error}`,
+          'error',
+          '#FF4853'
+        );
       }
     } catch (error) {
-      console.error('Error:', error);
+      console.error('설계도 전송 실패 중 에러:', error);
       showSnackbar(
         enqueueSnackbar,
-        `설계도 저장 중 오류가 발생했습니다: ${error}`,
+        '설계도 전송 실패 중 에러가 발생했습니다.',
         'error',
-        '#FF4848',
+        '#FF4853'
       );
     }
   };
 
   return (
     <>
-      <div
-        className="fixed bottom-8 right-[50px] transform translate-x-4 h-[40px] px-4 bg-white border-gray-300 border text-blue-600 hover:text-white hover:bg-blue-500 active:bg-blue-600 rounded-lg flex items-center justify-center transition duration-200 ease-in-out">
+      <div className="fixed bottom-8 right-[50px] transform translate-x-4 h-[40px] px-4 bg-white border-gray_3 border text-blue_6 hover:text-white hover:bg-blue_5 active:bg-blue_6 rounded-lg flex items-center justify-center transition duration-200 ease-in-out">
         <button
           className="flex items-center gap-2 text-center"
           onClick={handleSave}
@@ -124,7 +154,7 @@ const SaveButton: React.FC = () => {
             {isDockerRemote && (
               <input
                 type="text"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+                className="w-full px-3 py-2 border border-grey_3 rounded-md focus:outline-none focus:ring-2 focus:ring-blue_5 mb-4"
                 placeholder="Remote URL"
                 value={remoteUrl}
                 onChange={(e) => setRemoteUrl(e.target.value)}
@@ -132,13 +162,13 @@ const SaveButton: React.FC = () => {
             )}
             <div className="flex justify-end mt-6 gap-2">
               <button
-                className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+                className="px-4 py-2 text-grey_6 hover:text-grey_7 transition-colors"
                 onClick={() => setIsModalOpen(false)}
               >
                 취소
               </button>
               <button
-                className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+                className="px-4 py-2 bg-blue_6 text-white rounded-md hover:bg-blue_5 transition-colors"
                 onClick={handleSubmit}
               >
                 저장

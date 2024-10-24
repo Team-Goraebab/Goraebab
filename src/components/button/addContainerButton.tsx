@@ -28,7 +28,7 @@ const AddContainerButton = ({ onCreate }: AddContainerButtonProps) => {
           enqueueSnackbar,
           '컨테이너가 성공적으로 생성되었습니다!',
           'success',
-          '#254b7a'
+          '#4CAF50'
         );
         onCreate(result);
       } else {
