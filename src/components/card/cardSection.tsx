@@ -36,8 +36,6 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
   const { selectedNetwork, setSelectedNetwork, clearSelectedNetwork } =
     useSelectedNetworkStore();
 
-  console.log('선택한 네트워크 3333', selectedNetwork);
-
   const allContainers = useStore((state) => state.hostContainers);
   const deleteNetwork = useHostStore((state) => state.deleteNetwork);
 

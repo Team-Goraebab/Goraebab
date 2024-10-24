@@ -163,7 +163,7 @@ const SelectVolumeModal = ({
         <Button
           onClick={handleSave}
           color="primary"
-          disabled={selectedVolumes.length === 0}
+          // disabled={selectedVolumes.length === 0}
         >
           저장
         </Button>

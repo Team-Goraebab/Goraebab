@@ -144,6 +144,7 @@ const NetworkCard = ({ data, onDeleteSuccess }: CardDataProps) => {
         subnet: networkInfo.subnet,
         scope: networkInfo.scope,
         id: networkInfo.id,
+        uniqueId: uuidv4(),
       });
 
       showSnackbar(
