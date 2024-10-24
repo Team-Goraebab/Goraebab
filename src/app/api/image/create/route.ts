@@ -5,7 +5,9 @@ import { createGzip, createBrotliCompress, createGunzip } from 'node:zlib';
 import tar from 'tar-stream';
 import { extname } from 'path';
 
-export async function POST(req: NextRequest) {
+export const runtime = 'nodejs';
+
+export const POST = async (req: NextRequest) => {
   const { searchParams } = new URL(req.url);
   const hostIp = searchParams.get('hostIp') || 'localhost';
   const dockerClient = createDockerClient(hostIp);
@@ -143,9 +145,10 @@ export async function POST(req: NextRequest) {
       { status: 500 }
     );
   }
-}
+};
 
-export const config = {
+export const routeConfig = {
+  runtime: 'nodejs',
   api: {
     bodyParser: false,
   },
