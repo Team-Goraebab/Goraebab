@@ -1,5 +1,8 @@
 @echo off
 
+docker pull openjdk:17-jdk-slim
+docker pull node:20-alpine
+
 set DBMS=%1
 set DB_USERNAME=root
 set DB_PASSWORD=root
@@ -23,5 +26,6 @@ if /I "%DBMS%"=="mysql" (
 
 docker-compose up "%DBMS%" -d
 docker-compose up backend -d
+docker-compose up frontend -d
 
 pause
