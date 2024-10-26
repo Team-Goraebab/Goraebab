@@ -100,7 +100,6 @@ const VolumeCard = ({ data, onDeleteSuccess }: VolumeCardProps) => {
         );
       }
     } catch (error) {
-      console.error('볼륨 삭제 중 에러:', error);
       showSnackbar(
         enqueueSnackbar,
         `볼륨 삭제 요청 중 에러: ${error}`,

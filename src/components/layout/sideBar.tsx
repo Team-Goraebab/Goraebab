@@ -167,7 +167,7 @@ const Sidebar = () => {
       return Object.entries(groupedContainers).map(
         ([groupName, { containers }]) => (
           <ContainerCardGroup
-            key={groupName}
+            key={`${groupName}-${selectedHostIp}`}
             projectName={groupName}
             containers={containers}
             onDeleteSuccess={handleDeleteSuccess}
@@ -177,15 +177,14 @@ const Sidebar = () => {
     }
 
     return data && data.length > 0
-      ? data.map(
-        (item) =>
-          CardComponent && (
-            <CardComponent
-              key={`${item.Id}-${selectedHostIp}`}
-              data={item}
-              onDeleteSuccess={handleDeleteSuccess}
-            />
-          ),
+      ? data.map((item, index) =>
+        CardComponent ? (
+          <CardComponent
+            key={`${item.Id || index}-${selectedHostIp}`}
+            data={item}
+            onDeleteSuccess={handleDeleteSuccess}
+          />
+        ) : null,
       )
       : renderNoDataMessage(noDataMessage);
   };
