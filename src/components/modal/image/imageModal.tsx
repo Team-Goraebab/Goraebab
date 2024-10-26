@@ -2,25 +2,25 @@
 
 import React, { useState, useEffect } from 'react';
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
   Button,
-  Tab,
   Tabs,
-  TextField,
-  Typography,
-  Box,
-  IconButton,
-} from '@mui/material';
-import { styled } from '@mui/material/styles';
-import { FolderOpen, Label, Description, Delete, Hub, Close } from '@mui/icons-material';
+  Tab,
+  Input,
+  Card,
+  CardBody,
+  type Selection,
+} from '@nextui-org/react';
+import { FolderIcon, TagIcon, FileTextIcon, TrashIcon, DockIcon } from 'lucide-react';
 import { useSnackbar } from 'notistack';
 import { v4 as uuidv4 } from 'uuid';
 import { showSnackbar } from '@/utils/toastUtils';
 import { DockerHubContent } from '@/components';
-import ModalButton from '@/components/button/ModalButton';
+import { Key } from '@react-types/shared';
 
 interface ModalProps {
   isOpen: boolean;
@@ -36,20 +36,10 @@ interface ModalProps {
   ) => void;
 }
 
-const VisuallyHiddenInput = styled('input')({
-  clip: 'rect(0 0 0 0)',
-  clipPath: 'inset(50%)',
-  height: 1,
-  overflow: 'hidden',
-  position: 'absolute',
-  bottom: 0,
-  left: 0,
-  whiteSpace: 'nowrap',
-  width: 1,
-});
+type TabKey = 'dockerHub' | 'local';
 
 const ImageModal: React.FC<ModalProps> = ({ isOpen, onClose, onSave }) => {
-  const [activeTab, setActiveTab] = useState(0);
+  const [activeTab, setActiveTab] = useState<TabKey>('dockerHub');
   const [file, setFile] = useState<File | null>(null);
   const [name, setName] = useState<string>('');
   const [tag, setTag] = useState<string>('');
@@ -64,7 +54,7 @@ const ImageModal: React.FC<ModalProps> = ({ isOpen, onClose, onSave }) => {
       setName('');
       setTag('');
       setSize('');
-      setActiveTab(0);
+      setActiveTab('dockerHub');
       setDockerImageInfo(null);
     }
   }, [isOpen]);
@@ -115,7 +105,7 @@ const ImageModal: React.FC<ModalProps> = ({ isOpen, onClose, onSave }) => {
   };
 
   const validateInputs = () => {
-    if (!file && activeTab === 1) {
+    if (!file && activeTab === 'local') {
       showSnackbar(enqueueSnackbar, '이미지를 선택해주세요.', 'error', '#FF4853');
       return false;
     }
@@ -127,7 +117,7 @@ const ImageModal: React.FC<ModalProps> = ({ isOpen, onClose, onSave }) => {
       showSnackbar(enqueueSnackbar, '태그를 입력해주세요.', 'error', '#FF4853');
       return false;
     }
-    if (activeTab === 0 && !dockerImageInfo) {
+    if (activeTab === 'dockerHub' && !dockerImageInfo) {
       showSnackbar(enqueueSnackbar, 'Docker Hub 이미지를 선택해주세요.', 'error', '#FF4853');
       return false;
     }
@@ -137,27 +127,28 @@ const ImageModal: React.FC<ModalProps> = ({ isOpen, onClose, onSave }) => {
   const handleSave = () => {
     if (validateInputs()) {
       const id = uuidv4();
-      if (activeTab === 1 && file) {
+      if (activeTab === 'local' && file) {
         onSave(id, name, tag, file, size, 'local');
-      } else if (activeTab === 0 && dockerImageInfo) {
+      } else if (activeTab === 'dockerHub' && dockerImageInfo) {
         onSave(id, name, tag, null, size, 'dockerHub', dockerImageInfo);
       }
       onClose();
     }
   };
 
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
-    if (file && newValue === 0) {
+  const handleTabChange = (key: Key) => {
+    const selectedKey = key as TabKey;
+    if (file && selectedKey === 'dockerHub') {
       setIsWarningModalOpen(true);
     } else {
-      setActiveTab(newValue);
+      setActiveTab(selectedKey);
     }
   };
 
   const handleWarningConfirm = () => {
     setFile(null);
     setSize('');
-    setActiveTab(0);
+    setActiveTab('dockerHub');
     setIsWarningModalOpen(false);
   };
 
@@ -167,143 +158,143 @@ const ImageModal: React.FC<ModalProps> = ({ isOpen, onClose, onSave }) => {
     setTag(image.tags?.[0] || 'latest');
   };
 
-  const renderTabContent = () => {
-    switch (activeTab) {
-      case 0:
-        return <DockerHubContent onSelectImage={handleDockerHubImageSelect} />;
-      case 1:
-        return (
-          <>
-            {file ? (
-              <Box sx={{ border: '1px solid', borderRadius: 4, position: 'relative', p: 2, width: '100%', mt: 2 }}>
-                <Typography variant="subtitle1" color="primary" fontWeight="bold">
-                  {file.name}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {size} MB
-                </Typography>
-                <IconButton
-                  onClick={handleDeleteFile}
-                  color="error"
-                  size="small"
-                  sx={{ position: 'absolute', top: 22, right: 12 }}
-                >
-                  <Delete />
-                </IconButton>
-              </Box>
-            ) : (
-              <Box
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  height: '200px',
-                  border: '2px dashed',
-                  borderColor: 'primary.main',
-                  borderRadius: 2,
-                  p: 2,
-                  cursor: 'pointer',
-                  transition: 'background-color 0.3s ease',
-                  '&:hover': {
-                    backgroundColor: 'action.hover',
-                  },
-                }}
-                component="label"
-              >
-                <FolderOpen sx={{ fontSize: 48, mb: 2, color: 'primary.main' }} />
-                <Typography>파일을 드래그하거나 클릭하여 선택하세요</Typography>
-                <VisuallyHiddenInput
-                  type="file"
-                  onChange={handleFileChange}
-                  accept=".tar,.tar.gz,.tar.bz2,.tar.xz"
-                />
-              </Box>
-            )}
-          </>
-        );
-      default:
-        return null;
+  const renderFileUpload = () => {
+    if (file) {
+      return (
+        <Card className="w-full mt-4">
+          <CardBody className="flex flex-row items-center justify-between">
+            <div>
+              <p className="text-primary font-medium">{file.name}</p>
+              <p className="text-sm text-default-500">{size} MB</p>
+            </div>
+            <Button
+              isIconOnly
+              color="danger"
+              variant="light"
+              onPress={handleDeleteFile}
+              className="min-w-unit-10"
+            >
+              <TrashIcon size={20} />
+            </Button>
+          </CardBody>
+        </Card>
+      );
     }
+
+    return (
+      <label
+        className="flex flex-col items-center justify-center w-full h-[200px] mt-4 border-2 border-dashed rounded-large border-primary cursor-pointer hover:bg-default-100 transition-colors">
+        <FolderIcon size={48} className="text-primary mb-4" />
+        <p className="text-default-700">파일을 드래그하거나 클릭하여 선택하세요</p>
+        <input
+          type="file"
+          className="hidden"
+          onChange={handleFileChange}
+          accept=".tar,.tar.gz,.tar.bz2,.tar.xz"
+        />
+      </label>
+    );
   };
 
   return (
     <>
-      <Dialog
-        open={isOpen}
+      <Modal
+        isOpen={isOpen}
         onClose={onClose}
-        maxWidth="md"
-        fullWidth
-        PaperProps={{
-          sx: {
-            display: 'flex',
-            flexDirection: 'column',
-            maxHeight: '90vh',
-          },
-        }}
+        size="3xl"
+        scrollBehavior="inside"
       >
-        <Box sx={{ p: 3, position: 'relative', flexGrow: 0 }}>
-          <IconButton
-            onClick={onClose}
-            sx={{ position: 'absolute', top: 8, right: 8 }}
-          >
-            <Close />
-          </IconButton>
-          <Tabs value={activeTab} onChange={handleTabChange}>
-            <Tab icon={<Hub className="text-blue_6" />} label="Docker Hub" className="text-blue_6" />
-            <Tab icon={<FolderOpen className="text-blue_6" />} label="Local Path" className="text-blue_6" />
-          </Tabs>
-        </Box>
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">
+                <Tabs
+                  selectedKey={activeTab}
+                  onSelectionChange={handleTabChange}
+                  color="primary"
+                  variant="underlined"
+                  classNames={{
+                    tabList: 'gap-6',
+                  }}
+                >
+                  <Tab
+                    key="dockerHub"
+                    title={
+                      <div className="flex items-center space-x-2">
+                        <DockIcon size={20} />
+                        <span>Docker Hub</span>
+                      </div>
+                    }
+                  />
+                  <Tab
+                    key="local"
+                    title={
+                      <div className="flex items-center space-x-2">
+                        <FolderIcon size={20} />
+                        <span>Local Path</span>
+                      </div>
+                    }
+                  />
+                </Tabs>
+              </ModalHeader>
+              <ModalBody>
+                {activeTab === 'dockerHub' ? (
+                  <DockerHubContent onSelectImage={handleDockerHubImageSelect} />
+                ) : (
+                  renderFileUpload()
+                )}
+                <div className="space-y-4 mt-4">
+                  <Input
+                    label="이름"
+                    value={name}
+                    onValueChange={setName}
+                    startContent={<FileTextIcon size={18} className="text-default-400" />}
+                    variant="bordered"
+                  />
+                  <Input
+                    label="태그"
+                    value={tag}
+                    onValueChange={setTag}
+                    startContent={<TagIcon size={18} className="text-default-400" />}
+                    variant="bordered"
+                  />
+                </div>
+              </ModalBody>
+              <ModalFooter>
+                <Button color="default" variant="light" onPress={onClose}>
+                  취소
+                </Button>
+                <Button color="primary" onPress={handleSave}>
+                  저장하기
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
 
-        <DialogContent sx={{ flexGrow: 1, overflowY: 'auto', p: 3 }}>
-          {renderTabContent()}
-          <Box sx={{ mt: 2 }}>
-            <TextField
-              fullWidth
-              label="이름"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              InputProps={{
-                startAdornment: <Description sx={{ color: 'action.active', mr: 1 }} />,
-              }}
-              sx={{ mb: 2 }}
-            />
-            <TextField
-              fullWidth
-              label="태그"
-              value={tag}
-              onChange={(e) => setTag(e.target.value)}
-              InputProps={{
-                startAdornment: <Label sx={{ color: 'action.active', mr: 1 }} />,
-              }}
-            />
-          </Box>
-        </DialogContent>
-
-        <DialogActions sx={{ p: 3, borderTop: '1px solid', borderColor: 'divider', flexGrow: 0 }}>
-          <Button onClick={onClose} color="primary">
-            취소
-          </Button>
-          <ModalButton onClick={handleSave}>저장하기</ModalButton>
-        </DialogActions>
-      </Dialog>
-
-      <Dialog open={isWarningModalOpen} onClose={() => setIsWarningModalOpen(false)} sx={{ p: 2 }}>
-        <DialogTitle>경고</DialogTitle>
-        <DialogContent>
-          <Typography>
-            로컬 파일이 이미 존재합니다. Docker Hub로 전환하면 현재 선택된 파일이 삭제됩니다. 계속하시겠습니까?
-          </Typography>
-        </DialogContent>
-        <DialogActions sx={{ p: 2 }}>
-          <Button onClick={() => setIsWarningModalOpen(false)} color="primary">
-            취소
-          </Button>
-          <Button onClick={handleWarningConfirm} color="primary" variant="contained">
-            확인
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <Modal isOpen={isWarningModalOpen} onClose={() => setIsWarningModalOpen(false)} size="sm">
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader>경고</ModalHeader>
+              <ModalBody>
+                <p>
+                  로컬 파일이 이미 존재합니다. Docker Hub로 전환하면 현재 선택된 파일이 삭제됩니다. 계속하시겠습니까?
+                </p>
+              </ModalBody>
+              <ModalFooter>
+                <Button color="default" variant="light" onPress={onClose}>
+                  취소
+                </Button>
+                <Button color="primary" onPress={handleWarningConfirm}>
+                  확인
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
     </>
   );
 };

@@ -249,7 +249,6 @@ const Sidebar = () => {
           </Button>
         )}
       </CardFooter>
-      <DaemonConnectBar />
     </Card>
   );
 };
