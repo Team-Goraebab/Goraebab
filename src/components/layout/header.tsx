@@ -76,16 +76,21 @@ const Header = () => {
               <div className="flex flex-col gap-1 pl-3">
                 {MENU_ITEMS.map((item) => (
                   <Tooltip
+                    showArrow
                     key={item.id}
-                    content={isCollapsed ? item.name : ''}
                     placement="right"
-                    delay={200}
-                    className="capitalize"
+                    content={item.name}
+                    classNames={{
+                      content: [
+                        'py-2 px-4',
+                        'text-black',
+                      ],
+                    }}
                   >
                     <Button
                       onClick={() => handleNavigation(item.path, item.id)}
                       className={`w-full justify-start group transition-all duration-300 ${
-                        isCollapsed ? 'px-2' : 'px-4'
+                        isCollapsed ? 'px-2' : 'px-2'
                       } ${
                         activeId === item.id
                           ? 'bg-primary/10 dark:bg-primary/20 hover:bg-primary/20 dark:hover:bg-primary/30'

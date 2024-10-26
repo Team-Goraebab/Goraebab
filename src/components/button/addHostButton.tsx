@@ -22,7 +22,7 @@ const AddHostButton = () => {
         </button>
       </div>
       <div className="min-h-screen flex items-center justify-center">
-        {isModalOpen && <HostModal onClose={() => setIsModalOpen(false)} />}
+        {isModalOpen && <HostModal onClose={() => setIsModalOpen(false)} isOpen={isModalOpen} />}
       </div>
     </>
   );

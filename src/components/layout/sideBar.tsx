@@ -233,7 +233,7 @@ const Sidebar = () => {
       </CardHeader>
       <Divider />
       <ScrollShadow className="flex-grow h-[calc(100vh-180px)] px-4 py-4">
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-2">
           {renderDataList()}
         </div>
       </ScrollShadow>
