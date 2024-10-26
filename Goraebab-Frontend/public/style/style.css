@@ -1,0 +1,55 @@
+/* scrollbar custom */
+
+.scrollbar-custom::-webkit-scrollbar {
+  width: 12px !important;
+}
+
+.scrollbar-custom::-webkit-scrollbar-track {
+  background: #f1f1f1 !important;
+  border-radius: 10px;
+}
+
+.scrollbar-custom::-webkit-scrollbar-thumb {
+  background-color: #888 !important;
+  border-radius: 10px !important;
+  border: 3px solid #f1f1f1 !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  .scrollbar-custom::-webkit-scrollbar-track {
+    background: #333 !important;
+  }
+
+  .scrollbar-custom::-webkit-scrollbar-thumb {
+    background-color: #555 !important;
+    border: 3px solid #333 !important;
+  }
+}
+
+/* scrollbar 숨기기 */
+
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, and Opera */
+}
+
+/* card 말줄임표 */
+
+.truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* cursor */
+
+.grabbing {
+  cursor: grabbing;
+}
+.grab {
+  cursor: grab;
+}
