@@ -110,10 +110,10 @@ const DaemonConnectBar = () => {
         <FaDocker className="mr-2 w-4 h-4" />
         <span className="font-semibold text-sm">
           {engineStatus === 'connect'
-            ? 'Daemon connected'
+            ? '도커 연결 성공'
             : engineStatus === 'connecting'
-              ? 'Connecting...'
-              : 'Daemon disconnected'}
+              ? '연결 중...'
+              : '도커 연결 실패'}
         </span>
       </div>
       <div className="flex items-center space-x-2">

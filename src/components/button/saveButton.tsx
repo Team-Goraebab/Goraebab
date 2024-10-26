@@ -118,7 +118,7 @@ const SaveButton = () => {
   return (
     <>
       <div
-        className="fixed bottom-8 right-[50px] transform translate-x-4 h-[40px] px-4 bg-white border-gray_3 border text-blue_6 hover:text-white hover:bg-blue_5 active:bg-blue_6 rounded-lg flex items-center justify-center transition duration-200 ease-in-out">
+        className="h-[40px] px-4 bg-white border-gray_3 border text-blue_6 hover:text-white hover:bg-blue_5 active:bg-blue_6 rounded-lg flex items-center justify-center transition duration-200 ease-in-out">
         <button
           className="flex items-center gap-2 text-center"
           onClick={handleSave}

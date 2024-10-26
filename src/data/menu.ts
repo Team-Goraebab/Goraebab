@@ -9,10 +9,10 @@ import { LuNetwork } from 'react-icons/lu';
 }
 
 export const MENU_ITEMS = [
-  { id: 1, name: 'Container', path: '/', icon: FiBox },
-  { id: 2, name: 'Image', path: '/', icon: FiImage },
-  { id: 3, name: 'Network', path: '/', icon: LuNetwork },
-  { id: 4, name: 'Volume', path: '/', icon: FiCpu },
+  { id: 1, name: '컨테이너', path: '/', icon: FiBox },
+  { id: 2, name: '이미지', path: '/', icon: FiImage },
+  { id: 3, name: '네트워크', path: '/', icon: LuNetwork },
+  { id: 4, name: '볼륨', path: '/', icon: FiCpu },
 ];
 
 export const MANAGEMENT_MENU = [

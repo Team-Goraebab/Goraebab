@@ -1,20 +1,27 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import {
+  Card,
+  Button,
+  ScrollShadow,
+  Tooltip,
+  Divider,
+  Badge, CardHeader, CardFooter,
+} from '@nextui-org/react';
+import { useMenuStore } from '@/store/menuStore';
+import { selectedHostStore } from '@/store/seletedHostStore';
+import { RxReload } from 'react-icons/rx';
+import { AiOutlineInfoCircle } from 'react-icons/ai';
 import AddBridgeButton from '../button/addBridgeButton';
-import NetworkCard from '../card/networkCard';
-import VolumeCard from '../card/volumeCard';
 import AddVolumeButton from '../button/addVolumeButton';
 import AddContainerButton from '../button/addContainerButton';
 import AddImageButton from '../button/addImageButton';
-import { useMenuStore } from '@/store/menuStore';
+import NetworkCard from '../card/networkCard';
+import VolumeCard from '../card/volumeCard';
 import ImageCard from '../card/imageCard';
-import DaemonConnectBar from '../bar/daemonConnectBar';
-import { AiOutlineInfoCircle } from 'react-icons/ai';
-import LargeButton from '../button/largeButton';
-import { RxReload } from 'react-icons/rx';
 import ContainerCardGroup from '@/components/card/containerCardGroup';
-import { selectedHostStore } from '@/store/seletedHostStore';
+import DaemonConnectBar from '../bar/daemonConnectBar';
 
 type DataHandlerType = {
   data: any[];
@@ -56,7 +63,6 @@ const loadData = async (
 const Sidebar = () => {
   const { activeId } = useMenuStore();
   const selectedHostIp = selectedHostStore((state) => state.selectedHostIp);
-
   const [networkData, setNetworkData] = useState<any[]>([]);
   const [volumeData, setVolumeData] = useState<any[]>([]);
   const [containerData, setContainerData] = useState<Container[]>([]);
@@ -74,25 +80,6 @@ const Sidebar = () => {
     2: { data: imageData, setData: setImageData },
     3: { data: networkData, setData: setNetworkData },
     4: { data: volumeData, setData: setVolumeData },
-  };
-
-  const handleCreate = async (newItem: any) => {
-    try {
-      const { url, dataKey } = apiMap[activeId] || {};
-      if (!url) return;
-
-      await loadData(
-        url,
-        dataHandlers[activeId as 1 | 2 | 3 | 4].setData,
-        dataKey,
-      );
-
-      setTimeout(() => {
-        loadData(url, dataHandlers[activeId as 1 | 2 | 3 | 4].setData, dataKey);
-      }, 2000);
-    } catch (error) {
-      throw error;
-    }
   };
 
   const componentMap: Record<1 | 2 | 3 | 4, ComponentMapItem> = {
@@ -125,14 +112,29 @@ const Sidebar = () => {
     },
   };
 
+  const handleCreate = async (newItem: any) => {
+    try {
+      const { url, dataKey } = apiMap[activeId] || {};
+      if (!url) return;
+
+      await loadData(url, dataHandlers[activeId as 1 | 2 | 3 | 4].setData, dataKey);
+      setTimeout(() => {
+        loadData(url, dataHandlers[activeId as 1 | 2 | 3 | 4].setData, dataKey);
+      }, 2000);
+    } catch (error) {
+      throw error;
+    }
+  };
+
   const currentComponent = componentMap[activeId as 1 | 2 | 3 | 4];
 
   const renderNoDataMessage = (message: string) => (
-    <div
-      className="flex flex-col items-center justify-center text-center p-4 border border-dashed border-blue_3 rounded-md bg-blue_0">
-      <AiOutlineInfoCircle className="text-blue_6 text-2xl mb-2" />
-      <p className="font-pretendard font-medium text-blue_6">{message}</p>
-    </div>
+    <Card className="bg-default-50 border-dashed border-2 border-default-200">
+      <Card className="py-8 flex flex-col items-center gap-2">
+        <AiOutlineInfoCircle className="text-default-500 text-2xl" />
+        <p className="text-default-500 text-sm">{message}</p>
+      </Card>
+    </Card>
   );
 
   const handleDeleteSuccess = () => {
@@ -164,16 +166,14 @@ const Sidebar = () => {
         }, {} as Record<string, { containers: Container[]; networkMode: string }>)
         : {};
 
-      return Object.entries(groupedContainers).map(
-        ([groupName, { containers }]) => (
-          <ContainerCardGroup
-            key={`${groupName}-${selectedHostIp}`}
-            projectName={groupName}
-            containers={containers}
-            onDeleteSuccess={handleDeleteSuccess}
-          />
-        ),
-      );
+      return Object.entries(groupedContainers).map(([groupName, { containers }]) => (
+        <ContainerCardGroup
+          key={`${groupName}-${selectedHostIp}`}
+          projectName={groupName}
+          containers={containers}
+          onDeleteSuccess={handleDeleteSuccess}
+        />
+      ));
     }
 
     return data && data.length > 0
@@ -207,39 +207,50 @@ const Sidebar = () => {
   }, [selectedHostIp]);
 
   return (
-    <div className="fixed z-[99] top-0 left-0 w-[300px] flex flex-col h-full bg-white border-r-2 border-grey_2 pt-14">
-      <div className="flex justify-between items-center px-6 py-4 bg-gray-100 border-b border-grey_2">
-        <h2 className="text-md font-semibold font-pretendard flex items-center">
-          {currentComponent?.title || '데이터'}
-          <span className="ml-2 px-2 py-1 bg-blue_4 text-white text-xs font-pretendard rounded-lg">
+    <Card
+      className="fixed z-[9] top-0 right-0 w-[280px] h-full rounded-none shadow-lg bg-background/70 backdrop-blur-md">
+      <CardHeader className="flex flex-row justify-between items-center px-4 py-3 bg-default-50">
+        <div className="flex items-center gap-2">
+          <h2 className="text-md font-semibold">
+            {currentComponent?.title || '데이터'}
+          </h2>
+          <div
+            className="px-2 py-1 bg-blue_1 rounded-lg font-medium text-sm"
+          >
             {dataHandlers[activeId as 1 | 2 | 3 | 4]?.data.length || 0}
-          </span>
-        </h2>
-        <button
-          className="text-blue_6 font-bold"
-          onClick={refreshData}
-          title="새로고침"
-        >
-          <RxReload size={16} />
-        </button>
-      </div>
-      <div className="flex flex-col flex-grow pl-4 pr-4 pt-4 overflow-y-auto scrollbar-hide">
-        <div className="flex-grow">{renderDataList()}</div>
-      </div>
-      <div className="flex-shrink-0 p-4 border-t">
+          </div>
+        </div>
+        <Tooltip content="새로고침">
+          <Button
+            isIconOnly
+            variant="light"
+            size="sm"
+            onClick={refreshData}
+          >
+            <RxReload size={16} />
+          </Button>
+        </Tooltip>
+      </CardHeader>
+      <Divider />
+      <ScrollShadow className="flex-grow h-[calc(100vh-180px)] px-4 py-4">
+        <div className="flex flex-col gap-3">
+          {renderDataList()}
+        </div>
+      </ScrollShadow>
+      <Divider />
+      <CardFooter className="px-4 py-4">
         {currentComponent ? (
           React.createElement(currentComponent.addButton, {
             onCreate: handleCreate,
           })
         ) : (
-          <LargeButton title={'추가하기'} onClick={() => {
-          }} />
+          <Button fullWidth color="primary">
+            추가하기
+          </Button>
         )}
-      </div>
-      <div>
-        <DaemonConnectBar />
-      </div>
-    </div>
+      </CardFooter>
+      <DaemonConnectBar />
+    </Card>
   );
 };
 
