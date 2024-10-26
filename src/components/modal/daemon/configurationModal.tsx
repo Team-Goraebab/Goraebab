@@ -51,10 +51,10 @@ interface MountConfigProps {
 }
 
 const ConfigurationModal = ({
-  open,
-  onClose,
-  onSave,
-}: ConfigurationModalProps) => {
+                              open,
+                              onClose,
+                              onSave,
+                            }: ConfigurationModalProps) => {
   const [activeTab, setActiveTab] = useState(0);
   const [networkSettings, setNetworkSettings] = useState({
     gateway: '192.168.1.1',
@@ -90,11 +90,11 @@ const ConfigurationModal = ({
         (mount) =>
           !mount.destination ||
           (mount.type === 'bind' && !mount.source) ||
-          (mount.type === 'volume' && !mount.name)
+          (mount.type === 'volume' && !mount.name),
       )
     ) {
       alert(
-        '마운트 설정의 대상 경로와 각 타입에 맞는 필수 항목을 모두 입력해 주세요.'
+        '마운트 설정의 대상 경로와 각 타입에 맞는 필수 항목을 모두 입력해 주세요.',
       );
       return;
     }
@@ -107,11 +107,11 @@ const ConfigurationModal = ({
       ports:
         portSettings.privatePort && portSettings.publicPort
           ? [
-              {
-                privatePort: parseInt(portSettings.privatePort, 10),
-                publicPort: parseInt(portSettings.publicPort, 10),
-              },
-            ]
+            {
+              privatePort: parseInt(portSettings.privatePort, 10),
+              publicPort: parseInt(portSettings.publicPort, 10),
+            },
+          ]
           : [],
       mounts: mounts.length > 0 ? mounts : [],
       env: envVariables ? envVariables.split('\n').filter(Boolean) : [],
@@ -119,7 +119,6 @@ const ConfigurationModal = ({
     };
 
     onSave(config);
-    console.log('config', config);
     handleClose();
   };
 

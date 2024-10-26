@@ -102,7 +102,7 @@ const ImageCard = ({ data, onDeleteSuccess }: CardDataProps) => {
         `/api/image/delete?id=${data.Id}&force=true`,
         {
           method: 'DELETE',
-        }
+        },
       );
 
       if (!response.ok) {
@@ -114,7 +114,7 @@ const ImageCard = ({ data, onDeleteSuccess }: CardDataProps) => {
         enqueueSnackbar,
         '이미지가 삭제되었습니다.',
         'success',
-        '#4CAF50'
+        '#4CAF50',
       );
 
       onDeleteSuccess();
@@ -124,7 +124,7 @@ const ImageCard = ({ data, onDeleteSuccess }: CardDataProps) => {
         enqueueSnackbar,
         '이미지 삭제에 실패했습니다.',
         'error',
-        '#FF0000'
+        '#FF0000',
       );
     } finally {
       setShowModal(false);
@@ -154,7 +154,6 @@ const ImageCard = ({ data, onDeleteSuccess }: CardDataProps) => {
       setDetailData(imageDetail);
       setIsModalOpen(true);
     } catch (error) {
-      console.log(error);
       throw error;
     }
   };
@@ -182,7 +181,7 @@ const ImageCard = ({ data, onDeleteSuccess }: CardDataProps) => {
         enqueueSnackbar,
         '컨테이너가 성공적으로 실행되었습니다.',
         'success',
-        '#4CAF50'
+        '#4CAF50',
       );
     } catch (error) {
       console.error('Error running container:', error);
@@ -190,7 +189,7 @@ const ImageCard = ({ data, onDeleteSuccess }: CardDataProps) => {
         enqueueSnackbar,
         '컨테이너 실행에 실패했습니다.',
         'error',
-        '#FF0000'
+        '#FF0000',
       );
     }
   };

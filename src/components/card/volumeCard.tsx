@@ -88,7 +88,7 @@ const VolumeCard = ({ data, onDeleteSuccess }: VolumeCardProps) => {
           enqueueSnackbar,
           '볼륨이 성공적으로 삭제되었습니다!',
           'success',
-          '#4CAF50'
+          '#4CAF50',
         );
         onDeleteSuccess();
       } else {
@@ -96,7 +96,7 @@ const VolumeCard = ({ data, onDeleteSuccess }: VolumeCardProps) => {
           enqueueSnackbar,
           `볼륨 삭제 실패: ${result.error}`,
           'error',
-          '#FF4853'
+          '#FF4853',
         );
       }
     } catch (error) {
@@ -105,7 +105,7 @@ const VolumeCard = ({ data, onDeleteSuccess }: VolumeCardProps) => {
         enqueueSnackbar,
         `볼륨 삭제 요청 중 에러: ${error}`,
         'error',
-        '#FF4853'
+        '#FF4853',
       );
     } finally {
       setLoading(false);
@@ -125,7 +125,6 @@ const VolumeCard = ({ data, onDeleteSuccess }: VolumeCardProps) => {
       }
       return data;
     } catch (error) {
-      console.error('Error fetching volume detail:', error);
       throw error;
     }
   };
@@ -136,7 +135,7 @@ const VolumeCard = ({ data, onDeleteSuccess }: VolumeCardProps) => {
       setDetailData(volumeDetail);
       setIsModalOpen(true);
     } catch (error) {
-      console.log(error);
+      throw error;
     }
   };
 

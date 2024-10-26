@@ -121,9 +121,7 @@ export const POST = async (req: NextRequest) => {
         { status: 400 },
       );
     }
-
-    console.log(response.data);
-
+    
     // Buffer로 변환하여 응답하기
     const responseData =
       typeof response.data === 'string'

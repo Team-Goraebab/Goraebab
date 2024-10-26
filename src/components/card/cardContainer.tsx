@@ -47,17 +47,17 @@ interface ImageToNetwork {
 }
 
 const CardContainer = ({
-  networkName,
-  networkIp,
-  containers,
-  themeColor,
-  onDelete,
-  onSelectNetwork,
-  isSelected,
-  hostIp,
-  networkUniqueId,
-  containerName,
-}: CardContainerProps) => {
+                         networkName,
+                         networkIp,
+                         containers,
+                         themeColor,
+                         onDelete,
+                         onSelectNetwork,
+                         isSelected,
+                         hostIp,
+                         networkUniqueId,
+                         containerName,
+                       }: CardContainerProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const { enqueueSnackbar } = useSnackbar();
 
@@ -66,7 +66,7 @@ const CardContainer = ({
   const hosts = useHostStore((state) => state.hosts);
   const allContainers = useStore((state) => state.hostContainers);
   const connectedBridgeIds = selectedHostStore(
-    (state) => state.connectedBridgeIds
+    (state) => state.connectedBridgeIds,
   );
   const mappedData = useBlueprintStore((state) => state.mappedData);
 
@@ -141,16 +141,7 @@ const CardContainer = ({
     containerName,
     setMappedData,
   ]);
-
-  console.log('Mapped data >>>>>', mappedData);
-
   const volumes = imageVolumes[droppedImages[0]?.id] || defaultVolumeData;
-  // console.log('imageToNetwork >>>', imageToNetwork);
-  // console.log('droppedImages >>>', droppedImages);
-  // console.log('configs >>>', configs);
-  // console.log('containerName >>>', containerName);
-  // console.log('imageVolumes >>>', volumes);
-  // console.log('host data >>>>>', hosts);
 
   const splitImageNameAndTag = (image: string, id: string): ImageInfo => {
     const [name, tag] = image.split(':');
@@ -160,12 +151,12 @@ const CardContainer = ({
   const handleGetInfo = async (imageName: string) => {
     try {
       const imageDetail = await fetch(
-        `/api/image/detail?name=${imageName}`
+        `/api/image/detail?name=${imageName}`,
       ).then((res) => res.json());
       setDetailData(imageDetail);
       setIsModalOpen(true);
     } catch (error) {
-      console.log(error);
+      throw error;
     }
   };
 
@@ -398,7 +389,7 @@ const CardContainer = ({
                                     {vol.Driver}
                                   </span>
                                 </li>
-                              )
+                              ),
                             )}
                           </ul>
                         </div>
@@ -408,7 +399,8 @@ const CardContainer = ({
               })}
             </div>
           ) : (
-            <div className="w-full h-44 flex items-center justify-center text-grey_7 p-2 text-sm border-2 border-dashed border-grey_2 rounded-lg">
+            <div
+              className="w-full h-44 flex items-center justify-center text-grey_7 p-2 text-sm border-2 border-dashed border-grey_2 rounded-lg">
               이미지를 드래그해서 놓으세요
             </div>
           )}

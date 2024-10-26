@@ -49,8 +49,6 @@ const ZoomButtons = () => {
       } else {
         handleZoomOut();
       }
-    } else {
-      console.log('Shift 키 누르지 않음');
     }
   };
 

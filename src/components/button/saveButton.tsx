@@ -32,7 +32,7 @@ const SaveButton = () => {
           enqueueSnackbar,
           '매핑된 데이터가 유효하지 않습니다.',
           'error',
-          '#FF4853'
+          '#FF4853',
         );
         return;
       }
@@ -46,43 +46,41 @@ const SaveButton = () => {
             ip: isDockerRemote ? remoteUrl : null,
             network: Array.isArray(host.networks)
               ? host.networks.map((network) => ({
-                  name: network.name,
-                  driver: network.driver || 'bridge',
-                  ipam: {
-                    config: [
-                      {
-                        subnet: network.subnet || '',
-                      },
-                    ],
-                  },
-                  containers: [
+                name: network.name,
+                driver: network.driver || 'bridge',
+                ipam: {
+                  config: [
                     {
-                      containerName: network.containerName || null,
-                      image: {
-                        imageId: network.droppedImages?.[0]?.id || '',
-                        name: network.droppedImages?.[0]?.name || '',
-                        tag: network.droppedImages?.[0]?.tag || '',
-                      },
-                      networkSettings: network.networkSettings || {},
-                      ports: network.ports || [],
-                      mounts: network.mounts || [],
-                      env: network.env || [],
-                      cmd: network.cmd || [],
+                      subnet: network.subnet || '',
                     },
                   ],
-                }))
+                },
+                containers: [
+                  {
+                    containerName: network.containerName || null,
+                    image: {
+                      imageId: network.droppedImages?.[0]?.id || '',
+                      name: network.droppedImages?.[0]?.name || '',
+                      tag: network.droppedImages?.[0]?.tag || '',
+                    },
+                    networkSettings: network.networkSettings || {},
+                    ports: network.ports || [],
+                    mounts: network.mounts || [],
+                    env: network.env || [],
+                    cmd: network.cmd || [],
+                  },
+                ],
+              }))
               : [],
             volume: Array.isArray(host.imageVolumes)
               ? host.imageVolumes.map((volume) => ({
-                  name: volume.Name,
-                  driver: volume.Driver,
-                }))
+                name: volume.Name,
+                driver: volume.Driver,
+              }))
               : [],
           })),
         },
       };
-
-      console.log(requestBody);
 
       const res = await fetch('/api/blueprint/create', {
         method: 'POST',
@@ -96,14 +94,14 @@ const SaveButton = () => {
           enqueueSnackbar,
           '설계도를 성공적으로 전송했습니다!',
           'success',
-          '#4CAF50'
+          '#4CAF50',
         );
       } else {
         showSnackbar(
           enqueueSnackbar,
           `설계도 전송 실패: ${result.error}`,
           'error',
-          '#FF4853'
+          '#FF4853',
         );
       }
     } catch (error) {
@@ -112,14 +110,15 @@ const SaveButton = () => {
         enqueueSnackbar,
         '설계도 전송 실패 중 에러가 발생했습니다.',
         'error',
-        '#FF4853'
+        '#FF4853',
       );
     }
   };
 
   return (
     <>
-      <div className="fixed bottom-8 right-[50px] transform translate-x-4 h-[40px] px-4 bg-white border-gray_3 border text-blue_6 hover:text-white hover:bg-blue_5 active:bg-blue_6 rounded-lg flex items-center justify-center transition duration-200 ease-in-out">
+      <div
+        className="fixed bottom-8 right-[50px] transform translate-x-4 h-[40px] px-4 bg-white border-gray_3 border text-blue_6 hover:text-white hover:bg-blue_5 active:bg-blue_6 rounded-lg flex items-center justify-center transition duration-200 ease-in-out">
         <button
           className="flex items-center gap-2 text-center"
           onClick={handleSave}
