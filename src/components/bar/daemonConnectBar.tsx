@@ -31,7 +31,6 @@ const DaemonConnectBar = () => {
       setEngineStatus('connect');
       setVersionData(response.data);
     } catch (error) {
-      console.error('원격 데몬 정보를 가져오는 데 실패했습니다:', error);
       setEngineStatus('disconnect');
       // 연결 실패 시 알림 표시
       showSnackbar(
@@ -46,10 +45,9 @@ const DaemonConnectBar = () => {
   async function fetchSystemInfo() {
     try {
       const response = await axios.get(`api/daemon/system`);
-      console.log('시스템 :::', response);
       setSystemData(response.data);
     } catch (error) {
-      console.error('원격 데몬 정보를 가져오는 데 실패했습니다:', error);
+      throw error;
     }
   }
 

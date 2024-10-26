@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createDockerClient } from '../../axiosInstance';
 import { Readable } from 'stream';
-import { createGzip, createBrotliCompress, createGunzip } from 'node:zlib';
+import { createBrotliCompress, createGunzip } from 'node:zlib';
 import tar from 'tar-stream';
 import { extname } from 'path';
 
@@ -17,10 +17,9 @@ export const POST = async (req: NextRequest) => {
   const tag = (formData.get('tag') as string) || 'latest';
 
   if (!method || !imageName) {
-    console.error('Missing required parameters:', { method, imageName });
     return NextResponse.json(
       { error: 'Missing required parameters' },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -33,7 +32,7 @@ export const POST = async (req: NextRequest) => {
         console.error('No file provided for local build');
         return NextResponse.json(
           { error: 'No file provided for local build' },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
@@ -74,7 +73,7 @@ export const POST = async (req: NextRequest) => {
       
         # 이후에 추가로 필요한 스크립트나 실행 명령어들을 이곳에 추가
         # 예: CMD ["bash"]
-      `
+      `,
       );
 
       pack.entry({ name: file.name }, fileBuffer);
@@ -95,10 +94,9 @@ export const POST = async (req: NextRequest) => {
         const gunzip = createGunzip();
         readable = Readable.from(pack).pipe(gunzip);
       } else {
-        console.error('Unsupported file format:', fileExtension);
         return NextResponse.json(
           { error: 'Unsupported file format' },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
@@ -118,10 +116,9 @@ export const POST = async (req: NextRequest) => {
         },
       });
     } else {
-      console.error('Invalid method specified:', method);
       return NextResponse.json(
         { error: 'Invalid method specified' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -136,20 +133,12 @@ export const POST = async (req: NextRequest) => {
       headers: { 'Content-Type': 'application/json' },
     });
   } catch (error) {
-    console.error('Error creating/building image:', error);
     return NextResponse.json(
       {
         error:
           error instanceof Error ? error.message : 'Unknown error occurred',
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
-};
-
-export const routeConfig = {
-  runtime: 'nodejs',
-  api: {
-    bodyParser: false,
-  },
 };
