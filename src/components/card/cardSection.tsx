@@ -126,7 +126,6 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
                       borderWidth: '2px',
                     }}
                   >
-                    {/* Header Section */}
                     <div
                       className="w-full py-3 px-4"
                       style={{
@@ -177,8 +176,6 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
                         </div>
                       </div>
                     </div>
-
-                    {/* Networks Section */}
                     <div className="p-4">
                       {networks.length > 0 ? (
                         <div className="flex flex-col gap-4 w-full">
@@ -218,7 +215,7 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
                         </div>
                       ) : (
                         <div className="text-center text-gray-500 py-4">
-                          No networks configured
+                          연결된 네트워크가 없습니다.
                         </div>
                       )}
                     </div>

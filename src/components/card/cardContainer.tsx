@@ -503,7 +503,6 @@ const CardContainer = ({
         )}
       </Card>
 
-      {/* Modals */}
       <ImageDetailModal
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
