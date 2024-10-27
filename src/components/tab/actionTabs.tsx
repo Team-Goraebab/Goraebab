@@ -24,6 +24,7 @@ import { showSnackbar } from '@/utils/toastUtils';
 import HostModal from '@/components/modal/host/hostModal';
 import SystemInfoModal from '@/components/modal/daemon/systemModal';
 import VersionDetailModal from '@/components/modal/daemon/versionModal';
+import { IoDocumentOutline } from 'react-icons/io5';
 
 const ActionTabs = () => {
   const [isHostModalOpen, setIsHostModalOpen] = useState(false);
@@ -83,6 +84,18 @@ const ActionTabs = () => {
     deleteAllHosts();
     setIsDeleteModalOpen(false);
     showSnackbar(enqueueSnackbar, '설계도가 삭제되었습니다.', 'success', '#4CAF50');
+  };
+
+  const fetchBlueprints = async () => {
+    try {
+      const response = await fetch('/api/blueprint/list', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      console.log(response);
+    } catch (e) {
+      throw e;
+    }
   };
 
   const handleSaveSubmit = async () => {
@@ -215,14 +228,19 @@ const ActionTabs = () => {
           </Dropdown>
 
           <div className="h-6 w-px bg-gray-300" />
-
-          {/* Existing Action Buttons */}
           <Button
             isIconOnly
             className="bg-white"
             onClick={() => setIsHostModalOpen(true)}
           >
             <HiOutlineHome size={20} />
+          </Button>
+          <Button
+            isIconOnly
+            className="bg-white"
+            onClick={fetchBlueprints}
+          >
+            <IoDocumentOutline size={20} />
           </Button>
 
           <Button
@@ -260,8 +278,6 @@ const ActionTabs = () => {
           </Button>
         </div>
       </div>
-
-      {/* Modals */}
       {isHostModalOpen && (
         <HostModal isOpen={isHostModalOpen} onClose={() => setIsHostModalOpen(false)} />
       )}
