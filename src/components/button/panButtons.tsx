@@ -64,7 +64,7 @@ const PanButtons = () => {
       >
         <HiOutlineCursorClick size={20} />
       </button>
-      <div className="w-px h-6 bg-gray-300 mx-1"></div>
+      <div className="w-px h-6 bg-grey_2 mx-1"></div>
       <button
         className={`p-1.5 rounded-lg ${
           isHandMode ? 'bg-blue_1 text-blue_6' : 'text-black'

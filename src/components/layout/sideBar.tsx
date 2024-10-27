@@ -63,6 +63,7 @@ const loadData = async (
 const Sidebar = () => {
   const { activeId } = useMenuStore();
   const selectedHostIp = selectedHostStore((state) => state.selectedHostIp);
+
   const [networkData, setNetworkData] = useState<any[]>([]);
   const [volumeData, setVolumeData] = useState<any[]>([]);
   const [containerData, setContainerData] = useState<Container[]>([]);
@@ -152,18 +153,18 @@ const Sidebar = () => {
     if (activeId === 1) {
       const groupedContainers = Array.isArray(containerData)
         ? containerData.reduce((acc, container) => {
-          const groupName =
-            container.Labels['com.docker.compose.project'] ||
-            container.Names[0].replace(/^\//, '');
-          if (!acc[groupName]) {
-            acc[groupName] = {
-              containers: [],
-              networkMode: container.HostConfig?.NetworkMode || 'Unknown',
-            };
-          }
-          acc[groupName].containers.push(container);
-          return acc;
-        }, {} as Record<string, { containers: Container[]; networkMode: string }>)
+            const groupName =
+              container.Labels['com.docker.compose.project'] ||
+              container.Names[0].replace(/^\//, '');
+            if (!acc[groupName]) {
+              acc[groupName] = {
+                containers: [],
+                networkMode: container.HostConfig?.NetworkMode || 'Unknown',
+              };
+            }
+            acc[groupName].containers.push(container);
+            return acc;
+          }, {} as Record<string, { containers: Container[]; networkMode: string }>)
         : {};
 
       return Object.entries(groupedContainers).map(([groupName, { containers }]) => (
@@ -199,6 +200,12 @@ const Sidebar = () => {
     const { url, dataKey } = apiMap[activeId] || {};
     if (!url) return;
     loadData(url, dataHandlers[activeId as 1 | 2 | 3 | 4].setData, dataKey);
+
+    Object.keys(dataHandlers).forEach((key) => {
+      if (Number(key) !== activeId) {
+        dataHandlers[Number(key) as 1 | 2 | 3 | 4].setData([]);
+      }
+    });
   }, [activeId]);
 
   useEffect(() => {
