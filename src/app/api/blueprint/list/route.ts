@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
 import axios from 'axios';
+import { API_URL } from '@/app/api/urlPath';
 
 export async function GET() {
   try {
-    const response = await axios.get(`api/v1/blueprints`, {});
-    console.log(response);
+    const response = await axios.get(`${API_URL}/blueprints`);
     return NextResponse.json(response.data, { status: 200 });
   } catch (error) {
     console.log(error);

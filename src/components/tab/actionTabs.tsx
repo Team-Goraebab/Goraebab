@@ -25,6 +25,8 @@ import HostModal from '@/components/modal/host/hostModal';
 import SystemInfoModal from '@/components/modal/daemon/systemModal';
 import VersionDetailModal from '@/components/modal/daemon/versionModal';
 import { IoDocumentOutline } from 'react-icons/io5';
+import BlueprintListModal from '@/components/modal/blueprint/blueprintListModal';
+import { createBlueprint } from '@/services/blueprint/api';
 
 const ActionTabs = () => {
   const [isHostModalOpen, setIsHostModalOpen] = useState(false);
@@ -38,6 +40,7 @@ const ActionTabs = () => {
   const [systemData, setSystemData] = useState<any>();
   const [showVersionInfo, setShowVersionInfo] = useState(false);
   const [showSystemInfo, setShowSystemInfo] = useState(false);
+  const [isListModalOpen, setIsListModalOpen] = useState(false);
 
   const deleteAllHosts = useHostStore((state) => state.deleteAllHosts);
   const isHandMode = useHandModeStore((state) => state.isHandMode);
@@ -101,7 +104,12 @@ const ActionTabs = () => {
   const handleSaveSubmit = async () => {
     try {
       if (!mappedData || !Array.isArray(mappedData)) {
-        showSnackbar(enqueueSnackbar, '매핑된 데이터가 유효하지 않습니다.', 'error', '#FF4853');
+        showSnackbar(
+          enqueueSnackbar,
+          '매핑된 데이터가 유효하지 않습니다.',
+          'error',
+          '#FF4853',
+        );
         return;
       }
 
@@ -117,7 +125,11 @@ const ActionTabs = () => {
                 name: network.name,
                 driver: network.driver || 'bridge',
                 ipam: {
-                  config: [{ subnet: network.subnet || '' }],
+                  config: [
+                    {
+                      subnet: network.subnet || '',
+                    },
+                  ],
                 },
                 containers: [
                   {
@@ -146,21 +158,33 @@ const ActionTabs = () => {
         },
       };
 
-      const res = await fetch('/api/blueprint/create', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestBody),
-      });
+      console.log(requestBody);
 
-      const result = await res.json();
-      if (res.ok) {
-        showSnackbar(enqueueSnackbar, '설계도를 성공적으로 전송했습니다!', 'success', '#4CAF50');
-        setIsSaveModalOpen(false);
+      const res = await createBlueprint(requestBody);
+
+      if (res.status === 200 || res.status === 201) {
+        showSnackbar(
+          enqueueSnackbar,
+          '설계도를 성공적으로 전송했습니다!',
+          'success',
+          '#4CAF50',
+        );
       } else {
-        showSnackbar(enqueueSnackbar, `설계도 전송 실패: ${result.error}`, 'error', '#FF4853');
+        showSnackbar(
+          enqueueSnackbar,
+          `설계도 전송 실패: ${res.data.error}`,
+          'error',
+          '#FF4853',
+        );
       }
     } catch (error) {
-      showSnackbar(enqueueSnackbar, '설계도 전송 실패 중 에러가 발생했습니다.', 'error', '#FF4853');
+      console.error('설계도 전송 실패 중 에러:', error);
+      showSnackbar(
+        enqueueSnackbar,
+        '설계도 전송 실패 중 에러가 발생했습니다.',
+        'error',
+        '#FF4853',
+      );
     }
   };
 
@@ -238,7 +262,7 @@ const ActionTabs = () => {
           <Button
             isIconOnly
             className="bg-white"
-            onClick={fetchBlueprints}
+            onClick={() => setIsListModalOpen(true)}
           >
             <IoDocumentOutline size={20} />
           </Button>
@@ -338,6 +362,10 @@ const ActionTabs = () => {
         open={showSystemInfo}
         onClose={() => setShowSystemInfo(false)}
         data={systemData}
+      />
+      <BlueprintListModal
+        isOpen={isListModalOpen}
+        onClose={() => setIsListModalOpen(false)}
       />
     </>
   );
