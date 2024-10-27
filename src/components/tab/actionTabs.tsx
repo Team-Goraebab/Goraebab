@@ -178,11 +178,11 @@ const ActionTabs = () => {
             onClick={handleEngineStartStop}
           >
             {engineStatus === 'connect' ? (
-              <FaStop size={12} />
+              <FaStop size={12} className={'text-gray-700'} />
             ) : engineStatus === 'connecting' ? (
-              <FaPause size={12} />
+              <FaPause size={12} className={'text-gray-700'} />
             ) : (
-              <FaPlay size={12} />
+              <FaPlay size={12} className={'text-gray-700'} />
             )}
           </Button>
           <Dropdown>
