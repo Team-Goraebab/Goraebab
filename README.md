@@ -1,21 +1,21 @@
 # Goraebab
 
 ## Table of Contents
-[Introduce](#-introduce)
+[Introduce](#introduce)
 
-[Architecture](#-architecture)
+[Architecture](#architecture)
 
-[How to run Goraebab](#-how-to-run-goraebab)
+[How to run Goraebab](#how-to-run-goraebab)
 
-[How to use Goraebab](#-how-to-use-goraebab)
+[How to use Goraebab](#how-to-use-goraebab)
 
-[API documentation](#-api-documentation)
+[API documentation](#api-documentation)
 
-[How to contribute](#-how-to-contribute)
+[How to contribute](#how-to-contribute)
 
-[Upcoming features](#-upcoming-features)
+[Upcoming features](#upcoming-features)
 
-[Contributors](#-contributors)
+[Contributors](#contributors)
 
 
 # Introduce
