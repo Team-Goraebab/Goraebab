@@ -1,20 +1,31 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Modal, OptionModal } from '@/components';
-import { v4 as uuidv4 } from 'uuid';
+import { Modal } from '@/components';
 import { useSnackbar } from 'notistack';
 import { showSnackbar } from '@/utils/toastUtils';
-import { useSelectedNetworkStore } from '@/store/selectedNetworkStore';
-import { useContainerStore } from '@/store/containerStore';
-import { useStore } from '@/store/cardStore';
-import { selectedHostStore } from '@/store/seletedHostStore';
 import { getStatusColors } from '@/utils/statusColorsUtils';
-import { AiOutlineUp, AiOutlineDown, AiOutlineFileText } from 'react-icons/ai';
 import { formatTimestamp } from '@/utils/formatTimestamp';
 import { fetchData } from '@/services/apiUtils';
 import ContainerDetailModal from '../modal/container/containerDetailModal';
 import LogModal from '../modal/container/logModal';
+import {
+  FiActivity,
+  FiAlertCircle,
+  FiCalendar,
+  FiCheckCircle,
+  FiChevronDown,
+  FiChevronUp,
+  FiCpu,
+  FiFileText,
+  FiGlobe,
+  FiHardDrive,
+  FiImage,
+  FiInfo,
+  FiPauseCircle,
+  FiTrash,
+  FiXCircle,
+} from 'react-icons/fi';
 
 interface CardDataProps {
   data: any;
@@ -22,100 +33,76 @@ interface CardDataProps {
   onDeleteSuccess: () => void;
 }
 
+interface StatusProps {
+  state: string;
+}
+
 /**
  * ContainerCard: 컨테이너 정보를 표시하는 컴포넌트
  * @param data 컨테이너 정보
  * @param selectedHostId 선택한 호스트 id
- * @param selectedHostName 선택한 호스트 name
  * @returns JSX.Element
  */
 const ContainerCard = ({ data, onDeleteSuccess }: CardDataProps) => {
   const { enqueueSnackbar } = useSnackbar();
-  const { selectedNetwork } = useSelectedNetworkStore();
-  const { selectedHostId, selectedHostName } = selectedHostStore();
-  const addContainerToHost = useStore((state) => state.addContainerToHost);
-
   const cardRef = useRef<HTMLDivElement>(null);
   const { bg1, bg2 } = getStatusColors(data.State);
 
-  const [showOptions, setShowOptions] = useState<boolean>(false);
-  const [showModal, setShowModal] = useState<boolean>(false);
-  const [isVolumeOpen, setIsVolumeOpen] = useState<boolean>(false);
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [detailData, setDetailData] = useState<boolean>(false);
-  const [isLogModalOpen, setIsLogModalOpen] = useState<boolean>(false);
-  const { assignImageToContainer, assignNetworkToContainer } =
-    useContainerStore();
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [showOptions, setShowOptions] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [detailData, setDetailData] = useState(null);
+  const [isLogModalOpen, setIsLogModalOpen] = useState(false);
 
   const containerName = data.Names ? data.Names[0].replace(/^\//, '') : 'N/A';
   const imageName = data.Image || 'N/A';
 
   const items = [
-    { label: 'NAME', value: containerName },
-    { label: 'CREATED', value: formatTimestamp(data.Created) || 'N/A' },
-    { label: 'IMAGE', value: imageName },
-    { label: 'NETWORK', value: data?.HostConfig?.NetworkMode || 'N/A' },
-    { label: 'STATUS', value: data.Status || 'N/A' },
+    { label: 'Name', value: containerName, icon: FiCpu },
+    {
+      label: 'Created',
+      value: formatTimestamp(data.Created) || 'N/A',
+      icon: FiCalendar,
+    },
+    { label: 'Image', value: imageName, icon: FiImage },
+    { label: 'Status', value: data.Status || 'N/A', icon: FiActivity },
   ];
 
-  const handleOptionClick = () => {
-    setShowOptions(!showOptions);
+  const StatusIcon: React.FC<StatusProps> = ({ state }) => {
+    switch (state.toLowerCase()) {
+      case 'running':
+        return <FiCheckCircle className="text-green_6" size={16} />;
+      case 'paused':
+        return <FiPauseCircle className="text-yellow_6" size={16} />;
+      case 'exited':
+        return <FiXCircle className="text-red_6" size={16} />;
+      default:
+        return <FiAlertCircle className="text-grey_4" size={16} />;
+    }
+  };
+
+  const StatusText: React.FC<StatusProps> = ({ state }) => {
+    const stateColor = {
+      running: 'text-green_6',
+      paused: 'text-yellow_6',
+      exited: 'text-red_6',
+      default: 'text-grey_6',
+    };
+
+    const color =
+      stateColor[state.toLowerCase() as keyof typeof stateColor] ||
+      stateColor.default;
+
+    return (
+      <span className={`font-medium font-pretendard text-sm ${color}`}>
+        {state}
+      </span>
+    );
   };
 
   const handleLogsClick = () => {
     setIsLogModalOpen(true);
-  };
-
-  const handleRun = () => {
-    if (!selectedNetwork) {
-      showSnackbar(
-        enqueueSnackbar,
-        '네트워크를 선택해주세요.',
-        'error',
-        '#FF4853'
-      );
-      return;
-    }
-
-    if (selectedHostId) {
-      const newContainer = {
-        id: uuidv4(),
-        name: containerName,
-        ip: data.ip,
-        size: data.size,
-        tag: data.Image?.tag || 'latest',
-        active: data.active,
-        status: 'running',
-        network: selectedNetwork.networkName,
-        image: data.image,
-        mounts: data.Mounts || [],
-      };
-
-      addContainerToHost(selectedHostId, newContainer);
-
-      if (data.image) {
-        assignImageToContainer(newContainer.id, data.image);
-      } else {
-        console.warn('Image information is missing for the container.');
-      }
-
-      assignNetworkToContainer(newContainer.id, selectedNetwork.hostId);
-
-      showSnackbar(
-        enqueueSnackbar,
-        `호스트 ${selectedHostName}의 ${selectedNetwork.networkName} 네트워크에서 컨테이너가 실행되었습니다.`,
-        'success',
-        '#254b7a'
-      );
-    } else {
-      showSnackbar(
-        enqueueSnackbar,
-        '호스트를 선택해주세요.',
-        'error',
-        '#FF4853'
-      );
-    }
-    setShowOptions(false);
   };
 
   const handleDelete = () => {
@@ -138,7 +125,7 @@ const ContainerCard = ({ data, onDeleteSuccess }: CardDataProps) => {
           enqueueSnackbar,
           '컨테이너가 성공적으로 삭제되었습니다!',
           'success',
-          '#254b7a'
+          '#4CAF50'
         );
         onDeleteSuccess();
       } else {
@@ -168,10 +155,6 @@ const ContainerCard = ({ data, onDeleteSuccess }: CardDataProps) => {
     setShowModal(false);
   };
 
-  const toggleVolumeDropdown = () => {
-    setIsVolumeOpen(!isVolumeOpen);
-  };
-
   const fetchContainerDetail = async (id: string) => {
     try {
       const data = await fetchData(`/api/container/detail?id=${id}`);
@@ -188,12 +171,11 @@ const ContainerCard = ({ data, onDeleteSuccess }: CardDataProps) => {
   const handleGetInfo = async () => {
     try {
       const containerDetail = await fetchContainerDetail(data.Id);
-      console.log('컨테이너 상세 정보:', containerDetail);
       setDetailData(containerDetail);
       setShowOptions(false);
       setIsModalOpen(true);
     } catch (error) {
-      console.log(error);
+      throw error;
     }
   };
 
@@ -212,102 +194,77 @@ const ContainerCard = ({ data, onDeleteSuccess }: CardDataProps) => {
   return (
     <div
       ref={cardRef}
-      className="relative flex items-start px-3 pt-1 pb-3 bg-grey_0 shadow rounded-lg mb-4"
+      className="bg-white border rounded-lg mb-2 overflow-hidden"
     >
       <div
-        className="absolute left-0 top-0 bottom-0 w-2.5 rounded-l-lg"
-        style={{ backgroundColor: bg2 }}
-      />
-      <div className="ml-4 flex flex-col w-full">
-        <div className="flex justify-between text-grey_4 text-sm mb-3 relative">
-          <span className={'flex font-pretendard font-bold text-grey_6 pt-2'}>
-            {data.Labels?.['com.docker.compose.project'] || 'Unknown Project'}{' '}
-            <AiOutlineFileText
-              className="cursor-pointer text-blue_500 ml-2"
-              size={18}
-              onClick={handleLogsClick}
-              title="View Logs"
-            />
+        className="flex justify-between items-center px-4 py-2 bg-gray-50 border-b cursor-pointer"
+        onClick={() => setIsExpanded(!isExpanded)}
+      >
+        <div className="flex items-center space-x-2 truncate">
+          <StatusIcon state={data.State} />
+          <StatusText state={data.State} />
+          <span className="font-medium text-sm text-grey_6 truncate">
+            {containerName}
           </span>
-          <span
-            className="font-semibold text-xs cursor-pointer"
-            onClick={handleOptionClick}
-          >
-            •••
-          </span>
-          {showOptions && (
-            <div className="absolute top-4 left-28">
-              <OptionModal
-                onTopHandler={handleGetInfo}
-                btnVisible={false}
-                // onMiddleHandler={handleRun}
-                onBottomHandler={handleDelete}
-              />
-            </div>
-          )}
         </div>
-        {/* 컨테이너 정보 */}
-        {items.map((item, index) => (
-          <div key={index} className="flex items-center mt-[5px] space-x-3.5">
-            <span
-              className="text-xs py-1 w-[65px] rounded-md font-bold text-center"
-              style={{ backgroundColor: bg1, color: bg2 }}
-            >
-              {item.label}
-            </span>
-            <span className="font-semibold text-xs truncate max-w-[150px]">
-              {item.value}
-            </span>
-          </div>
-        ))}
-        {/* 볼륨 드롭다운 */}
-        <div className="flex items-center mt-2">
-          <p
-            className="text-xs py-1 w-[65px] h-6 mr-2 rounded-md font-bold text-center flex-shrink-0"
-            style={{ backgroundColor: bg1, color: bg2 }}
-          >
-            VOLUME
-          </p>
-          <button
-            onClick={toggleVolumeDropdown}
-            className="flex w-full text-xs font-semibold text-left text-grey_6"
-          >
-            <div className="flex w-full items-center justify-between pb-2 pl-1">
-              {isVolumeOpen ? 'Hide Volumes' : 'Show Volumes'}
-              {isVolumeOpen ? <AiOutlineUp /> : <AiOutlineDown />}
-            </div>
-          </button>
+        <div className="flex items-center">
+          {isExpanded ? <FiChevronUp size={16} /> : <FiChevronDown size={16} />}
         </div>
+      </div>
 
-        {/* 볼륨 드롭다운 내용 */}
-        {isVolumeOpen && (
-          <div className="max-h-42 overflow-y-auto scrollbar-custom w-full flex-grow">
-            {data.Mounts?.length > 0 ? (
-              data.Mounts.map((mount: any, index: number) => (
-                <div
-                  key={index}
-                  className="flex flex-col mb-2 p-1 border rounded w-full"
-                >
-                  {mount.Driver && (
-                    <p className="text-xs">Driver: {mount.Driver}</p>
-                  )}
-                  {mount.Destination && (
-                    <p className="text-xs">Mount: {mount.Destination}</p>
-                  )}
-                  {mount.Mode && <p className="text-xs">Mode: {mount.Mode}</p>}
+      {isExpanded && (
+        <div className="p-4">
+          <div className="grid gap-4">
+            {items && items.length > 0 ? (
+              items.map((item, index) => (
+                <div key={index} className="flex items-center space-x-3">
+                  <div
+                    className="p-2 rounded-lg"
+                    style={{ backgroundColor: bg1 }}
+                  >
+                    <item.icon size={16} style={{ color: bg2 }} />
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-xs text-grey_4 font-medium">
+                      {item.label}
+                    </span>
+                    <span className="font-semibold text-sm text-grey_7 truncate max-w-[150px]">
+                      {item.value}
+                    </span>
+                  </div>
                 </div>
               ))
             ) : (
-              <p className="text-xs text-grey_4">No volumes attached.</p>
+              <div className="text-center">항목이 없습니다.</div>
             )}
           </div>
-        )}
-      </div>
+          <div className="mt-4 flex justify-end space-x-3">
+            <button
+              onClick={handleLogsClick}
+              className="p-1 text-blue-600 rounded hover:bg-blue-200 transition-colors text-md"
+            >
+              <FiFileText />
+            </button>
+            <button
+              onClick={handleGetInfo}
+              className="p-1 text-green-600 rounded hover:bg-green-200 transition-colors text-md"
+            >
+              <FiInfo />
+            </button>
+            <button
+              onClick={handleDelete}
+              className="p-1 text-red-600 rounded hover:bg-red-200 transition-colors text-md"
+            >
+              <FiTrash />
+            </button>
+          </div>
+        </div>
+      )}
+
       <Modal
         isOpen={showModal}
         onClose={handleCloseModal}
         onConfirm={handleConfirmDelete}
-        question={`컨테이너를 삭제하시겠습니까?`}
       />
       <ContainerDetailModal
         open={isModalOpen}

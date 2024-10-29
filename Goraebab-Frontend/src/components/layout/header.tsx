@@ -1,134 +1,243 @@
-'use client';
-
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { Tooltip } from 'react-tooltip';
-import { MENU_ITEMS } from '@/data/menu';
+import {
+  Button,
+  Card,
+  ScrollShadow,
+  Tooltip,
+  Divider,
+} from '@nextui-org/react';
 import { useMenuStore } from '@/store/menuStore';
-import { FiSettings, FiGrid } from 'react-icons/fi';
+import { MENU_ITEMS } from '@/data/menu';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FiSettings, FiChevronLeft } from 'react-icons/fi';
+import { FaQuestion } from 'react-icons/fa';
+import HelpModal from '@/components/modal/helpModal';
 
 const Header = () => {
   const router = useRouter();
   const pathname = usePathname();
-  const navRef = useRef<HTMLDivElement>(null);
-
   const { activeId, setActiveId } = useMenuStore();
-  const [barWidth, setBarWidth] = useState(0);
-  const [barLeft, setBarLeft] = useState(0);
-
-  const isRightSidePath =
-    pathname === '/management' || pathname === '/dashboard';
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
 
   const handleNavigation = (path: string, id: number) => {
     setActiveId(id);
     router.push(path);
   };
 
+  const toggleSidebar = () => {
+    setIsCollapsed(!isCollapsed);
+  };
+
   useEffect(() => {
-    if (navRef.current) {
-      if (isRightSidePath) {
-        const activeIndex = MENU_ITEMS.findIndex(
-          (item) => item.id === activeId
-        );
-        if (activeIndex !== -1) {
-          const activeItem = navRef.current.children[activeIndex];
-          if (activeItem) {
-            setBarWidth(activeItem.clientWidth);
-            setBarLeft(
-              activeItem.getBoundingClientRect().left -
-                navRef.current.getBoundingClientRect().left
-            );
-          }
-        }
-      } else {
-        const activeIndex = MENU_ITEMS.findIndex(
-          (item) => item.id === activeId
-        );
-        const activeItem = navRef.current.children[activeIndex];
-        if (activeItem) {
-          setBarWidth(activeItem.clientWidth);
-          setBarLeft(
-            activeItem.getBoundingClientRect().left -
-              navRef.current.getBoundingClientRect().left
-          );
-        }
-      }
-    }
-  }, [activeId, isRightSidePath]);
+    return () => {
+      sessionStorage.removeItem('selectedHostIp');
+    };
+  }, []);
+
+  // Sidebar animation variants
+  const sidebarVariants = {
+    expanded: {
+      width: '288px',
+      transition: { duration: 0.3, ease: 'easeInOut' },
+    },
+    collapsed: {
+      width: '80px',
+      transition: { duration: 0.3, ease: 'easeInOut' },
+    },
+  };
+
+  // Button animation variants
+  const buttonVariants = {
+    expanded: { x: 0, opacity: 1 },
+    collapsed: { x: -10, opacity: 0 },
+  };
+
+  // Icon animation variants
+  const iconVariants = {
+    hover: { scale: 1.1, rotate: 0 },
+    settings: { rotate: 180 },
+    tap: { scale: 0.9 },
+  };
 
   return (
-    <header className="fixed w-full p-4 bg-grey_1 z-30">
-      <div className="container mx-auto flex justify-between items-center relative">
-        <div className="flex-grow" />
-        <nav
-          className="flex space-x-6 relative items-center justify-center"
-          ref={navRef}
-        >
-          {MENU_ITEMS.map((item) => (
-            <div
-              key={item.id}
-              onClick={() => handleNavigation(item.path, item.id)}
-              className={`flex flex-col items-center cursor-pointer font-pretendard ${
-                activeId === item.id && !isRightSidePath
-                  ? 'text-blue_6'
-                  : 'text-grey_6'
-              }`}
-              data-tooltip-id={`tooltip-${item.name}`}
-              data-tooltip-content={item.name}
-            >
-              <item.icon className="text-2xl" />
-              <Tooltip id={`tooltip-${item.name}`} />
+    <div className="relative">
+      <motion.div
+        initial="expanded"
+        animate={isCollapsed ? 'collapsed' : 'expanded'}
+        variants={sidebarVariants}
+        className="fixed left-0 z-[1] h-screen"
+      >
+        <Card
+          className="h-full transition-all duration-300 border-r border-divider shadow-lg rounded-none bg-background/70 backdrop-blur-md">
+          <div className="flex flex-col h-full pt-4">
+            <ScrollShadow className="flex-grow px-2">
+              <div className="flex flex-col gap-1 pl-3">
+                {MENU_ITEMS.map((item) => (
+                  <Tooltip
+                    showArrow
+                    key={item.id}
+                    placement="right"
+                    content={item.name}
+                    classNames={{
+                      content: [
+                        'py-2 px-4',
+                        'text-black',
+                      ],
+                    }}
+                  >
+                    <Button
+                      onClick={() => handleNavigation(item.path, item.id)}
+                      className={`w-full justify-start group transition-all duration-300 ${
+                        isCollapsed ? 'px-2' : 'px-2'
+                      } ${
+                        activeId === item.id
+                          ? 'bg-primary/10 dark:bg-primary/20 hover:bg-primary/20 dark:hover:bg-primary/30'
+                          : 'bg-transparent hover:bg-default-100'
+                      }`}
+                      startContent={
+                        <motion.div
+                          variants={iconVariants}
+                          whileHover="hover"
+                          className={`text-xl ${
+                            activeId === item.id ? 'text-primary' : 'text-default-600'
+                          }`}
+                        >
+                          <item.icon />
+                        </motion.div>
+                      }
+                      variant="light"
+                    >
+                      <AnimatePresence mode="wait">
+                        {!isCollapsed && (
+                          <motion.span
+                            variants={buttonVariants}
+                            initial="collapsed"
+                            animate="expanded"
+                            exit="collapsed"
+                            className={`ml-2 text-sm font-medium ${
+                              activeId === item.id ? 'text-primary' : 'text-default-600'
+                            }`}
+                          >
+                            {item.name}
+                          </motion.span>
+                        )}
+                      </AnimatePresence>
+                    </Button>
+                  </Tooltip>
+                ))}
+              </div>
+            </ScrollShadow>
+            <div className="px-3">
+              <Divider className="my-4" />
             </div>
-          ))}
-          {!isRightSidePath && (
-            <div
-              className="absolute bottom-0 h-1 bg-blue_6 rounded-tl rounded-tr transition-all duration-300"
-              style={{
-                width: `${barWidth}px`,
-                left: `${barLeft - 24}px`,
-                top: 37,
-              }}
-            />
-          )}
-        </nav>
-        <div className="flex-grow" />
-        <div className="flex items-center space-x-4">
-          <div
-            onClick={() => handleNavigation('/dashboard', 5)}
-            className={`cursor-pointer text-grey_6 hover:text-blue_6 ${
-              pathname === '/dashboard' ? 'text-blue_6' : ''
-            }`}
-          >
-            <FiGrid className="text-2xl" data-tooltip-id="dashboard-tooltip" />
-            <Tooltip id="dashboard-tooltip" content="Dashboard" />
-          </div>
+            <div className="pl-5 pr-2 pb-4 mt-auto">
+              <Tooltip
+                content={isCollapsed ? 'Management' : ''}
+                placement="right"
+                delay={200}
+              >
+                <Button
+                  onClick={() => handleNavigation('/management', 6)}
+                  className={`w-full justify-start mb-2 ${
+                    isCollapsed ? 'px-2' : 'px-4'
+                  } ${
+                    activeId === 6
+                      ? 'bg-primary/10 dark:bg-primary/20 hover:bg-primary/20 dark:hover:bg-primary/30'
+                      : 'bg-transparent hover:bg-default-100'
+                  }`}
+                  startContent={
+                    <motion.div
+                      variants={iconVariants}
+                      whileHover="settings"
+                      transition={{ duration: 0.3 }}
+                    >
+                      <FiSettings className="text-xl" />
+                    </motion.div>
+                  }
+                  variant="light"
+                >
+                  <AnimatePresence mode="wait">
+                    {!isCollapsed && (
+                      <motion.span
+                        variants={buttonVariants}
+                        initial="collapsed"
+                        animate="expanded"
+                        exit="collapsed"
+                        className="ml-2"
+                      >
+                        관리
+                      </motion.span>
+                    )}
+                  </AnimatePresence>
+                </Button>
+              </Tooltip>
 
-          <div
-            onClick={() => handleNavigation('/management', 6)}
-            className={`cursor-pointer text-grey_6 hover:text-blue_6 ${
-              pathname === '/management' ? 'text-blue_6' : ''
-            }`}
-          >
-            <FiSettings
-              className="text-2xl"
-              data-tooltip-id="management-tooltip"
-            />
-            <Tooltip id="management-tooltip" content="management" />
+              <Tooltip
+                content={isCollapsed ? 'Help' : ''}
+                placement="right"
+                delay={200}
+              >
+                <Button
+                  onClick={() => setIsHelpOpen(true)}
+                  className={`w-full justify-start pl-3 ${
+                    isCollapsed ? 'px-2' : 'px-4'
+                  }`}
+                  startContent={
+                    <motion.div
+                      variants={iconVariants}
+                      whileHover="hover"
+                      className="text-primary"
+                    >
+                      <FaQuestion className="text-xl" />
+                    </motion.div>
+                  }
+                  variant="light"
+                >
+                  <AnimatePresence mode="wait">
+                    {!isCollapsed && (
+                      <motion.span
+                        variants={buttonVariants}
+                        initial="collapsed"
+                        animate="expanded"
+                        exit="collapsed"
+                        className="ml-2"
+                      >
+                        도움말
+                      </motion.span>
+                    )}
+                  </AnimatePresence>
+                </Button>
+              </Tooltip>
+            </div>
           </div>
-        </div>
-
-        {isRightSidePath && (
-          <div
-            className="absolute bottom-0 h-1 bg-blue_6 rounded-tl rounded-tr transition-all duration-300"
-            style={{
-              width: `${barWidth}px`,
-              right: pathname === '/management' ? '0px' : '40px',
-              top: 37,
-            }}
-          />
-        )}
+        </Card>
+        {isHelpOpen && <HelpModal />}
+      </motion.div>
+      <div className="fixed" style={{
+        left: isCollapsed ? '63px' : '271px',
+        top: '50%',
+        transform: 'translateY(-50%)',
+        zIndex: 9,
+        transition: 'left 0.3s ease-in-out',
+      }}>
+        <Button
+          isIconOnly
+          className="bg-white border border-primary/20 rounded-full hover:bg-gray_1"
+          size="sm"
+          onClick={toggleSidebar}
+        >
+          <motion.div
+            animate={{ rotate: isCollapsed ? 180 : 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <FiChevronLeft />
+          </motion.div>
+        </Button>
       </div>
-    </header>
+
+    </div>
   );
 };
 

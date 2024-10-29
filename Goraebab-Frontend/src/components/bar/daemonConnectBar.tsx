@@ -6,7 +6,6 @@ import { showSnackbar } from '@/utils/toastUtils';
 import { useSnackbar } from 'notistack';
 import { FaPlay, FaPause, FaStop, FaEllipsisV, FaDocker } from 'react-icons/fa';
 import BarOptionModal from '../modal/barOptionModal';
-import { SiTruenas } from 'react-icons/si';
 import SystemInfoModal from '../modal/daemon/systemModal';
 import VersionDetailModal from '../modal/daemon/versionModal';
 
@@ -32,14 +31,13 @@ const DaemonConnectBar = () => {
       setEngineStatus('connect');
       setVersionData(response.data);
     } catch (error) {
-      console.error('원격 데몬 정보를 가져오는 데 실패했습니다:', error);
       setEngineStatus('disconnect');
       // 연결 실패 시 알림 표시
       showSnackbar(
         enqueueSnackbar,
         '도커 엔진이 실행되지 않았습니다.',
         'info',
-        '#7F7F7F'
+        '#7F7F7F',
       );
     }
   }
@@ -47,10 +45,9 @@ const DaemonConnectBar = () => {
   async function fetchSystemInfo() {
     try {
       const response = await axios.get(`api/daemon/system`);
-      console.log('시스템 :::', response);
       setSystemData(response.data);
     } catch (error) {
-      console.error('원격 데몬 정보를 가져오는 데 실패했습니다:', error);
+      throw error;
     }
   }
 
@@ -101,22 +98,22 @@ const DaemonConnectBar = () => {
   return (
     <div
       ref={barRef}
-      className={`px-4 p-1 flex items-center justify-between text-white ${
+      className={`z-50 px-4 p-1 flex items-center justify-between text-white ${
         engineStatus === 'connect'
           ? 'bg-green_6'
           : engineStatus === 'connecting'
-          ? 'bg-yellow_6'
-          : 'bg-red_6'
+            ? 'bg-yellow_6'
+            : 'bg-red_6'
       }`}
     >
       <div className="flex items-center">
         <FaDocker className="mr-2 w-4 h-4" />
         <span className="font-semibold text-sm">
           {engineStatus === 'connect'
-            ? 'Daemon connected'
+            ? '도커 연결 성공'
             : engineStatus === 'connecting'
-            ? 'Connecting...'
-            : 'Daemon disconnected'}
+              ? '연결 중...'
+              : '도커 연결 실패'}
         </span>
       </div>
       <div className="flex items-center space-x-2">
@@ -141,10 +138,11 @@ const DaemonConnectBar = () => {
         </button>
       </div>
       {showOptions && (
-        <div ref={modalRef} className="absolute bottom-[85px] left-[264px]">
+        <div ref={modalRef} className="absolute z-50 bottom-[85px] left-[264px]">
           <BarOptionModal
             onTopHandler={handleTopOptionClick}
-            onMiddleHandler={() => {}}
+            onMiddleHandler={() => {
+            }}
             onBottomHandler={handleBottomOptionClick}
           />
         </div>

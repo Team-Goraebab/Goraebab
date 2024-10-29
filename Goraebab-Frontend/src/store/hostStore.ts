@@ -1,33 +1,32 @@
+import { Host, HostNetwork } from '@/types/type';
 import { create } from 'zustand';
-import { Host } from '@/types/type';
-
-type Network = {
-  id: string;
-  name: string;
-  ip: string;
-  hostId: string;
-  containers: string[];
-};
 
 interface HostStore {
   hosts: Host[];
-  networks: Network[];
+  networks: HostNetwork[];
   addHost: (host: Host) => void;
   deleteHost: (hostId: string) => void;
-  deleteNetwork: (hostId: string, networkId: string) => void;
+  deleteNetwork: (hostId: string, uniqueId: string) => void;
   deleteAllHosts: () => void;
 }
 
-// 호스트 정보를 저장하는 store
-export const useHostStore = create<HostStore>((set) => ({
+// 호스트 및 네트워크 정보를 저장하는 store
+// 상태 관리 로직
+export const useHostStore = create<HostStore>((set, get) => ({
   hosts: [],
   networks: [],
 
   // 호스트 추가
-  addHost: (host) =>
-    set((state) => ({
-      hosts: [...state.hosts, host],
-    })),
+  addHost: (host: Host) =>
+    set((state) => {
+      if (state.hosts.length >= 5) {
+        return state;
+      }
+
+      return {
+        hosts: [...state.hosts, { ...host, networks: [] }],
+      };
+    }),
 
   // 호스트 삭제
   deleteHost: (hostId) =>
@@ -36,28 +35,40 @@ export const useHostStore = create<HostStore>((set) => ({
       networks: state.networks.filter((network) => network.hostId !== hostId),
     })),
 
-  // 네트워크 삭제
-  deleteNetwork: (hostId, networkId) =>
+  // 네트워크 추가
+  addNetworkToHost: (hostId: string, network: HostNetwork) =>
     set((state) => {
-      // 업데이트된 네트워크 목록
-      const updatedNetworks = state.networks.filter(
-        (network) => network.id !== networkId || network.hostId !== hostId
-      );
-
-      // 호스트를 업데이트하고 네트워크 정보를 제거
       const updatedHosts = state.hosts.map((host) => {
         if (host.id === hostId) {
           return {
             ...host,
-            networkName: host.networkName === networkId ? '' : host.networkName,
-            networkIp: host.networkIp === networkId ? '' : host.networkIp,
+            networks: [...host.networks, network],
           };
         }
         return host;
       });
 
       return {
-        networks: updatedNetworks,
+        hosts: updatedHosts,
+      };
+    }),
+
+  // 네트워크 삭제
+  deleteNetwork: (hostId, uniqueId) =>
+    set((state) => {
+      const updatedHosts = state.hosts.map((host) => {
+        if (host.id === hostId) {
+          return {
+            ...host,
+            networks: host.networks.filter(
+              (network) => network.networkUniqueId !== uniqueId
+            ),
+          };
+        }
+        return host;
+      });
+
+      return {
         hosts: updatedHosts,
       };
     }),

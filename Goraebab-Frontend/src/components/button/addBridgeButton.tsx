@@ -27,7 +27,7 @@ const AddBridgeButton = ({ onCreate }: AddBridgeButtonProps) => {
     name: string,
     subnet: string,
     gateway: string,
-    driver: string
+    driver: string,
   ) => {
     const newNetworkData = {
       Name: name,
@@ -52,7 +52,7 @@ const AddBridgeButton = ({ onCreate }: AddBridgeButtonProps) => {
           enqueueSnackbar,
           '브리지 네트워크가 성공적으로 생성되었습니다!',
           'success',
-          '#254b7a'
+          '#4CAF50',
         );
 
         // 생성된 네트워크의 ID와 함께 부모 컴포넌트에 전달
@@ -62,16 +62,15 @@ const AddBridgeButton = ({ onCreate }: AddBridgeButtonProps) => {
           enqueueSnackbar,
           `네트워크 생성 실패: ${result.error}`,
           'error',
-          '#FF4853'
+          '#FF4853',
         );
       }
     } catch (error) {
-      console.error('네트워크 생성 중 에러:', error);
       showSnackbar(
         enqueueSnackbar,
         '네트워크 생성 중 에러가 발생했습니다.',
         'error',
-        '#FF4853'
+        '#FF4853',
       );
     }
 

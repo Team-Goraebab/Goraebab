@@ -1,20 +1,14 @@
 import { useHostStore } from '@/store/hostStore';
 import { selectedHostStore } from '@/store/seletedHostStore';
+import { ThemeColor } from '@/types/type';
 import { FaTrash, FaHome } from 'react-icons/fa';
 
 export type HostCardProps = {
   id: string;
   hostNm: string;
-  ip: string;
-  status?: boolean;
+  hostIp: string;
   isRemote: boolean;
-  themeColor: {
-    label: string;
-    bgColor: string;
-    borderColor: string;
-    textColor: string;
-  };
-  networkIp: string;
+  themeColor: ThemeColor;
   onClick?: () => void;
   className?: string;
   isSelectedNetwork?: boolean;
@@ -24,6 +18,7 @@ export type HostCardProps = {
  *
  * @param id 호스트 id
  * @param hostNm 호스트 이름
+ * @param hostIp 호스트 아이피
  * @param isRemote local/remote
  * @param themeColor 테마 색상
  * @param className 추가 className
@@ -31,19 +26,19 @@ export type HostCardProps = {
  * @returns
  */
 const HostCard = ({
-  id,
-  hostNm,
-  ip,
-  isRemote,
-  themeColor,
-  className = '',
-  isSelectedNetwork = false, // 기본값은 false
-}: HostCardProps) => {
+                    id,
+                    hostNm,
+                    hostIp,
+                    isRemote,
+                    themeColor,
+                    className = '',
+                    isSelectedNetwork = false, // 기본값은 false
+                  }: HostCardProps) => {
   const {
     selectedHostId,
     setSelectedHostId,
-    selectedHostName,
     setSelectedHostName,
+    setSelectedHostIp,
   } = selectedHostStore();
   const deleteHost = useHostStore((state) => state.deleteHost);
 
@@ -52,16 +47,26 @@ const HostCard = ({
   };
 
   const handleClick = () => {
-    setSelectedHostId(selectedHostId === id ? null : id);
-    setSelectedHostName(selectedHostName === hostNm ? null : hostNm ?? 'HOST');
+    if (selectedHostId === id) {
+      setSelectedHostId(null);
+      setSelectedHostName(null);
+      setSelectedHostIp('localhost');
+      sessionStorage.setItem('selectedHostIp', 'localhost');
+    } else {
+      setSelectedHostId(id);
+      setSelectedHostName(hostNm ?? 'HOST');
+      setSelectedHostIp(hostIp ?? 'localhost');
+      sessionStorage.setItem('selectedHostIp', hostIp ?? 'localhost');
+    }
   };
 
   // 선택된 호스트 또는 네트워크에 따라 테두리 색상을 설정
   const borderColor =
     selectedHostId === id || isSelectedNetwork
       ? themeColor.borderColor
-      : 'grey';
+      : 'lightGrey';
   const badgeText = isRemote ? 'REMOTE' : 'LOCAL';
+  const ipText = isRemote ? hostIp : 'localhost';
 
   return (
     <div
@@ -84,7 +89,7 @@ const HostCard = ({
       </div>
       <div
         onClick={handleClick}
-        className={`relative flex flex-col items-center p-[10px] border bg-white rounded-lg shadow-lg w-72 h-28 cursor-pointer`}
+        className={`relative flex flex-col items-center p-[10px] border bg-white rounded-lg w-72 h-28 cursor-pointer`}
         style={{
           borderColor: borderColor,
           borderWidth:
@@ -117,7 +122,7 @@ const HostCard = ({
             {hostNm || 'HOST'}
           </div>
         </div>
-        <div className="text-lg font-semibold">{`eth0 : ${ip}`}</div>
+        <div className="text-lg font-semibold">{ipText}</div>
       </div>
     </div>
   );

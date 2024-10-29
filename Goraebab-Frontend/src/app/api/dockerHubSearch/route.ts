@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
   if (!query) {
     return NextResponse.json(
       { error: 'Query parameter is required' },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -19,10 +19,9 @@ export async function GET(req: NextRequest) {
     });
     return NextResponse.json(response.data.results, { status: 200 });
   } catch (error) {
-    console.error('Error fetching Docker Hub images:', error);
     return NextResponse.json(
       { error: 'Failed to fetch Docker Hub images' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

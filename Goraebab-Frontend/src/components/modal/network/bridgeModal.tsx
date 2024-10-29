@@ -84,7 +84,7 @@ const BridgeModal = ({ onClose, onCreate }: BridgeModalProps) => {
       return;
     }
 
-    const id = uuidv4(); // 네트워크 ID 생성
+    const id = uuidv4();
     onCreate(id, name, subnet, gateway, driver);
     onClose();
   };
@@ -92,41 +92,40 @@ const BridgeModal = ({ onClose, onCreate }: BridgeModalProps) => {
   return (
     <Dialog open={true} onClose={onClose} fullWidth maxWidth="xs">
       <div className="p-4">
-        <h2 className="text-lg font-semibold mb-4">Create Custom Bridge</h2>
+        <h2 className="text-lg font-semibold mb-4">Bridge 생성하기</h2>
         <input
           type="text"
           placeholder="Bridge Name"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="mb-2 p-2 border border-gray-300 rounded w-full"
+          className="mb-2 p-2 border border-grey_2 rounded w-full"
         />
         <input
           type="text"
           placeholder="Subnet (e.g., 192.168.1.0/24)"
           value={subnet}
           onChange={(e) => setSubnet(e.target.value)}
-          className="mb-2 p-2 border border-gray-300 rounded w-full"
+          className="mb-2 p-2 border border-grey_2 rounded w-full"
         />
         <input
           type="text"
           placeholder="Gateway (e.g., 192.168.1.1)"
           value={gateway}
           onChange={(e) => setGateway(e.target.value)}
-          className="mb-2 p-2 border border-gray-300 rounded w-full"
+          className="mb-2 p-2 border border-grey_2 rounded w-full"
         />
         <select
           value={driver}
           onChange={(e) => setDriver(e.target.value)}
-          className="mb-8 p-2 border border-gray-300 rounded w-full"
+          className="mb-8 p-2 border border-grey_2 rounded w-full"
         >
-          {/* 드라이버 옵션 */}
           <option value="bridge">Bridge</option>
           <option value="host">Host</option>
           <option value="overlay">Overlay</option>
         </select>
         <div className="flex justify-end space-x-2 pt-8">
-          <Button title={'Cancel'} onClick={onClose} color="grey" />
-          <Button title={'Create'} onClick={handleCreate} />
+          <Button title={'취소'} onClick={onClose} color={'red'} />
+          <Button title={'생성'} onClick={handleCreate} />
         </div>
       </div>
     </Dialog>
