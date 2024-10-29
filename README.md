@@ -2,10 +2,17 @@
 
 ## Table of Contents
 [Introduce](#introduce)
+- [Problem](#problem)
+- [Solution](#solution)
 
+  
 [Architecture](#architecture)
+- [Tech](#tech)
+
 
 [How to run Goraebab](#how-to-run-goraebab)
+- [Requirements](#requirements)
+- [Execution](#execution)
 
 [How to use Goraebab](#how-to-use-goraebab)
 
@@ -34,6 +41,14 @@ Goraebab addresses this issue by enabling users to design Docker configurations 
 
 ## Tech
 
+### Frontend
+
+![Next.js](https://img.shields.io/badge/Next.js-v14.2.4-000000?style=flat&logo=next.js&logoColor=white) ![React](https://img.shields.io/badge/React-v18-61DAFB?style=flat&logo=react&logoColor=white) ![TypeScript](https://img.shields.io/badge/TypeScript-v5-3178C6?style=flat&logo=typescript&logoColor=white) ![Docker](https://img.shields.io/badge/Docker-v24.0-2496ED?style=flat&logo=docker&logoColor=white)
+
+### Backend
+![Spring Boot](https://img.shields.io/badge/SpringBoot-v3.2.8-6DB33F?style=flat&logo=Spring&logoColor=white) ![MySQL](https://img.shields.io/badge/MySQL-v8.0-4479A1?style=flat&logo=mysql&labelColor=4479A1&logoColor=FFF) ![MariaDB](https://img.shields.io/badge/MariaDB-v11.7-003545?style=flat&logo=mariadb&logoColor=white) ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-v.17-4169E1?style=flat&logo=postgresql&logoColor=white) ![Gradle](https://img.shields.io/badge/Gradle-v8.8-02303A?style=flat&logo=Gradle&logoColor=white) ![Docker](https://img.shields.io/badge/Docker-v.24.0-2496ED?style=flat&logo=Docker&logoColor=white) ![Github actions](https://img.shields.io/badge/Github%20actions-v4-5f5f5f?style=flat&logo=github&logoColor=white) ![Swagger](https://img.shields.io/badge/Swagger-85EA2D?style=flat&logo=Swagger&logoColor=white) 
+
+
 
 
 # How to run Goraebab
@@ -42,7 +57,7 @@ Goraebab addresses this issue by enabling users to design Docker configurations 
 
 
 
-## 1. Requirements
+## Requirements
 
 ### Hardware
 
@@ -81,7 +96,7 @@ Recommended Resources
     ```
 
 
-## 3. Execution
+## Execution
 
 ```bash
 // Check if port 2387, DBMS DEAFULT port is available
@@ -127,6 +142,11 @@ You can check the API specification through `localhost:2387/swagger`.
 
 - More intuitive, beginner-friendly UI
 - Flexible option settings (ex. port)
--
+- 
 
 # Contributors
+[![contributors](https://contrib.rocks/image?repo=Team-Goraebab/Goraebab)](https://github.com/Team-Goraebab/Goraebab/graphs/contributors)
+
+# License
+Goraeabab is licensed under the Apache License 2.0.
+
