@@ -25,7 +25,6 @@ export async function POST(req: NextRequest) {
       }
       return await response.json();
     } catch (error) {
-      console.error('Failed to fetch networks:', error);
       return [];
     }
   };
@@ -66,7 +65,7 @@ export async function POST(req: NextRequest) {
               return null;
             })
             .filter(
-              (mount): mount is NonNullable<typeof mount> => mount !== null
+              (mount): mount is NonNullable<typeof mount> => mount !== null,
             ),
           PortBindings: bodyData.ports
             ?.split(',')
@@ -76,7 +75,7 @@ export async function POST(req: NextRequest) {
                 acc[`${containerPort}/tcp`] = [{ HostPort: hostPort }];
                 return acc;
               },
-              {}
+              {},
             ),
         },
         ExposedPorts: bodyData.ports
@@ -93,7 +92,7 @@ export async function POST(req: NextRequest) {
             const [key, ...values] = envVar.split('=');
             return `${key.trim()}=${values.join('=').trim()}`;
           }),
-      }
+      },
     );
 
     const containerId = createResponse.data.Id;
@@ -105,7 +104,7 @@ export async function POST(req: NextRequest) {
         message: 'Container created and started successfully',
         containerId: containerId,
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     console.error('Error running container:', error);
@@ -113,13 +112,13 @@ export async function POST(req: NextRequest) {
     if (error instanceof Error && 'response' in error) {
       return NextResponse.json(
         { error: (error as any).response.data.message },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
     return NextResponse.json(
       { error: 'Failed to run container' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

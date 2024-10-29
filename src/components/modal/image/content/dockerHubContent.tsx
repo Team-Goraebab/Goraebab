@@ -1,9 +1,10 @@
 'use client';
 
 import { getDockerHubImages } from '@/services/api';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { FaStar, FaDownload, FaCheckCircle } from 'react-icons/fa';
 import { formatNumber } from '@/utils/format';
+import { Card, CardBody, Input, Button, Spinner, Badge, Divider } from '@nextui-org/react';
 
 interface DockerImage {
   id: string;
@@ -19,7 +20,7 @@ interface DockerHubContentProps {
   onSelectImage: (image: DockerImage) => void;
 }
 
-const DockerHubContent: React.FC<DockerHubContentProps> = ({ onSelectImage }) => {
+const DockerHubContent = ({ onSelectImage }: DockerHubContentProps) => {
   const [query, setQuery] = useState<string>('');
   const [images, setImages] = useState<DockerImage[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -38,77 +39,88 @@ const DockerHubContent: React.FC<DockerHubContentProps> = ({ onSelectImage }) =>
   };
 
   return (
-    <div className="flex flex-col border border-dashed border-gray-300 rounded-lg w-full h-full p-6">
-      <div className="flex w-full mb-4">
-        <input
-          type="text"
-          placeholder="이미지를 검색하세요"
-          className="border border-gray-300 rounded-l-lg w-full pl-4 py-3 font-pretendard font-light focus:outline-none"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-        />
-        <button
-          onClick={handleSearch}
-          className="px-6 py-2 bg-blue_6 text-white rounded-r-lg focus:outline-none text-nowrap font-pretendard font-medium"
-        >
-          검색
-        </button>
-      </div>
-      {loading && (
-        <p className="mt-4 font-pretendard font-light">이미지 검색 중...</p>
-      )}
-      <div className="mt-4 w-full h-48 overflow-y-auto scrollbar-hide space-y-4">
-        {images.length > 0
-          ? images.map((image) => (
-            <div
-              key={image.id}
-              className={`border rounded-lg p-4 cursor-pointer transition-all duration-300 ${
-                selectedImage === image.repo_name
-                  ? 'border-blue_6 bg-blue-50'
-                  : 'border-gray-300 hover:border-blue_6'
-              }`}
-              onClick={() => handleSelectImage(image)}
-            >
-              <div className="flex justify-between items-center mb-2">
-                <div className="flex items-center space-x-2">
-                  <p className="font-bold font-pretendard text-lg truncate">
-                    {image.repo_name}
-                  </p>
-                  {image.is_official && (
-                    <span
-                      className="bg-blue_6 text-white text-xs px-2 py-1 rounded-full flex items-center font-pretendard font-bold">
-                        <FaCheckCircle className="mr-1" />
-                        Official
-                      </span>
-                  )}
-                </div>
-                <div className="flex items-center space-x-4">
-                  <div className="flex items-center">
-                    <FaStar className="mr-1 text-yellow-500" />
-                    <span className="font-pretendard font-light text-sm">
-                        {formatNumber(image.star_count)}
-                      </span>
+    <Card className="w-full" shadow={'none'} style={{ border: '1px solid #F5F5F5' }}>
+      <CardBody className="p-6">
+        <div className="flex gap-2 mb-4">
+          <Input
+            placeholder="이미지를 검색하세요"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+            className="w-full"
+            size="lg"
+            radius="sm"
+          />
+          <Button
+            color="primary"
+            onClick={handleSearch}
+            className="px-6"
+            size="lg"
+            radius="sm"
+          >
+            검색
+          </Button>
+        </div>
+
+        {loading ? (
+          <div className="flex justify-center items-center h-48">
+            <Spinner label="이미지 검색 중..." color="primary" />
+          </div>
+        ) : (
+          <div className="mt-4 h-48 overflow-y-auto">
+            {images.length > 0 ? (
+              images.map((image, index) => (
+                <div key={`${image.id}-${image.repo_name}`}>
+                  <div
+                    className={`py-4 px-2 cursor-pointer transition-all hover:bg-default-100 ${
+                      selectedImage === image.repo_name ? 'bg-default-100' : ''
+                    }`}
+                    onClick={() => handleSelectImage(image)}
+                  >
+                    <div className="flex justify-between items-center mb-2">
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-lg">{image.repo_name}</span>
+                        {image.is_official && (
+                          <div
+                            className="flex flex-row justify-center items-center gap-1 bg-blue_1 px-2 py-1 rounded-lg text-blue_6 text-sm">
+                            <FaCheckCircle size={12} />
+                            Official
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-1">
+                          <FaStar className="text-warning" />
+                          <span className="text-sm">
+                            {formatNumber(image.star_count)}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <FaDownload className="text-primary" />
+                          <span className="text-sm">
+                            {formatNumber(image.pull_count)}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <p className="text-sm text-default-500">
+                      {image.short_description}
+                    </p>
                   </div>
-                  <div className="flex items-center">
-                    <FaDownload className="mr-1 text-blue_6" />
-                    <span className="font-pretendard font-light text-sm">
-                        {formatNumber(image.pull_count)}
-                      </span>
-                  </div>
+                  {index < images.length - 1 && <Divider />}
                 </div>
+              ))
+            ) : (
+              <div className="flex justify-center items-center h-full">
+                <p className="text-default-500 text-center">
+                  검색 결과가 없습니다.
+                </p>
               </div>
-              <p className="text-sm text-gray-600 pretendard font-light mb-2">
-                {image.short_description}
-              </p>
-            </div>
-          ))
-          : !loading && (
-          <p className="text-gray-500 font-pretendard font-light text-center mt-20">
-            검색 결과가 없습니다.
-          </p>
+            )}
+          </div>
         )}
-      </div>
-    </div>
+      </CardBody>
+    </Card>
   );
 };
 

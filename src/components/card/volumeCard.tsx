@@ -88,7 +88,7 @@ const VolumeCard = ({ data, onDeleteSuccess }: VolumeCardProps) => {
           enqueueSnackbar,
           '볼륨이 성공적으로 삭제되었습니다!',
           'success',
-          '#4CAF50'
+          '#4CAF50',
         );
         onDeleteSuccess();
       } else {
@@ -96,16 +96,15 @@ const VolumeCard = ({ data, onDeleteSuccess }: VolumeCardProps) => {
           enqueueSnackbar,
           `볼륨 삭제 실패: ${result.error}`,
           'error',
-          '#FF4853'
+          '#FF4853',
         );
       }
     } catch (error) {
-      console.error('볼륨 삭제 중 에러:', error);
       showSnackbar(
         enqueueSnackbar,
         `볼륨 삭제 요청 중 에러: ${error}`,
         'error',
-        '#FF4853'
+        '#FF4853',
       );
     } finally {
       setLoading(false);
@@ -125,7 +124,6 @@ const VolumeCard = ({ data, onDeleteSuccess }: VolumeCardProps) => {
       }
       return data;
     } catch (error) {
-      console.error('Error fetching volume detail:', error);
       throw error;
     }
   };
@@ -136,7 +134,7 @@ const VolumeCard = ({ data, onDeleteSuccess }: VolumeCardProps) => {
       setDetailData(volumeDetail);
       setIsModalOpen(true);
     } catch (error) {
-      console.log(error);
+      throw error;
     }
   };
 
@@ -151,34 +149,34 @@ const VolumeCard = ({ data, onDeleteSuccess }: VolumeCardProps) => {
     >
       <div className="flex justify-between items-center px-4 py-2 bg-gray-50 border-b">
         <div className="flex items-center space-x-2 truncate">
-          <span className="font-pretendard text-sm font-bold text-gray-700 truncate">
+          <span className="font-pretendard text-sm font-bold text-grey_6 truncate">
             {data.Name}
           </span>
         </div>
         <div className="flex">
           <button
             onClick={handleGetInfo}
-            className="p-2 rounded-full hover:bg-gray-200 transition-colors"
+            className="p-2 rounded-full hover:bg-grey_1 transition-colors"
             title="Volume Info"
           >
-            <FiInfo className="text-gray-500" size={16} />
+            <FiInfo className="text-grey_4" size={16} />
           </button>
           <button
             onClick={handleDelete}
-            className="p-2 rounded-full hover:bg-gray-200 transition-colors"
+            className="p-2 rounded-full hover:bg-grey_1 transition-colors"
             title="Delete Volume"
           >
-            <FiTrash className="text-gray-500" size={16} />
+            <FiTrash className="text-grey_4" size={16} />
           </button>
           <button
             onClick={toggleAccordion}
-            className="p-2 rounded-full hover:bg-gray-200 transition-colors"
+            className="p-2 rounded-full hover:bg-grey_1 transition-colors"
             title="Toggle Details"
           >
             {isExpanded ? (
-              <FiChevronUp size={16} className="text-gray-500" />
+              <FiChevronUp size={16} className="text-grey_4" />
             ) : (
-              <FiChevronDown size={16} className="text-gray-500" />
+              <FiChevronDown size={16} className="text-grey_4" />
             )}
           </button>
         </div>
@@ -196,10 +194,10 @@ const VolumeCard = ({ data, onDeleteSuccess }: VolumeCardProps) => {
                   <item.icon size={16} style={{ color: bg2 }} />
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-xs text-gray-500 font-medium font-pretendard">
+                  <span className="text-xs text-grey_4 font-medium font-pretendard">
                     {item.label}
                   </span>
-                  <span className="font-pretendard font-semibold text-sm text-gray-800 truncate max-w-[150px]">
+                  <span className="font-pretendard font-semibold text-sm text-grey_7 truncate max-w-[150px]">
                     {item.value}
                   </span>
                 </div>

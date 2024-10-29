@@ -5,12 +5,7 @@ import { useSnackbar } from 'notistack';
 import { showSnackbar } from '@/utils/toastUtils';
 import { AiOutlineSave } from 'react-icons/ai';
 import { useBlueprintStore } from '@/store/blueprintStore';
-
-interface BlueprintReqDto {
-  name: string;
-  isDockerRemote: boolean;
-  remoteUrl?: string;
-}
+import { createBlueprint } from '@/services/blueprint/api';
 
 const SaveButton = () => {
   const { enqueueSnackbar } = useSnackbar();
@@ -32,7 +27,7 @@ const SaveButton = () => {
           enqueueSnackbar,
           '매핑된 데이터가 유효하지 않습니다.',
           'error',
-          '#FF4853'
+          '#FF4853',
         );
         return;
       }
@@ -84,14 +79,9 @@ const SaveButton = () => {
 
       console.log(requestBody);
 
-      const res = await fetch('/api/blueprint/create', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestBody),
-      });
+      const res = await createBlueprint(requestBody);
 
-      const result = await res.json();
-      if (res.ok) {
+      if (res.status === 200 || res.status === 201) {
         showSnackbar(
           enqueueSnackbar,
           '설계도를 성공적으로 전송했습니다!',
@@ -101,7 +91,7 @@ const SaveButton = () => {
       } else {
         showSnackbar(
           enqueueSnackbar,
-          `설계도 전송 실패: ${result.error}`,
+          `설계도 전송 실패: ${res.data.error}`,
           'error',
           '#FF4853'
         );
@@ -119,7 +109,8 @@ const SaveButton = () => {
 
   return (
     <>
-      <div className="fixed bottom-8 right-[50px] transform translate-x-4 h-[40px] px-4 bg-white border-gray_3 border text-blue_6 hover:text-white hover:bg-blue_5 active:bg-blue_6 rounded-lg flex items-center justify-center transition duration-200 ease-in-out">
+      <div
+        className="h-[40px] px-4 bg-white border-gray_3 border text-blue_6 hover:text-white hover:bg-blue_5 active:bg-blue_6 rounded-lg flex items-center justify-center transition duration-200 ease-in-out">
         <button
           className="flex items-center gap-2 text-center"
           onClick={handleSave}
@@ -135,7 +126,7 @@ const SaveButton = () => {
             <h2 className="text-xl font-semibold mb-4">설계도 저장</h2>
             <input
               type="text"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+              className="w-full px-3 py-2 border border-grey_2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
               placeholder="설계도 이름"
               value={blueprintName}
               onChange={(e) => setBlueprintName(e.target.value)}

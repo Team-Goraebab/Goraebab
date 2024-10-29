@@ -25,7 +25,7 @@ const AddImageButton = ({ onCreate }: AddImageButtonProps) => {
     file: File | null,
     size: string,
     source: 'local' | 'dockerHub',
-    dockerImageInfo?: any
+    dockerImageInfo?: any,
   ) => {
     setIsLoading(true);
 
@@ -43,7 +43,7 @@ const AddImageButton = ({ onCreate }: AddImageButtonProps) => {
         enqueueSnackbar,
         '올바른 소스를 선택해 주세요.',
         'error',
-        '#FF4853'
+        '#FF4853',
       );
       setIsLoading(false);
       return;
@@ -73,17 +73,16 @@ const AddImageButton = ({ onCreate }: AddImageButtonProps) => {
         enqueueSnackbar,
         '이미지가 성공적으로 추가되었습니다!',
         'success',
-        '#4CAF50'
+        '#4CAF50',
       );
 
       setIsModalOpen(false);
     } catch (error) {
-      console.error('Error creating image:', error);
       showSnackbar(
         enqueueSnackbar,
         '이미지 추가 중 오류가 발생했습니다.',
         'error',
-        '#FF0000'
+        '#FF0000',
       );
     } finally {
       setIsLoading(false);

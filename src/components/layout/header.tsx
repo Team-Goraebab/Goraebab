@@ -1,149 +1,243 @@
-'use client';
-
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { Tooltip } from 'react-tooltip';
-import { MENU_ITEMS } from '@/data/menu';
+import {
+  Button,
+  Card,
+  ScrollShadow,
+  Tooltip,
+  Divider,
+} from '@nextui-org/react';
 import { useMenuStore } from '@/store/menuStore';
-import { FiSettings } from 'react-icons/fi';
-import Image from 'next/image';
+import { MENU_ITEMS } from '@/data/menu';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FiSettings, FiChevronLeft } from 'react-icons/fi';
 import { FaQuestion } from 'react-icons/fa';
-import HelpModal from '../modal/helpModal';
+import HelpModal from '@/components/modal/helpModal';
 
 const Header = () => {
   const router = useRouter();
   const pathname = usePathname();
-  const navRef = useRef<HTMLDivElement>(null);
-
   const { activeId, setActiveId } = useMenuStore();
-  const [barWidth, setBarWidth] = useState<number>(0);
-  const [barLeft, setBarLeft] = useState<number>(0);
-  const [isHelpOpen, setIsHelpOpen] = useState<boolean>(false);
-
-  const handleHelp = () => {
-    setIsHelpOpen(true);
-  };
-
-  const isRightSidePath = pathname === '/management';
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
 
   const handleNavigation = (path: string, id: number) => {
     setActiveId(id);
     router.push(path);
   };
 
-  useEffect(() => {
-    if (navRef.current) {
-      if (isRightSidePath) {
-        const activeIndex = MENU_ITEMS.findIndex(
-          (item) => item.id === activeId
-        );
-        if (activeIndex !== -1) {
-          const activeItem = navRef.current.children[activeIndex];
-          if (activeItem) {
-            setBarWidth(activeItem.clientWidth);
-            setBarLeft(
-              activeItem.getBoundingClientRect().left -
-                navRef.current.getBoundingClientRect().left
-            );
-          }
-        }
-      } else {
-        const activeIndex = MENU_ITEMS.findIndex(
-          (item) => item.id === activeId
-        );
-        const activeItem = navRef.current.children[activeIndex];
-        if (activeItem) {
-          setBarWidth(activeItem.clientWidth);
-          setBarLeft(
-            activeItem.getBoundingClientRect().left -
-              navRef.current.getBoundingClientRect().left
-          );
-        }
-      }
-    }
-  }, [activeId, isRightSidePath]);
+  const toggleSidebar = () => {
+    setIsCollapsed(!isCollapsed);
+  };
 
-  window.onbeforeunload = () => {
-    sessionStorage.removeItem('selectedHostIp');
+  useEffect(() => {
+    return () => {
+      sessionStorage.removeItem('selectedHostIp');
+    };
+  }, []);
+
+  // Sidebar animation variants
+  const sidebarVariants = {
+    expanded: {
+      width: '288px',
+      transition: { duration: 0.3, ease: 'easeInOut' },
+    },
+    collapsed: {
+      width: '80px',
+      transition: { duration: 0.3, ease: 'easeInOut' },
+    },
+  };
+
+  // Button animation variants
+  const buttonVariants = {
+    expanded: { x: 0, opacity: 1 },
+    collapsed: { x: -10, opacity: 0 },
+  };
+
+  // Icon animation variants
+  const iconVariants = {
+    hover: { scale: 1.1, rotate: 0 },
+    settings: { rotate: 180 },
+    tap: { scale: 0.9 },
   };
 
   return (
-    <header className="fixed w-full py-4 px-8 bg-blue_6 text-white z-[999]">
-      <div className="mx-auto flex justify-between items-center relative">
-        <div>
-          <Image
-            src={require('../../../public/images/GORAEBAB.svg')}
-            alt={'logo'}
-            width={150}
-          />
-        </div>
-        <div className="flex-grow"></div>
-        <nav
-          className="flex space-x-6 relative items-center justify-center"
-          ref={navRef}
-        >
-          {MENU_ITEMS.map((item) => (
-            <div
-              key={item.id}
-              onClick={() => handleNavigation(item.path, item.id)}
-              className={`flex flex-col items-center cursor-pointer font-semibold text-sm transition-colors duration-300 ${
-                activeId === item.id
-                  ? 'text-blue_3'
-                  : 'text-white hover:text-white'
-              }`}
-              data-tooltip-id={`tooltip-${item.name}`}
-              data-tooltip-content={item.name}
-            >
-              <item.icon className="text-xl mb-1" />
-              <Tooltip id={`tooltip-${item.name}`} />
+    <div className="relative">
+      <motion.div
+        initial="expanded"
+        animate={isCollapsed ? 'collapsed' : 'expanded'}
+        variants={sidebarVariants}
+        className="fixed left-0 z-[1] h-screen"
+      >
+        <Card
+          className="h-full transition-all duration-300 border-r border-divider shadow-lg rounded-none bg-background/70 backdrop-blur-md">
+          <div className="flex flex-col h-full pt-4">
+            <ScrollShadow className="flex-grow px-2">
+              <div className="flex flex-col gap-1 pl-3">
+                {MENU_ITEMS.map((item) => (
+                  <Tooltip
+                    showArrow
+                    key={item.id}
+                    placement="right"
+                    content={item.name}
+                    classNames={{
+                      content: [
+                        'py-2 px-4',
+                        'text-black',
+                      ],
+                    }}
+                  >
+                    <Button
+                      onClick={() => handleNavigation(item.path, item.id)}
+                      className={`w-full justify-start group transition-all duration-300 ${
+                        isCollapsed ? 'px-2' : 'px-2'
+                      } ${
+                        activeId === item.id
+                          ? 'bg-primary/10 dark:bg-primary/20 hover:bg-primary/20 dark:hover:bg-primary/30'
+                          : 'bg-transparent hover:bg-default-100'
+                      }`}
+                      startContent={
+                        <motion.div
+                          variants={iconVariants}
+                          whileHover="hover"
+                          className={`text-xl ${
+                            activeId === item.id ? 'text-primary' : 'text-default-600'
+                          }`}
+                        >
+                          <item.icon />
+                        </motion.div>
+                      }
+                      variant="light"
+                    >
+                      <AnimatePresence mode="wait">
+                        {!isCollapsed && (
+                          <motion.span
+                            variants={buttonVariants}
+                            initial="collapsed"
+                            animate="expanded"
+                            exit="collapsed"
+                            className={`ml-2 text-sm font-medium ${
+                              activeId === item.id ? 'text-primary' : 'text-default-600'
+                            }`}
+                          >
+                            {item.name}
+                          </motion.span>
+                        )}
+                      </AnimatePresence>
+                    </Button>
+                  </Tooltip>
+                ))}
+              </div>
+            </ScrollShadow>
+            <div className="px-3">
+              <Divider className="my-4" />
             </div>
-          ))}
-          {!isRightSidePath && (
-            <div
-              className="absolute bottom-0 h-1 bg-blue_3 rounded-tl rounded-tr transition-all duration-300"
-              style={{
-                width: `${barWidth}px`,
-                left: `${barLeft - 24}px`,
-                top: 36,
-              }}
-            />
-          )}
-        </nav>
-        <div className="flex-grow" />
-        <div className="flex items-center space-x-4">
-          <div
-            onClick={() => handleNavigation('/management', 6)}
-            className={`cursor-pointer transition-colors duration-300 ${
-              activeId === 6 ? 'text-blue_3' : 'text-white hover:text-white'
-            }`}
-          >
-            <FiSettings
-              className="text-xl"
-              data-tooltip-id="management-tooltip"
-            />
-            <Tooltip id="management-tooltip" content="Management" />
+            <div className="pl-5 pr-2 pb-4 mt-auto">
+              <Tooltip
+                content={isCollapsed ? 'Management' : ''}
+                placement="right"
+                delay={200}
+              >
+                <Button
+                  onClick={() => handleNavigation('/management', 6)}
+                  className={`w-full justify-start mb-2 ${
+                    isCollapsed ? 'px-2' : 'px-4'
+                  } ${
+                    activeId === 6
+                      ? 'bg-primary/10 dark:bg-primary/20 hover:bg-primary/20 dark:hover:bg-primary/30'
+                      : 'bg-transparent hover:bg-default-100'
+                  }`}
+                  startContent={
+                    <motion.div
+                      variants={iconVariants}
+                      whileHover="settings"
+                      transition={{ duration: 0.3 }}
+                    >
+                      <FiSettings className="text-xl" />
+                    </motion.div>
+                  }
+                  variant="light"
+                >
+                  <AnimatePresence mode="wait">
+                    {!isCollapsed && (
+                      <motion.span
+                        variants={buttonVariants}
+                        initial="collapsed"
+                        animate="expanded"
+                        exit="collapsed"
+                        className="ml-2"
+                      >
+                        관리
+                      </motion.span>
+                    )}
+                  </AnimatePresence>
+                </Button>
+              </Tooltip>
+
+              <Tooltip
+                content={isCollapsed ? 'Help' : ''}
+                placement="right"
+                delay={200}
+              >
+                <Button
+                  onClick={() => setIsHelpOpen(true)}
+                  className={`w-full justify-start pl-3 ${
+                    isCollapsed ? 'px-2' : 'px-4'
+                  }`}
+                  startContent={
+                    <motion.div
+                      variants={iconVariants}
+                      whileHover="hover"
+                      className="text-primary"
+                    >
+                      <FaQuestion className="text-xl" />
+                    </motion.div>
+                  }
+                  variant="light"
+                >
+                  <AnimatePresence mode="wait">
+                    {!isCollapsed && (
+                      <motion.span
+                        variants={buttonVariants}
+                        initial="collapsed"
+                        animate="expanded"
+                        exit="collapsed"
+                        className="ml-2"
+                      >
+                        도움말
+                      </motion.span>
+                    )}
+                  </AnimatePresence>
+                </Button>
+              </Tooltip>
+            </div>
           </div>
-          {isRightSidePath && (
-            <div
-              className="absolute bottom-0 h-1 bg-blue_3 rounded-tl rounded-tr transition-all duration-300"
-              style={{
-                width: `${barWidth}px`,
-                right: '35px',
-                top: 36,
-              }}
-            />
-          )}
-          <div
-            onClick={handleHelp}
-            className="cursor-pointer text-white hover:text-white transition-colors duration-300"
+        </Card>
+        {isHelpOpen && <HelpModal />}
+      </motion.div>
+      <div className="fixed" style={{
+        left: isCollapsed ? '63px' : '271px',
+        top: '50%',
+        transform: 'translateY(-50%)',
+        zIndex: 9,
+        transition: 'left 0.3s ease-in-out',
+      }}>
+        <Button
+          isIconOnly
+          className="bg-white border border-primary/20 rounded-full hover:bg-gray_1"
+          size="sm"
+          onClick={toggleSidebar}
+        >
+          <motion.div
+            animate={{ rotate: isCollapsed ? 180 : 0 }}
+            transition={{ duration: 0.3 }}
           >
-            <FaQuestion className="text-xl" data-tooltip-id="help" />
-            <Tooltip id="help" content="Help" />
-          </div>
-        </div>
+            <FiChevronLeft />
+          </motion.div>
+        </Button>
       </div>
-      {isHelpOpen && <HelpModal />}
-    </header>
+
+    </div>
   );
 };
 

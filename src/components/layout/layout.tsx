@@ -1,23 +1,20 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Header, PanButtons, Sidebar } from '@/components';
-import AddHostButton from '../button/addHostButton';
-import SaveButton from '../button/saveButton';
-import DeleteBlueprintButton from '../button/deleteBlueprintButton';
+import { Header, Sidebar } from '@/components';
 import { SnackbarProvider } from 'notistack';
 import { usePathname } from 'next/navigation';
 import Splash from '@/components/splash/splash';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { DndProvider } from 'react-dnd';
+import ActionTabs from '@/components/tab/actionTabs';
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();
   const [isHandMode, setIsHandMode] = useState(false);
-  const [loading, setLoading] = useState(true); // 스플래시 화면 표시 여부를 위한 상태
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // 스플래시 화면을 3초 동안 표시
     const timer = setTimeout(() => {
       setLoading(false);
     }, 3000);
@@ -46,16 +43,13 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
               </div>
             </div>
           ) : (
-            <div className="flex flex-col flex-1 ml-[300px]">
+            <div className="flex flex-col flex-1 mr-[280px]">
               <div className="flex-1 bg-basic_1 bg-grey_0">
                 <main className={`relative ${isHandMode ? 'hand-mode' : ''}`}>
                   {children}
                 </main>
                 <Sidebar />
-                <PanButtons />
-                <AddHostButton />
-                <DeleteBlueprintButton />
-                <SaveButton />
+                <ActionTabs />
               </div>
             </div>
           )}

@@ -6,7 +6,6 @@ export async function POST(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const hostIp = searchParams.get('hostIp') || 'localhost';
   const dockerClient = createDockerClient(hostIp);
-  console.log(bodyData);
 
   try {
     const response = await dockerClient.post('/networks/create', {
@@ -24,18 +23,16 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(response.data, { status: 200 });
   } catch (error) {
-    console.error('Error creating network:', error);
-
     if (error instanceof Error && (error as any).response) {
       return NextResponse.json(
         { error: (error as any).response.data.message },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
     return NextResponse.json(
       { error: 'Unknown error occurred' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

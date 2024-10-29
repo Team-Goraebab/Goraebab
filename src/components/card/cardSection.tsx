@@ -1,28 +1,27 @@
 'use client';
 
 import React, { useState } from 'react';
-import { CardContainer, ConnectBar, HostCard } from '@/components';
+import { CardContainer } from '@/components';
 import { HostCardProps } from './hostCard';
 import Draggable from 'react-draggable';
 import { useStore } from '@/store/cardStore';
 import { selectedHostStore } from '@/store/seletedHostStore';
 import { useHostStore } from '@/store/hostStore';
 import { useSelectedNetworkStore } from '@/store/selectedNetworkStore';
-import { FaPencilAlt } from 'react-icons/fa';
-import ContainerNameModal from '../modal/container/containerNameModal';
+import { FaTrash, FaHome, FaGlobeAsia } from 'react-icons/fa';
 
 interface CardSectionProps {
   hostData: HostCardProps[];
   isHandMode: boolean;
 }
 
-/**
- *
- * @param hostData 호스트 데이터
- * @param isHandMode 손 동작 모드
- * @returns
- */
 const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
+  const [containerNames, setContainerNames] = useState<{
+    [hostId: string]: {
+      [networkUniqueId: string]: string;
+    };
+  }>({});
+
   const {
     selectedHostId,
     setSelectedHostId,
@@ -33,17 +32,13 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
     connectedBridgeIds,
     deleteConnectedBridgeId,
   } = selectedHostStore();
+
   const { selectedNetwork, setSelectedNetwork, clearSelectedNetwork } =
     useSelectedNetworkStore();
 
   const allContainers = useStore((state) => state.hostContainers);
+  const deleteHost = useHostStore((state) => state.deleteHost);
   const deleteNetwork = useHostStore((state) => state.deleteNetwork);
-
-  const [isNameModalOpen, setIsNameModalOpen] = useState(false);
-  const [editingUniqueId, setEditingUniqueId] = useState<string | null>(null);
-  const [containerNames, setContainerNames] = useState<{
-    [uniqueId: string]: string;
-  }>({});
 
   const handleHostClick = (id: string, name: string, ip: string) => {
     const newSelectedHostId = selectedHostId === id ? null : id;
@@ -53,10 +48,12 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
     setSelectedHostId(newSelectedHostId);
     setSelectedHostName(newSelectedHostName);
     setSelectedHostIp(newSelectedHostIp);
-
     sessionStorage.setItem('selectedHostIp', newSelectedHostIp);
-
     clearSelectedNetwork();
+  };
+
+  const handleDeleteHost = (id: string) => {
+    deleteHost(id);
   };
 
   const handleSelectNetwork = (
@@ -64,19 +61,16 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
     hostIp: string,
     networkName: string,
     networkId: string,
-    uniqueId: string
+    uniqueId: string,
   ) => {
     if (
       selectedNetwork?.hostId === hostId &&
       selectedNetwork?.uniqueId === uniqueId
     ) {
-      // 이미 선택된 네트워크를 다시 클릭하면 선택 해제
       clearSelectedNetwork();
     } else {
-      // 새로운 네트워크 선택
       setSelectedNetwork(hostId, networkName, networkId, uniqueId);
       sessionStorage.setItem('selectedHostIp', hostIp);
-      // 네트워크를 선택하면 해당 호스트도 자동 선택
       setSelectedHostId(hostId);
       setSelectedHostIp(hostIp);
     }
@@ -86,280 +80,155 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
     hostId: string,
     networkName: string,
     networkId: string,
-    uniqueId: string
+    uniqueId: string,
   ) => {
     if (
       selectedNetwork?.hostId === hostId &&
-      selectedNetwork?.networkName === networkName &&
-      selectedNetwork?.networkId === networkId &&
       selectedNetwork?.uniqueId === uniqueId
     ) {
-      // 네트워크 삭제 시 선택된 네트워크 해제
       clearSelectedNetwork();
     }
     deleteNetwork(hostId, uniqueId);
     deleteConnectedBridgeId(hostId, uniqueId);
   };
 
-  const handleOpenNameModal = (uniqueId: string) => {
-    setEditingUniqueId(uniqueId);
-    setIsNameModalOpen(true);
-  };
-
-  const handleSaveName = (newName: string) => {
-    if (editingUniqueId) {
-      setContainerNames((prevNames) => ({
-        ...prevNames,
-        [editingUniqueId]: newName,
-      }));
-    }
-    setIsNameModalOpen(false);
-    setEditingUniqueId(null);
+  const handleContainerNameChange = (hostId: string, networkUniqueId: string, name: string) => {
+    setContainerNames(prevNames => ({
+      ...prevNames,
+      [hostId]: {
+        ...(prevNames[hostId] || {}),
+        [networkUniqueId]: name,
+      },
+    }));
   };
 
   return (
-    <>
-      <Draggable disabled={!isHandMode}>
-        <div
-          className="flex flex-col items-center"
-          style={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-          }}
-        >
-          {hostData && hostData.length > 0 ? (
-            hostData.map((host, index) => {
-              const containers = allContainers[host.id] || [];
-              const networks = connectedBridgeIds[host.id] || [];
-              const isHostSelected =
-                selectedNetwork?.hostId === host.id ||
-                selectedHostId === host.id;
-              return (
-                <div key={host.id} className="flex flex-col items-center">
-                  <div className="flex flex-row items-center">
-                    {networks.length > 0 && (
-                      <div className="flex items-center">
-                        <div
-                          className={`absolute flex items-center text-xs font-semibold border-2 h-6 px-3 py-4 rounded-t-lg content-center`}
-                          style={{
-                            top: '-2.14rem',
-                            left: '1.25rem',
-                            zIndex: '10',
-                            borderColor: `${host.themeColor.borderColor}`,
-                            color: `${host.themeColor.textColor}`,
-                            backgroundColor: `${host.themeColor.bgColor}`,
-                          }}
-                        >
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleOpenNameModal(networks[0].uniqueId);
+    <Draggable disabled={!isHandMode}>
+      <div className="flex flex-col gap-8 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+        {hostData && hostData.length > 0 ? (
+          hostData.map((host) => {
+            const containers = allContainers[host.id] || [];
+            const networks = connectedBridgeIds[host.id] || [];
+            const isHostSelected = selectedNetwork?.hostId === host.id || selectedHostId === host.id;
+
+            return (
+              <div key={host.id} className="relative">
+                <div
+                  className={`transition-all duration-200 ${
+                    isHostSelected ? 'transform scale-105' : ''
+                  }`}
+                >
+                  <div
+                    onClick={() => handleHostClick(host.id, host.hostNm, host.hostIp)}
+                    className={`relative flex flex-col bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-200 w-[540px] cursor-pointer overflow-hidden`}
+                    style={{
+                      borderColor: isHostSelected ? host.themeColor.borderColor : 'transparent',
+                      borderWidth: '2px',
+                    }}
+                  >
+                    <div
+                      className="w-full py-3 px-4"
+                      style={{
+                        backgroundColor: host.themeColor.bgColor,
+                        borderBottom: `2px solid ${host.themeColor.borderColor}`,
+                      }}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                          {host.isRemote ? (
+                            <FaGlobeAsia className="w-5 h-5" style={{ color: host.themeColor.textColor }} />
+                          ) : (
+                            <FaHome className="w-5 h-5" style={{ color: host.themeColor.textColor }} />
+                          )}
+                          <div className="flex flex-col">
+                            <span
+                              className="text-sm font-bold"
+                              style={{ color: host.themeColor.textColor }}
+                            >
+                              {host.hostNm || 'HOST'}
+                            </span>
+                            <span
+                              className="text-xs"
+                              style={{ color: host.themeColor.textColor }}
+                            >
+                              {host.isRemote ? 'Remote' : 'Local'} Host
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-3">
+                          <span
+                            className="text-sm font-medium px-3 py-1 rounded-full"
+                            style={{
+                              backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                              color: host.themeColor.textColor,
                             }}
                           >
-                            <FaPencilAlt
-                              className="w-4 h-4 mr-1"
-                              style={{ color: host.themeColor.borderColor }}
-                            />
-                          </button>
-                          {containerNames[networks[0].uniqueId] ||
-                            'container 이름을 설정하세요'}
+                            {host.isRemote ? host.hostIp : 'localhost'}
+                          </span>
+                          {selectedHostId === host.id && (
+                            <button
+                              onClick={() => handleDeleteHost(host.id)}
+                              className="p-1.5 rounded-full hover:bg-red-100 transition-colors duration-200"
+                            >
+                              <FaTrash className="w-4 h-4 text-red-500" />
+                            </button>
+                          )}
                         </div>
-                        <CardContainer
-                          networkName={networks[0].name}
-                          networkIp={networks[0].gateway}
-                          containers={containers}
-                          containerName={containerNames[networks[0].uniqueId]}
-                          themeColor={host.themeColor}
-                          onDelete={() =>
-                            handleDeleteNetwork(
-                              host.id,
-                              networks[0].name,
-                              networks[0].id,
-                              networks[0].uniqueId
-                            )
-                          }
-                          onSelectNetwork={() =>
-                            handleSelectNetwork(
-                              host.id,
-                              host.hostIp,
-                              networks[0].name,
-                              networks[0].id,
-                              networks[0].uniqueId
-                            )
-                          }
-                          isSelected={
-                            selectedNetwork?.uniqueId === networks[0].uniqueId
-                          }
-                          hostIp={host.hostIp}
-                          networkUniqueId={networks[0].uniqueId}
-                        />
-                        <ConnectBar rotate={180} themeColor={host.themeColor} />
                       </div>
-                    )}
-                    <HostCard
-                      id={host.id}
-                      hostNm={host.hostNm}
-                      hostIp={host.hostIp}
-                      isRemote={host.isRemote}
-                      onClick={() =>
-                        handleHostClick(host.id, host.hostNm, host.hostIp)
-                      }
-                      themeColor={host.themeColor}
-                      className={
-                        isHostSelected ? 'scale-105 border-blue_5' : ''
-                      }
-                      isSelectedNetwork={isHostSelected}
-                    />
-                    {networks.length > 1 && (
-                      <div className="flex items-center">
-                        <ConnectBar themeColor={host.themeColor} />
-                        <div
-                          className={`absolute flex items-center text-xs font-semibold border-2 h-6 px-3 py-4 rounded-t-lg content-center`}
-                          style={{
-                            top: '-2.14rem',
-                            right: '1.25rem',
-                            zIndex: '10',
-                            borderColor: `${host.themeColor.borderColor}`,
-                            color: `${host.themeColor.textColor}`,
-                            backgroundColor: `${host.themeColor.bgColor}`,
-                          }}
-                        >
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleOpenNameModal(networks[1].uniqueId);
-                            }}
-                          >
-                            <FaPencilAlt
-                              className="w-4 h-4 mr-1"
-                              style={{ color: host.themeColor.borderColor }}
-                            />
-                          </button>
-                          {containerNames[networks[1].uniqueId] ||
-                            'container 이름을 설정하세요'}
-                        </div>
-                        <CardContainer
-                          networkName={networks[1].name}
-                          networkIp={networks[1].gateway}
-                          containers={containers}
-                          containerName={containerNames[networks[1].uniqueId]}
-                          themeColor={host.themeColor}
-                          onDelete={() =>
-                            handleDeleteNetwork(
-                              host.id,
-                              networks[1].name,
-                              networks[1].id,
-                              networks[1].uniqueId
-                            )
-                          }
-                          onSelectNetwork={() =>
-                            handleSelectNetwork(
-                              host.id,
-                              host.hostIp,
-                              networks[1].name,
-                              networks[1].id,
-                              networks[1].uniqueId
-                            )
-                          }
-                          isSelected={
-                            selectedNetwork?.uniqueId === networks[1].uniqueId
-                          }
-                          hostIp={host.hostIp}
-                          networkUniqueId={networks[1].uniqueId}
-                        />
-                      </div>
-                    )}
-                  </div>
-                  {networks.length > 2 && (
-                    <div className="flex flex-col items-center">
-                      <ConnectBar
-                        rotate={90}
-                        themeColor={host.themeColor}
-                        length={'long'}
-                      />
-                      <div
-                        className={`absolute flex items-center text-xs font-semibold border-2 h-6 px-3 py-4 rounded-t-lg content-center`}
-                        style={{
-                          bottom: '18.05rem',
-                          right: '32rem',
-                          zIndex: '10',
-                          borderColor: `${host.themeColor.borderColor}`,
-                          color: `${host.themeColor.textColor}`,
-                          backgroundColor: `${host.themeColor.bgColor}`,
-                        }}
-                      >
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleOpenNameModal(networks[2].uniqueId);
-                          }}
-                        >
-                          <FaPencilAlt
-                            className="w-4 h-4 mr-1"
-                            style={{ color: host.themeColor.borderColor }}
-                          />
-                        </button>
-                        {containerNames[networks[2].uniqueId] ||
-                          'container 이름을 설정하세요'}
-                      </div>
-                      <CardContainer
-                        networkName={networks[2].name}
-                        networkIp={networks[2].gateway}
-                        containers={containers}
-                        containerName={containerNames[networks[2].uniqueId]}
-                        themeColor={host.themeColor}
-                        onDelete={() =>
-                          handleDeleteNetwork(
-                            host.id,
-                            networks[2].name,
-                            networks[2].id,
-                            networks[2].uniqueId
-                          )
-                        }
-                        onSelectNetwork={() =>
-                          handleSelectNetwork(
-                            host.id,
-                            host.hostIp,
-                            networks[2].name,
-                            networks[2].id,
-                            networks[2].uniqueId
-                          )
-                        }
-                        isSelected={
-                          selectedNetwork?.uniqueId === networks[2].uniqueId
-                        }
-                        hostIp={host.hostIp}
-                        networkUniqueId={networks[2].uniqueId}
-                      />
                     </div>
-                  )}
+                    <div className="p-4">
+                      {networks.length > 0 ? (
+                        <div className="flex flex-col gap-4 w-full">
+                          {networks.map((network) => (
+                            <CardContainer
+                              key={network.uniqueId}
+                              networkName={network.name}
+                              networkIp={network.gateway}
+                              containers={containers}
+                              containerName={containerNames[host.id]?.[network.uniqueId]}
+                              themeColor={host.themeColor}
+                              onDelete={() =>
+                                handleDeleteNetwork(
+                                  host.id,
+                                  network.name,
+                                  network.id,
+                                  network.uniqueId,
+                                )
+                              }
+                              onSelectNetwork={() =>
+                                handleSelectNetwork(
+                                  host.id,
+                                  host.hostIp,
+                                  network.name,
+                                  network.id,
+                                  network.uniqueId,
+                                )
+                              }
+                              isSelected={selectedNetwork?.uniqueId === network.uniqueId}
+                              hostIp={host.hostIp}
+                              networkUniqueId={network.uniqueId}
+                              onContainerNameChange={(name) =>
+                                handleContainerNameChange(host.id, network.uniqueId, name)
+                              }
+                            />
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="text-center text-gray-500 py-4">
+                          연결된 네트워크가 없습니다.
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
-              );
-            })
-          ) : (
-            <div className="text-center">호스트 데이터가 없습니다.</div>
-          )}
-        </div>
-      </Draggable>
-      <ContainerNameModal
-        open={isNameModalOpen}
-        containerName={
-          editingUniqueId ? containerNames[editingUniqueId] || '' : ''
-        }
-        onClose={() => setIsNameModalOpen(false)}
-        onSave={handleSaveName}
-        onChange={(name) => {
-          if (editingUniqueId) {
-            setContainerNames((prevNames) => ({
-              ...prevNames,
-              [editingUniqueId]: name,
-            }));
-          }
-        }}
-      />
-    </>
+              </div>
+            );
+          })
+        ) : (
+          <div className="text-center text-gray-500">No host data available</div>
+        )}
+      </div>
+    </Draggable>
   );
 };
 

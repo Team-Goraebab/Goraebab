@@ -9,7 +9,7 @@ const AddHostButton = () => {
 
   return (
     <>
-      <div className="fixed top-20 z-[9] right-[50px] transform translate-x-4 h-[42px] rounded-lg flex items-center justify-between">
+      <div className="flex justify-center items-center z-50 relative h-[42px] rounded-lg">
         <button
           onClick={() => setIsModalOpen(true)}
           className="px-4 py-2.5 text-white bg-blue_6 hover:from-blue-600 hover:to-blue-800 text-center rounded-md transition-all duration-200 ease-in-out transform hover:scale-105 active:scale-95"
@@ -22,7 +22,7 @@ const AddHostButton = () => {
         </button>
       </div>
       <div className="min-h-screen flex items-center justify-center">
-        {isModalOpen && <HostModal onClose={() => setIsModalOpen(false)} />}
+        {isModalOpen && <HostModal onClose={() => setIsModalOpen(false)} isOpen={isModalOpen} />}
       </div>
     </>
   );

@@ -13,22 +13,20 @@ export async function GET(req: NextRequest) {
 
   try {
     const response = await dockerClient.get(
-      `/networks/${encodeURIComponent(id)}`
+      `/networks/${encodeURIComponent(id)}`,
     );
     return NextResponse.json(response.data, { status: 200 });
   } catch (error) {
-    console.error('Error fetching network detail:', error);
-
     if (error instanceof Error && (error as any).response) {
       return NextResponse.json(
         { error: (error as any).response.data.message || 'Unknown error' },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
     return NextResponse.json(
       { error: 'Failed to get network detail' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

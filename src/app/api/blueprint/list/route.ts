@@ -1,13 +1,13 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import axios from 'axios';
+import { API_URL } from '@/app/api/urlPath';
 
-export async function POST(req: NextRequest) {
-  const bodyData = await req.json();
-
+export async function GET() {
   try {
-    const response = await axios.post(`api/v1/blueprints`, {});
+    const response = await axios.get(`${API_URL}/blueprints`);
     return NextResponse.json(response.data, { status: 200 });
   } catch (error) {
+    console.log(error);
     if (error instanceof Error && (error as any).response) {
       return NextResponse.json(
         { error: (error as any).response.data.message },

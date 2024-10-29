@@ -26,14 +26,14 @@ export type HostCardProps = {
  * @returns
  */
 const HostCard = ({
-  id,
-  hostNm,
-  hostIp,
-  isRemote,
-  themeColor,
-  className = '',
-  isSelectedNetwork = false, // 기본값은 false
-}: HostCardProps) => {
+                    id,
+                    hostNm,
+                    hostIp,
+                    isRemote,
+                    themeColor,
+                    className = '',
+                    isSelectedNetwork = false, // 기본값은 false
+                  }: HostCardProps) => {
   const {
     selectedHostId,
     setSelectedHostId,
@@ -64,7 +64,7 @@ const HostCard = ({
   const borderColor =
     selectedHostId === id || isSelectedNetwork
       ? themeColor.borderColor
-      : 'grey';
+      : 'lightGrey';
   const badgeText = isRemote ? 'REMOTE' : 'LOCAL';
   const ipText = isRemote ? hostIp : 'localhost';
 
@@ -89,7 +89,7 @@ const HostCard = ({
       </div>
       <div
         onClick={handleClick}
-        className={`relative flex flex-col items-center p-[10px] border bg-white rounded-lg shadow-lg w-72 h-28 cursor-pointer`}
+        className={`relative flex flex-col items-center p-[10px] border bg-white rounded-lg w-72 h-28 cursor-pointer`}
         style={{
           borderColor: borderColor,
           borderWidth:

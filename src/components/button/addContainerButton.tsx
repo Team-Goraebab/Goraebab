@@ -28,7 +28,7 @@ const AddContainerButton = ({ onCreate }: AddContainerButtonProps) => {
           enqueueSnackbar,
           '컨테이너가 성공적으로 생성되었습니다!',
           'success',
-          '#4CAF50'
+          '#4CAF50',
         );
         onCreate(result);
       } else {
@@ -36,16 +36,15 @@ const AddContainerButton = ({ onCreate }: AddContainerButtonProps) => {
           enqueueSnackbar,
           `컨테이너 생성 실패: ${result.error}`,
           'error',
-          '#FF4853'
+          '#FF4853',
         );
       }
     } catch (error) {
-      console.error('컨테이너 생성 중 에러:', error);
       showSnackbar(
         enqueueSnackbar,
         '컨테이너 생성 중 에러가 발생했습니다.',
         'error',
-        '#FF4853'
+        '#FF4853',
       );
     }
 
