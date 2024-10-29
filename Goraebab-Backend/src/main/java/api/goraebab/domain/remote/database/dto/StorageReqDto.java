@@ -32,7 +32,7 @@ public class StorageReqDto {
   private Integer port;
 
   @ValidEnum(target = DBMS.class)
-  @Schema(description = "The type of DBMS. Choose one from [MYSQL, POSTGRESQL, ORACLE, or SQLSERVER]."
+  @Schema(description = "The type of DBMS. Choose one from [MYSQL, MARIADB, POSTGRESQL, ORACLE, or SQLSERVER]."
   ,example = "MYSQL")
   private DBMS dbms;
 

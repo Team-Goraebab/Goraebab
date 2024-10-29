@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import java.util.Arrays;
 
 public enum DBMS {
-  MYSQL, POSTGRESQL, ORACLE, SQLSERVER;
+  MYSQL, MARIADB, POSTGRESQL, ORACLE, SQLSERVER;
 
 
   @JsonCreator

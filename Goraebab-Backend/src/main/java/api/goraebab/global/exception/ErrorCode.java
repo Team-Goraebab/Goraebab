@@ -45,7 +45,8 @@ public enum ErrorCode {
     DOCKER_SYNC_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, 500, "Failed to synchronize Docker with the specified blueprint."),
     CONTAINER_SYNC_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, 500, "An error occurred during the container synchronization process."),
     CONTAINER_REMOVAL_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, 500, "Failed to stop or remove the specified container."),
-    CONTAINER_CREATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, 500, "Failed to create the specified Docker container.");
+    CONTAINER_CREATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, 500, "Failed to create the specified Docker container."),
+    CONVERSION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, 500, "Failed to convert the processed data to JSON format.");
 
     private final HttpStatus status;
 

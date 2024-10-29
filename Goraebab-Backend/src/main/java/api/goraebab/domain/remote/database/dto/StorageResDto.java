@@ -20,7 +20,7 @@ public class StorageResDto {
   @Schema(description = "The port number used to connect to the storage.", example = "3306")
   private Integer port;
 
-  @Schema(description = "The type of DBMS. Choose one from [MYSQL, POSTGRESQL, ORACLE, or SQLSERVER]."
+  @Schema(description = "The type of DBMS. Choose one from [MYSQL, MARIADB, POSTGRESQL, ORACLE, or SQLSERVER]."
       , example = "MYSQL")
   private DBMS dbms;
 

@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  mariadb:
+    container_name: goraebab_mariadb
+    image: mariadb:latest
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./db/mariadb:/docker-entrypoint-initdb.d
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    command:
+      - "mariadbd"
+      - "--character-set-server=utf8mb4"
+      - "--collation-server=utf8mb4_unicode_ci"
+    networks:
+      goraebab_network:
+        ipv4_address: 172.18.0.20
+    healthcheck:
+      test: [ "CMD", "mariadb-admin", "ping", "-h", "127.0.0.1", "-uroot", "-proot" ]
+      interval: 10s
+      retries: 5
+
+  backend:
+    container_name: goraebab_spring
+    image: spring:latest
+    build:
+      context: ./
+    ports:
+      - "2387:2387"
+    environment:
+      spring.profiles.active: mariadb
+      spring.datasource.url: jdbc:mariadb://172.18.0.20:3306/goraebab
+      spring.datasource.username: root
+      spring.datasource.password: root
+      spring.datasource.driver-class-name: org.mariadb.jdbc.Driver
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    networks:
+      goraebab_network:
+        ipv4_address: 172.18.0.10
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+networks:
+  goraebab_network:
+    name: goraebab_network
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.18.0.0/16

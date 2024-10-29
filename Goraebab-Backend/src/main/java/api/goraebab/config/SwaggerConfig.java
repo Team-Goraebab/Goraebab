@@ -1,4 +1,4 @@
-package api.goraebab.domain.config;
+package api.goraebab.config;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;

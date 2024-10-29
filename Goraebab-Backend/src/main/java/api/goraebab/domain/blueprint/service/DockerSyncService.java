@@ -1,7 +1,9 @@
 package api.goraebab.domain.blueprint.service;
 
+import api.goraebab.domain.blueprint.dockerObject.ProcessedData;
+
 public interface DockerSyncService {
 
-    void syncDockerWithBlueprint(Long blueprintId);
+    void syncDockerWithBlueprintData(ProcessedData processedData);
 
 }

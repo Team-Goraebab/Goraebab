@@ -11,13 +11,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class DockerClientUtil {
 
-    public DockerClient createLocalDockerClient() {
-        String dockerHost = System.getProperty("os.name").toLowerCase().contains("win")
-                ? "tcp://localhost:2375" // Window
-                : "unix:///var/run/docker.sock"; // Unix 기반 시스템(Linux, macOS)
+    private static final String LOCAL_DOCKER_URL = "host.docker.internal";
+    private static final String DOCKER_HOST_FORMAT = "tcp://%s:2375";
 
+    public DockerClient createLocalDockerClient() {
+        String localHost = String.format(DOCKER_HOST_FORMAT, LOCAL_DOCKER_URL);
         DefaultDockerClientConfig config = DefaultDockerClientConfig.createDefaultConfigBuilder()
-                .withDockerHost(dockerHost)
+                .withDockerHost(localHost)
                 .withApiVersion(RemoteApiVersion.VERSION_1_43)
                 .build();
 
@@ -29,8 +29,9 @@ public class DockerClientUtil {
     }
 
     public DockerClient createRemoteDockerClient(String remoteUrl) {
+        String remoteHost = String.format(DOCKER_HOST_FORMAT, remoteUrl);
         DefaultDockerClientConfig config = DefaultDockerClientConfig.createDefaultConfigBuilder()
-                .withDockerHost(remoteUrl)
+                .withDockerHost(remoteHost)
                 .withApiVersion(RemoteApiVersion.VERSION_1_43)
                 .build();
 

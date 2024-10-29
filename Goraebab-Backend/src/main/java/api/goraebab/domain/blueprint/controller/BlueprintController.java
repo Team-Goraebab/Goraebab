@@ -13,12 +13,18 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Tag(name = "Blueprint API")
@@ -166,9 +172,7 @@ public class BlueprintController {
         )
     })
     public ResponseEntity<Void> saveBlueprint(@RequestParam(required = false) @Schema(description = "The unique identifier of the storage. If null, the blueprint is considered to be in the local storage.") Long storageId,
-                                              @RequestPart @Valid BlueprintReqDto blueprintReqDto,
-                                              @RequestPart("data") MultipartFile data) {
-        blueprintReqDto.setData(data);
+                                              @RequestBody @Valid BlueprintReqDto blueprintReqDto) {
         blueprintService.saveBlueprint(storageId, blueprintReqDto);
 
         return ResponseEntity.ok().build();
@@ -212,9 +216,7 @@ public class BlueprintController {
     })
     public ResponseEntity<Void> modifyBlueprint(@RequestParam(required = false) @Schema(description = "The unique identifier of the storage. If null, the blueprint is considered to be in the local storage.") Long storageId,
                                                 @PathVariable @Schema(description = "The unique identifier of the blueprint.") Long blueprintId,
-                                                @RequestPart @Valid BlueprintReqDto blueprintReqDto,
-                                                @RequestPart("data") MultipartFile data) {
-        blueprintReqDto.setData(data);
+                                                @RequestBody @Valid BlueprintReqDto blueprintReqDto) {
         blueprintService.modifyBlueprint(storageId, blueprintId, blueprintReqDto);
 
         return ResponseEntity.ok().build();
