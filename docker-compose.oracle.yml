@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  oracle:
+    container_name: goraebab_oracle
+    image: gvenzl/oracle-xe:latest
+    ports:
+      - "1521:1521"
+    environment:
+      ORACLE_PASSWORD: root
+      ORACLE_DISABLE_ASYNCH_IO: "true"
+    networks:
+      goraebab_network:
+        ipv4_address: 172.18.0.20
+    healthcheck:
+      test: [ "CMD", "echo", "exit", "|", "sqlplus", "system/root@localhost:1521/XEPDB1" ]
+      interval: 10s
+      retries: 5
+
+  backend:
+    container_name: goraebab_spring
+    image: spring:latest
+    build:
+      context: ./
+    ports:
+      - "2387:2387"
+    environment:
+      spring.profiles.active: oracle
+      spring.datasource.url: jdbc:oracle:thin:@oracle:1521/XEPDB1
+      spring.datasource.username: system
+      spring.datasource.password: root
+      spring.datasource.driver-class-name: oracle.jdbc.OracleDriver
+    depends_on:
+      oracle:
+        condition: service_healthy
+    networks:
+      goraebab_network:
+        ipv4_address: 172.18.0.10
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  frontend:
+    container_name: goraebab_next
+    image: next:latest
+    build:
+      context: ./Goraebab-Frontend
+    ports:
+      - "3000:3000"
+    #    environment:
+    #      - REACT_APP_API_URL=http://backend:2387  # 백엔드 API 주소
+    depends_on:
+      - backend
+    networks:
+      goraebab_network:
+        ipv4_address: 172.18.0.30
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+networks:
+  goraebab_network:
+    name: goraebab_network
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.18.0.0/16

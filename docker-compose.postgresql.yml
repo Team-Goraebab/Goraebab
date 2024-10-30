@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  postgresql:
+    container_name: goraebab_postgresql
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db/postgresql:/docker-entrypoint-initdb.d
+    environment:
+      POSTGRES_PASSWORD: root
+    command:
+      - "postgres"
+      - "-c"
+      - "shared_buffers=256MB"
+      - "-c"
+      - "max_connections=200"
+    networks:
+      goraebab_network:
+        ipv4_address: 172.18.0.20
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      retries: 5
+
+
+  backend:
+    container_name: goraebab_spring
+    image: spring:latest
+    build:
+      context: ./
+    ports:
+      - "2387:2387"
+      - "5005:5005"
+    environment:
+      spring.profiles.active: postgresql
+      spring.datasource.url: jdbc:postgresql://172.18.0.20:5432/goraebab
+      spring.datasource.username: postgres
+      spring.datasource.password: root
+      spring.datasource.driver-class-name: org.postgresql.Driver
+    depends_on:
+      postgresql:
+        condition: service_healthy
+    networks:
+      goraebab_network:
+        ipv4_address: 172.18.0.10
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  frontend:
+    container_name: goraebab_next
+    image: next:latest
+    build:
+      context: ./Goraebab-Frontend
+    ports:
+      - "3000:3000"
+    #    environment:
+    #      - REACT_APP_API_URL=http://backend:2387  # 백엔드 API 주소
+    depends_on:
+      - backend
+    networks:
+      goraebab_network:
+        ipv4_address: 172.18.0.30
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+networks:
+  goraebab_network:
+    name: goraebab_network
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.18.0.0/16
