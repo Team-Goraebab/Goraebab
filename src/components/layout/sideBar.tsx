@@ -261,7 +261,7 @@ const Sidebar = () => {
         radius={'none'}
       />
       <ScrollShadow className="flex-grow h-[calc(100vh-180px)] px-4 py-4">
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-1">
           {renderDataList()}
         </div>
       </ScrollShadow>
