@@ -10,6 +10,9 @@ services:
       - '3000:3000'
     environment:
       API_URL: http://host.docker.internal:2387
+      BACKEND_API_URL: http://localhost:2387
+      DOCKER_URL: http://host.docker.internal:2375
+      HUB_URL: https://hub.docker.com/v2
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     command: npm run dev
