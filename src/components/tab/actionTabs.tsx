@@ -10,7 +10,7 @@ import {
   ModalBody,
   ModalFooter,
   Input,
-  Checkbox, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem,
+  Checkbox, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Tooltip,
 } from '@nextui-org/react';
 import { HiOutlineHand, HiOutlineHome } from 'react-icons/hi';
 import { AiOutlineSave, AiOutlineDelete } from 'react-icons/ai';
@@ -87,18 +87,6 @@ const ActionTabs = () => {
     deleteAllHosts();
     setIsDeleteModalOpen(false);
     showSnackbar(enqueueSnackbar, '설계도가 삭제되었습니다.', 'success', '#4CAF50');
-  };
-
-  const fetchBlueprints = async () => {
-    try {
-      const response = await fetch('/api/blueprint/list', {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-      });
-      console.log(response);
-    } catch (e) {
-      throw e;
-    }
   };
 
   const handleSaveSubmit = async () => {
@@ -249,37 +237,42 @@ const ActionTabs = () => {
           </Dropdown>
 
           <div className="h-6 w-px bg-gray-300" />
-          <Button
-            isIconOnly
-            className="bg-white"
-            onClick={() => setIsHostModalOpen(true)}
-          >
-            <HiOutlineHome size={20} />
-          </Button>
-          <Button
-            isIconOnly
-            className="bg-white"
-            onClick={() => setIsListModalOpen(true)}
-          >
-            <FiList size={20} />
-          </Button>
-
-          <Button
-            isIconOnly
-            className="bg-white"
-            onClick={() => setIsDeleteModalOpen(true)}
-          >
-            <AiOutlineDelete className="text-red_6" size={20} />
-          </Button>
-
-          <Button
-            isIconOnly
-            className="bg-white"
-            onClick={() => setIsSaveModalOpen(true)}
-          >
-            <AiOutlineSave className="text-blue_6" size={20} />
-          </Button>
-
+          <Tooltip content={'호스트 추가'} showArrow delay={200}>
+            <Button
+              isIconOnly
+              className="bg-white"
+              onClick={() => setIsHostModalOpen(true)}
+            >
+              <HiOutlineHome size={20} />
+            </Button>
+          </Tooltip>
+          <Tooltip content={'설계도 목록'} showArrow delay={200}>
+            <Button
+              isIconOnly
+              className="bg-white"
+              onClick={() => setIsListModalOpen(true)}
+            >
+              <FiList size={20} />
+            </Button>
+          </Tooltip>
+          <Tooltip content={'설계도 삭제'} showArrow delay={200}>
+            <Button
+              isIconOnly
+              className="bg-white"
+              onClick={() => setIsDeleteModalOpen(true)}
+            >
+              <AiOutlineDelete className="text-red_6" size={20} />
+            </Button>
+          </Tooltip>
+          <Tooltip content={'설계도 저장'} showArrow delay={200}>
+            <Button
+              isIconOnly
+              className="bg-white"
+              onClick={() => setIsSaveModalOpen(true)}
+            >
+              <AiOutlineSave className="text-blue_6" size={20} />
+            </Button>
+          </Tooltip>
           <div className="h-6 w-px bg-gray-300" />
 
           <Button
