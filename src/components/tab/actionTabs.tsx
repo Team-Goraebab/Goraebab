@@ -12,9 +12,9 @@ import {
   Input,
   Checkbox, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem,
 } from '@nextui-org/react';
-import { HiOutlineHome } from 'react-icons/hi';
+import { HiOutlineHand, HiOutlineHome } from 'react-icons/hi';
 import { AiOutlineSave, AiOutlineDelete } from 'react-icons/ai';
-import { FaRegHandPaper, FaDocker, FaPlay, FaPause, FaStop, FaEllipsisV } from 'react-icons/fa';
+import { FaDocker, FaPlay, FaPause, FaStop, FaEllipsisV } from 'react-icons/fa';
 import { HiOutlineCursorClick } from 'react-icons/hi';
 import { useHostStore } from '@/store/hostStore';
 import { useHandModeStore } from '@/store/handModeStore';
@@ -24,9 +24,9 @@ import { showSnackbar } from '@/utils/toastUtils';
 import HostModal from '@/components/modal/host/hostModal';
 import SystemInfoModal from '@/components/modal/daemon/systemModal';
 import VersionDetailModal from '@/components/modal/daemon/versionModal';
-import { IoDocumentOutline } from 'react-icons/io5';
 import BlueprintListModal from '@/components/modal/blueprint/blueprintListModal';
 import { createBlueprint } from '@/services/blueprint/api';
+import { FiList } from 'react-icons/fi';
 
 const ActionTabs = () => {
   const [isHostModalOpen, setIsHostModalOpen] = useState(false);
@@ -158,8 +158,6 @@ const ActionTabs = () => {
         },
       };
 
-      console.log(requestBody);
-
       const res = await createBlueprint(requestBody);
 
       if (res.status === 200 || res.status === 201) {
@@ -178,7 +176,6 @@ const ActionTabs = () => {
         );
       }
     } catch (error) {
-      console.error('설계도 전송 실패 중 에러:', error);
       showSnackbar(
         enqueueSnackbar,
         '설계도 전송 실패 중 에러가 발생했습니다.',
@@ -264,7 +261,7 @@ const ActionTabs = () => {
             className="bg-white"
             onClick={() => setIsListModalOpen(true)}
           >
-            <IoDocumentOutline size={20} />
+            <FiList size={20} />
           </Button>
 
           <Button
@@ -298,7 +295,7 @@ const ActionTabs = () => {
             className={`${isHandMode ? 'bg-blue_1 text-blue_6' : 'bg-white'}`}
             onClick={() => setHandMode(true)}
           >
-            <FaRegHandPaper size={20} />
+            <HiOutlineHand size={20} />
           </Button>
         </div>
       </div>
