@@ -125,7 +125,7 @@ const ContainerCard = ({ data, onDeleteSuccess }: CardDataProps) => {
           enqueueSnackbar,
           '컨테이너가 성공적으로 삭제되었습니다!',
           'success',
-          '#4CAF50'
+          '#4CAF50',
         );
         onDeleteSuccess();
       } else {
@@ -133,7 +133,7 @@ const ContainerCard = ({ data, onDeleteSuccess }: CardDataProps) => {
           enqueueSnackbar,
           `컨테이너 삭제 실패: ${result.error}`,
           'error',
-          '#FF4853'
+          '#FF4853',
         );
       }
     } catch (error) {
@@ -143,7 +143,7 @@ const ContainerCard = ({ data, onDeleteSuccess }: CardDataProps) => {
           enqueueSnackbar,
           `컨테이너 삭제 요청 중 에러: ${error}`,
           'error',
-          '#FF4853'
+          '#FF4853',
         );
       }
     } finally {
@@ -163,7 +163,6 @@ const ContainerCard = ({ data, onDeleteSuccess }: CardDataProps) => {
       }
       return data;
     } catch (error) {
-      console.error('Error fetching container detail:', error);
       throw error;
     }
   };
@@ -197,7 +196,7 @@ const ContainerCard = ({ data, onDeleteSuccess }: CardDataProps) => {
       className="bg-white border rounded-lg mb-2 overflow-hidden"
     >
       <div
-        className="flex justify-between items-center px-4 py-2 bg-gray-50 border-b cursor-pointer"
+        className="flex justify-between items-center px-4 py-2 bg-gray-50 cursor-pointer"
         onClick={() => setIsExpanded(!isExpanded)}
       >
         <div className="flex items-center space-x-2 truncate">

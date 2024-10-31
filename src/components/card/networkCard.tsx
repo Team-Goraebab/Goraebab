@@ -198,7 +198,7 @@ const NetworkCard = ({ data, onDeleteSuccess }: CardDataProps) => {
 
   return (
     <div className="relative bg-white border rounded-lg transition-all duration-300 mb-2 overflow-hidden">
-      <div className="flex justify-between items-center px-4 py-2 bg-gray-50 border-b">
+      <div className="flex justify-between items-center px-4 py-2 bg-gray-50">
         <div className="flex items-center space-x-2">
           <FaNetworkWired size={16} className="text-grey_5" />
           <span className="font-pretendard text-sm">Network</span>
