@@ -32,7 +32,6 @@ interface CardDataProps {
 
 const NetworkCard = ({ data, onDeleteSuccess }: CardDataProps) => {
   const { enqueueSnackbar } = useSnackbar();
-  const id = uuidv4();
 
   const { selectedHostId, addConnectedBridgeId } = selectedHostStore();
   const { connectedBridgeIds } = selectedHostStore((state) => ({
@@ -46,7 +45,7 @@ const NetworkCard = ({ data, onDeleteSuccess }: CardDataProps) => {
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
 
   const connectedContainers = Object.values(data.Containers || {}).map(
-    (container) => `${container.Name} (${container.IPv4Address})`
+    (container) => `${container.Name} (${container.IPv4Address})`,
   );
 
   const subnet = data.IPAM?.Config?.[0]?.Subnet || 'No Subnet';
@@ -88,7 +87,7 @@ const NetworkCard = ({ data, onDeleteSuccess }: CardDataProps) => {
           enqueueSnackbar,
           '네트워크가 성공적으로 삭제되었습니다!',
           'success',
-          '#4CAF50'
+          '#4CAF50',
         );
         onDeleteSuccess();
       } else {
@@ -96,7 +95,7 @@ const NetworkCard = ({ data, onDeleteSuccess }: CardDataProps) => {
           enqueueSnackbar,
           `네트워크 삭제 실패: ${result.error}`,
           'error',
-          '#FF4853'
+          '#FF4853',
         );
       }
     } catch (error) {
@@ -105,7 +104,7 @@ const NetworkCard = ({ data, onDeleteSuccess }: CardDataProps) => {
         enqueueSnackbar,
         `네트워크 삭제 요청 중 에러: ${error}`,
         'error',
-        '#FF4853'
+        '#FF4853',
       );
     } finally {
       setLoading(false);
@@ -126,7 +125,7 @@ const NetworkCard = ({ data, onDeleteSuccess }: CardDataProps) => {
           enqueueSnackbar,
           '네트워크는 최대 3개까지만 연결할 수 있습니다.',
           'error',
-          '#FF4853'
+          '#FF4853',
         );
         return; // 연결을 중단
       }
@@ -154,14 +153,14 @@ const NetworkCard = ({ data, onDeleteSuccess }: CardDataProps) => {
         enqueueSnackbar,
         '네트워크가 성공적으로 연결되었습니다.',
         'success',
-        '#4CAF50'
+        '#4CAF50',
       );
     } else {
       showSnackbar(
         enqueueSnackbar,
         '호스트를 선택해주세요.',
         'error',
-        '#FF4853'
+        '#FF4853',
       );
     }
   };
@@ -174,7 +173,6 @@ const NetworkCard = ({ data, onDeleteSuccess }: CardDataProps) => {
       }
       return data;
     } catch (error) {
-      console.error('Error fetching network detail:', error);
       throw error;
     }
   };
@@ -185,12 +183,11 @@ const NetworkCard = ({ data, onDeleteSuccess }: CardDataProps) => {
       setDetailData(networkDetail);
       setIsModalOpen(true);
     } catch (error) {
-      console.error('Error fetching network detail:', error);
       showSnackbar(
         enqueueSnackbar,
         '네트워크 정보를 가져오는데 실패했습니다.',
         'error',
-        '#FF4853'
+        '#FF4853',
       );
     }
   };
