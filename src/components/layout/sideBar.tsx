@@ -7,7 +7,8 @@ import {
   ScrollShadow,
   Tooltip,
   Divider,
-  Badge, CardHeader, CardFooter,
+  CardHeader, CardFooter,
+  Input,
 } from '@nextui-org/react';
 import { useMenuStore } from '@/store/menuStore';
 import { selectedHostStore } from '@/store/seletedHostStore';
@@ -21,7 +22,6 @@ import NetworkCard from '../card/networkCard';
 import VolumeCard from '../card/volumeCard';
 import ImageCard from '../card/imageCard';
 import ContainerCardGroup from '@/components/card/containerCardGroup';
-import DaemonConnectBar from '../bar/daemonConnectBar';
 
 type DataHandlerType = {
   data: any[];
@@ -63,6 +63,7 @@ const loadData = async (
 const Sidebar = () => {
   const { activeId } = useMenuStore();
   const selectedHostIp = selectedHostStore((state) => state.selectedHostIp);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const [networkData, setNetworkData] = useState<any[]>([]);
   const [volumeData, setVolumeData] = useState<any[]>([]);
@@ -153,18 +154,18 @@ const Sidebar = () => {
     if (activeId === 1) {
       const groupedContainers = Array.isArray(containerData)
         ? containerData.reduce((acc, container) => {
-            const groupName =
-              container.Labels['com.docker.compose.project'] ||
-              container.Names[0].replace(/^\//, '');
-            if (!acc[groupName]) {
-              acc[groupName] = {
-                containers: [],
-                networkMode: container.HostConfig?.NetworkMode || 'Unknown',
-              };
-            }
-            acc[groupName].containers.push(container);
-            return acc;
-          }, {} as Record<string, { containers: Container[]; networkMode: string }>)
+          const groupName =
+            container.Labels['com.docker.compose.project'] ||
+            container.Names[0].replace(/^\//, '');
+          if (!acc[groupName]) {
+            acc[groupName] = {
+              containers: [],
+              networkMode: container.HostConfig?.NetworkMode || 'Unknown',
+            };
+          }
+          acc[groupName].containers.push(container);
+          return acc;
+        }, {} as Record<string, { containers: Container[]; networkMode: string }>)
         : {};
 
       return Object.entries(groupedContainers).map(([groupName, { containers }]) => (
@@ -178,15 +179,27 @@ const Sidebar = () => {
     }
 
     return data && data.length > 0
-      ? data.map((item, index) =>
-        CardComponent ? (
-          <CardComponent
-            key={`${item.Id || index}-${selectedHostIp}`}
-            data={item}
-            onDeleteSuccess={handleDeleteSuccess}
-          />
-        ) : null,
-      )
+      ? data.filter((item) => {
+        if (currentComponent.title === '컨테이너') {
+          return (item.Name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (item.Labels && item.Labels['com.docker.compose.project']?.toLowerCase().includes(searchTerm.toLowerCase())));
+        } else if (currentComponent.title === '이미지') {
+          return item.RepoTags[0].toLowerCase().includes(searchTerm.toLowerCase());
+        } else if (currentComponent.title === '네트워크') {
+          return (item.Name.toLowerCase().includes(searchTerm.toLowerCase()));
+        } else if (currentComponent.title === '볼륨') {
+          return (item.Name.toLowerCase().includes(searchTerm.toLowerCase()));
+        }
+      })
+        .map((item, index) =>
+          CardComponent ? (
+            <CardComponent
+              key={`${item.Id || index}-${selectedHostIp}`}
+              data={item}
+              onDeleteSuccess={handleDeleteSuccess}
+            />
+          ) : null,
+        )
       : renderNoDataMessage(noDataMessage);
   };
 
@@ -227,20 +240,28 @@ const Sidebar = () => {
             {dataHandlers[activeId as 1 | 2 | 3 | 4]?.data.length || 0}
           </div>
         </div>
-        <Tooltip content="새로고침">
-          <Button
-            isIconOnly
-            variant="light"
-            size="sm"
-            onClick={refreshData}
-          >
-            <RxReload size={16} />
-          </Button>
-        </Tooltip>
+        <div className="flex items-center gap-2">
+          <Tooltip content="새로고침">
+            <Button
+              isIconOnly
+              variant="light"
+              size="sm"
+              onClick={refreshData}
+            >
+              <RxReload size={16} />
+            </Button>
+          </Tooltip>
+        </div>
       </CardHeader>
       <Divider />
+      <Input
+        placeholder="검색"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        radius={'none'}
+      />
       <ScrollShadow className="flex-grow h-[calc(100vh-180px)] px-4 py-4">
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-1">
           {renderDataList()}
         </div>
       </ScrollShadow>
