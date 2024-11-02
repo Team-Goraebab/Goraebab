@@ -7,7 +7,8 @@ import {
   ScrollShadow,
   Tooltip,
   Divider,
-  CardHeader, CardFooter,
+  CardHeader,
+  CardFooter,
   Input,
 } from '@nextui-org/react';
 import { useMenuStore } from '@/store/menuStore';
@@ -49,7 +50,7 @@ interface ComponentMapItem {
 const loadData = async (
   apiUrl: string,
   setData: React.Dispatch<React.SetStateAction<any[]>>,
-  dataKey?: string,
+  dataKey?: string
 ) => {
   try {
     const response = await fetch(apiUrl, { cache: 'no-store' });
@@ -119,7 +120,11 @@ const Sidebar = () => {
       const { url, dataKey } = apiMap[activeId] || {};
       if (!url) return;
 
-      await loadData(url, dataHandlers[activeId as 1 | 2 | 3 | 4].setData, dataKey);
+      await loadData(
+        url,
+        dataHandlers[activeId as 1 | 2 | 3 | 4].setData,
+        dataKey
+      );
       setTimeout(() => {
         loadData(url, dataHandlers[activeId as 1 | 2 | 3 | 4].setData, dataKey);
       }, 2000);
@@ -154,52 +159,69 @@ const Sidebar = () => {
     if (activeId === 1) {
       const groupedContainers = Array.isArray(containerData)
         ? containerData.reduce((acc, container) => {
-          const groupName =
-            container.Labels['com.docker.compose.project'] ||
-            container.Names[0].replace(/^\//, '');
-          if (!acc[groupName]) {
-            acc[groupName] = {
-              containers: [],
-              networkMode: container.HostConfig?.NetworkMode || 'Unknown',
-            };
-          }
-          acc[groupName].containers.push(container);
-          return acc;
-        }, {} as Record<string, { containers: Container[]; networkMode: string }>)
+            const groupName =
+              container.Labels['com.docker.compose.project'] ||
+              container.Names[0].replace(/^\//, '');
+            if (!acc[groupName]) {
+              acc[groupName] = {
+                containers: [],
+                networkMode: container.HostConfig?.NetworkMode || 'Unknown',
+              };
+            }
+            acc[groupName].containers.push(container);
+            return acc;
+          }, {} as Record<string, { containers: Container[]; networkMode: string }>)
         : {};
 
-      return Object.entries(groupedContainers).map(([groupName, { containers }]) => (
-        <ContainerCardGroup
-          key={`${groupName}-${selectedHostIp}`}
-          projectName={groupName}
-          containers={containers}
-          onDeleteSuccess={handleDeleteSuccess}
-        />
-      ));
+      return Object.entries(groupedContainers).map(
+        ([groupName, { containers }]) => (
+          <ContainerCardGroup
+            key={`${groupName}-${selectedHostIp}`}
+            projectName={groupName}
+            containers={containers}
+            onDeleteSuccess={handleDeleteSuccess}
+          />
+        )
+      );
     }
 
     return data && data.length > 0
-      ? data.filter((item) => {
-        if (currentComponent.title === '컨테이너') {
-          return (item.Name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            (item.Labels && item.Labels['com.docker.compose.project']?.toLowerCase().includes(searchTerm.toLowerCase())));
-        } else if (currentComponent.title === '이미지') {
-          return item.RepoTags[0].toLowerCase().includes(searchTerm.toLowerCase());
-        } else if (currentComponent.title === '네트워크') {
-          return (item.Name.toLowerCase().includes(searchTerm.toLowerCase()));
-        } else if (currentComponent.title === '볼륨') {
-          return (item.Name.toLowerCase().includes(searchTerm.toLowerCase()));
-        }
-      })
-        .map((item, index) =>
-          CardComponent ? (
-            <CardComponent
-              key={`${item.Id || index}-${selectedHostIp}`}
-              data={item}
-              onDeleteSuccess={handleDeleteSuccess}
-            />
-          ) : null,
-        )
+      ? data
+          .filter((item) => {
+            if (currentComponent.title === '컨테이너') {
+              return (
+                item.Name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                (item.Labels &&
+                  item.Labels['com.docker.compose.project']
+                    ?.toLowerCase()
+                    .includes(searchTerm.toLowerCase()))
+              );
+            } else if (currentComponent.title === '이미지') {
+              const repoTag =
+                item.RepoTags && item.RepoTags[0]
+                  ? item.RepoTags[0].toLowerCase()
+                  : '';
+              return repoTag.includes(searchTerm.toLowerCase());
+            } else if (currentComponent.title === '네트워크') {
+              return item.Name?.toLowerCase().includes(
+                searchTerm.toLowerCase()
+              );
+            } else if (currentComponent.title === '볼륨') {
+              return item.Name?.toLowerCase().includes(
+                searchTerm.toLowerCase()
+              );
+            }
+            return false; // 기본값 추가
+          })
+          .map((item, index) =>
+            CardComponent ? (
+              <CardComponent
+                key={`${item.Id || index}-${selectedHostIp}`}
+                data={item}
+                onDeleteSuccess={handleDeleteSuccess}
+              />
+            ) : null
+          )
       : renderNoDataMessage(noDataMessage);
   };
 
@@ -227,27 +249,19 @@ const Sidebar = () => {
   }, [selectedHostIp]);
 
   return (
-    <Card
-      className="fixed z-[9] top-0 right-0 w-[280px] h-full rounded-none shadow-lg bg-background/70 backdrop-blur-md">
+    <Card className="fixed z-[9] top-0 right-0 w-[280px] h-full rounded-none shadow-lg bg-background/70 backdrop-blur-md">
       <CardHeader className="flex flex-row justify-between items-center px-4 py-3 bg-default-50">
         <div className="flex items-center gap-2">
           <h2 className="text-md font-semibold">
             {currentComponent?.title || '데이터'}
           </h2>
-          <div
-            className="px-2 py-1 bg-blue_1 rounded-lg font-medium text-sm"
-          >
+          <div className="px-2 py-1 bg-blue_1 rounded-lg font-medium text-sm">
             {dataHandlers[activeId as 1 | 2 | 3 | 4]?.data.length || 0}
           </div>
         </div>
         <div className="flex items-center gap-2">
           <Tooltip content="새로고침">
-            <Button
-              isIconOnly
-              variant="light"
-              size="sm"
-              onClick={refreshData}
-            >
+            <Button isIconOnly variant="light" size="sm" onClick={refreshData}>
               <RxReload size={16} />
             </Button>
           </Tooltip>
@@ -261,9 +275,7 @@ const Sidebar = () => {
         radius={'none'}
       />
       <ScrollShadow className="flex-grow h-[calc(100vh-180px)] px-4 py-4">
-        <div className="flex flex-col gap-1">
-          {renderDataList()}
-        </div>
+        <div className="flex flex-col gap-1">{renderDataList()}</div>
       </ScrollShadow>
       <Divider />
       <CardFooter className="px-4 py-4">
