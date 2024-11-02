@@ -8,6 +8,5 @@ interface BlueprintStore {
 
 export const useBlueprintStore = create<BlueprintStore>((set) => ({
   mappedData: [],
-
   setMappedData: (data) => set({ mappedData: data }),
 }));

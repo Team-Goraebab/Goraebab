@@ -10,7 +10,12 @@ import {
   ModalBody,
   ModalFooter,
   Input,
-  Checkbox, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Tooltip,
+  Checkbox,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  Tooltip,
 } from '@nextui-org/react';
 import { HiOutlineHand, HiOutlineHome } from 'react-icons/hi';
 import { AiOutlineSave, AiOutlineDelete } from 'react-icons/ai';
@@ -35,7 +40,9 @@ const ActionTabs = () => {
   const [blueprintName, setBlueprintName] = useState('');
   const [isDockerRemote, setIsDockerRemote] = useState(false);
   const [remoteUrl, setRemoteUrl] = useState('');
-  const [engineStatus, setEngineStatus] = useState<'connect' | 'disconnect' | 'connecting'>('disconnect');
+  const [engineStatus, setEngineStatus] = useState<
+    'connect' | 'disconnect' | 'connecting'
+  >('disconnect');
   const [versionData, setVersionData] = useState<any>();
   const [systemData, setSystemData] = useState<any>();
   const [showVersionInfo, setShowVersionInfo] = useState(false);
@@ -54,10 +61,20 @@ const ActionTabs = () => {
       const response = await axios.get(`api/daemon/version`);
       setEngineStatus('connect');
       setVersionData(response.data);
-      showSnackbar(enqueueSnackbar, '도커 엔진이 연결되었습니다.', 'success', '#4CAF50');
+      showSnackbar(
+        enqueueSnackbar,
+        '도커 엔진이 연결되었습니다.',
+        'success',
+        '#4CAF50'
+      );
     } catch (error) {
       setEngineStatus('disconnect');
-      showSnackbar(enqueueSnackbar, '도커 엔진이 실행되지 않았습니다.', 'info', '#7F7F7F');
+      showSnackbar(
+        enqueueSnackbar,
+        '도커 엔진이 실행되지 않았습니다.',
+        'info',
+        '#7F7F7F'
+      );
     }
   }
 
@@ -70,14 +87,24 @@ const ActionTabs = () => {
       const response = await axios.get(`api/daemon/system`);
       setSystemData(response.data);
     } catch (error) {
-      showSnackbar(enqueueSnackbar, '시스템 정보를 가져오는데 실패했습니다.', 'error', '#FF4853');
+      showSnackbar(
+        enqueueSnackbar,
+        '시스템 정보를 가져오는데 실패했습니다.',
+        'error',
+        '#FF4853'
+      );
     }
   }
 
   const handleEngineStartStop = () => {
     if (engineStatus === 'connect' || engineStatus === 'connecting') {
       setEngineStatus('disconnect');
-      showSnackbar(enqueueSnackbar, '도커 엔진 연결이 해제되었습니다.', 'info', '#7F7F7F');
+      showSnackbar(
+        enqueueSnackbar,
+        '도커 엔진 연결이 해제되었습니다.',
+        'info',
+        '#7F7F7F'
+      );
     } else {
       fetchConnectDaemon();
     }
@@ -86,7 +113,12 @@ const ActionTabs = () => {
   const handleDelete = () => {
     deleteAllHosts();
     setIsDeleteModalOpen(false);
-    showSnackbar(enqueueSnackbar, '설계도가 삭제되었습니다.', 'success', '#4CAF50');
+    showSnackbar(
+      enqueueSnackbar,
+      '설계도가 삭제되었습니다.',
+      'success',
+      '#4CAF50'
+    );
   };
 
   const handleSaveSubmit = async () => {
@@ -96,7 +128,7 @@ const ActionTabs = () => {
           enqueueSnackbar,
           '매핑된 데이터가 유효하지 않습니다.',
           'error',
-          '#FF4853',
+          '#FF4853'
         );
         return;
       }
@@ -106,41 +138,41 @@ const ActionTabs = () => {
         processedData: {
           host: mappedData.map((host) => ({
             name: host.hostNm,
-            isLocal: !isDockerRemote,
+            isRemote: !isDockerRemote,
             ip: isDockerRemote ? remoteUrl : null,
             network: Array.isArray(host.networks)
               ? host.networks.map((network) => ({
-                name: network.name,
-                driver: network.driver || 'bridge',
-                ipam: {
-                  config: [
+                  name: network.name,
+                  driver: network.driver || 'bridge',
+                  ipam: {
+                    config: [
+                      {
+                        subnet: network.subnet || '',
+                      },
+                    ],
+                  },
+                  containers: [
                     {
-                      subnet: network.subnet || '',
+                      containerName: network.containerName || null,
+                      image: {
+                        imageId: network.droppedImages?.[0]?.id || '',
+                        name: network.droppedImages?.[0]?.name || '',
+                        tag: network.droppedImages?.[0]?.tag || '',
+                      },
+                      networkSettings: network.networkSettings || {},
+                      ports: network.ports || [],
+                      mounts: network.mounts || [],
+                      env: network.env || [],
+                      cmd: network.cmd || [],
                     },
                   ],
-                },
-                containers: [
-                  {
-                    containerName: network.containerName || null,
-                    image: {
-                      imageId: network.droppedImages?.[0]?.id || '',
-                      name: network.droppedImages?.[0]?.name || '',
-                      tag: network.droppedImages?.[0]?.tag || '',
-                    },
-                    networkSettings: network.networkSettings || {},
-                    ports: network.ports || [],
-                    mounts: network.mounts || [],
-                    env: network.env || [],
-                    cmd: network.cmd || [],
-                  },
-                ],
-              }))
+                }))
               : [],
             volume: Array.isArray(host.imageVolumes)
               ? host.imageVolumes.map((volume) => ({
-                name: volume.Name,
-                driver: volume.Driver,
-              }))
+                  name: volume.Name,
+                  driver: volume.Driver,
+                }))
               : [],
           })),
         },
@@ -153,14 +185,14 @@ const ActionTabs = () => {
           enqueueSnackbar,
           '설계도를 성공적으로 전송했습니다!',
           'success',
-          '#4CAF50',
+          '#4CAF50'
         );
       } else {
         showSnackbar(
           enqueueSnackbar,
           `설계도 전송 실패: ${res.data.error}`,
           'error',
-          '#FF4853',
+          '#FF4853'
         );
       }
     } catch (error) {
@@ -168,7 +200,7 @@ const ActionTabs = () => {
         enqueueSnackbar,
         '설계도 전송 실패 중 에러가 발생했습니다.',
         'error',
-        '#FF4853',
+        '#FF4853'
       );
     }
   };
@@ -177,20 +209,22 @@ const ActionTabs = () => {
     <>
       <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-[9]">
         <div className="bg-white rounded-xl shadow-lg p-2 flex gap-1.5 items-center">
-          <div className={`flex items-center gap-2 px-3 py-2.5 rounded-lg ${
-            engineStatus === 'connect'
-              ? 'bg-green-100 text-green-600'
-              : engineStatus === 'connecting'
+          <div
+            className={`flex items-center gap-2 px-3 py-2.5 rounded-lg ${
+              engineStatus === 'connect'
+                ? 'bg-green-100 text-green-600'
+                : engineStatus === 'connecting'
                 ? 'bg-yellow-100 text-yellow-600'
                 : 'bg-red-100 text-red-600'
-          }`}>
+            }`}
+          >
             <FaDocker size={16} />
             <span className="text-sm font-medium">
               {engineStatus === 'connect'
                 ? '연결됨'
                 : engineStatus === 'connecting'
-                  ? '연결 중...'
-                  : '연결 안됨'}
+                ? '연결 중...'
+                : '연결 안됨'}
             </span>
           </div>
           <Button
@@ -209,11 +243,7 @@ const ActionTabs = () => {
           </Button>
           <Dropdown>
             <DropdownTrigger>
-              <Button
-                isIconOnly
-                size="sm"
-                className="ml-1 bg-transparent"
-              >
+              <Button isIconOnly size="sm" className="ml-1 bg-transparent">
                 <FaEllipsisV size={12} />
               </Button>
             </DropdownTrigger>
@@ -293,15 +323,25 @@ const ActionTabs = () => {
         </div>
       </div>
       {isHostModalOpen && (
-        <HostModal isOpen={isHostModalOpen} onClose={() => setIsHostModalOpen(false)} />
+        <HostModal
+          isOpen={isHostModalOpen}
+          onClose={() => setIsHostModalOpen(false)}
+        />
       )}
 
-      <Modal isOpen={isDeleteModalOpen} onClose={() => setIsDeleteModalOpen(false)}>
+      <Modal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+      >
         <ModalContent>
           <ModalHeader>설계도 삭제</ModalHeader>
           <ModalBody>설계도를 삭제하시겠습니까?</ModalBody>
           <ModalFooter>
-            <Button color="default" variant="light" onPress={() => setIsDeleteModalOpen(false)}>
+            <Button
+              color="default"
+              variant="light"
+              onPress={() => setIsDeleteModalOpen(false)}
+            >
               취소
             </Button>
             <Button color="danger" onPress={handleDelete}>
@@ -321,7 +361,10 @@ const ActionTabs = () => {
               value={blueprintName}
               onChange={(e) => setBlueprintName(e.target.value)}
             />
-            <Checkbox isSelected={isDockerRemote} onValueChange={setIsDockerRemote}>
+            <Checkbox
+              isSelected={isDockerRemote}
+              onValueChange={setIsDockerRemote}
+            >
               Docker Remote
             </Checkbox>
             {isDockerRemote && (
@@ -333,7 +376,11 @@ const ActionTabs = () => {
             )}
           </ModalBody>
           <ModalFooter>
-            <Button color="default" variant="light" onPress={() => setIsSaveModalOpen(false)}>
+            <Button
+              color="default"
+              variant="light"
+              onPress={() => setIsSaveModalOpen(false)}
+            >
               취소
             </Button>
             <Button color="primary" onPress={handleSaveSubmit}>
