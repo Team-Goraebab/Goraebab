@@ -26,14 +26,14 @@ export type HostCardProps = {
  * @returns
  */
 const HostCard = ({
-                    id,
-                    hostNm,
-                    hostIp,
-                    isRemote,
-                    themeColor,
-                    className = '',
-                    isSelectedNetwork = false, // 기본값은 false
-                  }: HostCardProps) => {
+  id,
+  hostNm,
+  hostIp,
+  isRemote,
+  themeColor,
+  className = '',
+  isSelectedNetwork = false, // 기본값은 false
+}: HostCardProps) => {
   const {
     selectedHostId,
     setSelectedHostId,

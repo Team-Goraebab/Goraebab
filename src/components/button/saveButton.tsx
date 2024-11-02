@@ -40,7 +40,7 @@ const SaveButton = () => {
             isRemote: !isDockerRemote,
             ip: isDockerRemote ? remoteUrl : null,
             network: Array.isArray(host.networks)
-              ? host.networks.map((network) => ({
+              ? host.networks.map((network: any) => ({
                   name: network.name,
                   driver: network.driver || 'bridge',
                   ipam: {
@@ -68,7 +68,7 @@ const SaveButton = () => {
                 }))
               : [],
             volume: Array.isArray(host.imageVolumes)
-              ? host.imageVolumes.map((volume) => ({
+              ? host.imageVolumes.map((volume: any) => ({
                   name: volume.Name,
                   driver: volume.Driver,
                 }))

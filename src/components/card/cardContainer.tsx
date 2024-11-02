@@ -10,13 +10,24 @@ import {
   Chip,
   Accordion,
   AccordionItem,
-  ScrollShadow, Input, Divider, CardFooter,
+  ScrollShadow,
+  Input,
+  Divider,
+  CardFooter,
 } from '@nextui-org/react';
 import {
   CircleX,
   Info,
   Plus,
-  Settings, Edit2, Check, XIcon, HardDrive, Network, ContainerIcon, ImageIcon, FolderOpen,
+  Settings,
+  Edit2,
+  Check,
+  XIcon,
+  HardDrive,
+  Network,
+  ContainerIcon,
+  ImageIcon,
+  FolderOpen,
 } from 'lucide-react';
 import ImageDetailModal from '@/components/modal/image/imageDetailModal';
 import SelectVolumeModal from '../modal/volume/selectVolumeModal';
@@ -27,7 +38,6 @@ import { useHostStore } from '@/store/hostStore';
 import { useStore } from '@/store/cardStore';
 import { useBlueprintStore } from '@/store/blueprintStore';
 import { Box } from '@mui/material';
-
 
 export interface CardContainerProps {
   networkName: string;
@@ -57,18 +67,18 @@ interface ImageToNetwork {
 }
 
 const CardContainer = ({
-                         networkName,
-                         networkIp,
-                         containers,
-                         themeColor,
-                         onDelete,
-                         onSelectNetwork,
-                         isSelected,
-                         hostIp,
-                         networkUniqueId,
-                         containerName,
-                         onContainerNameChange,
-                       }: CardContainerProps) => {
+  networkName,
+  networkIp,
+  containers,
+  themeColor,
+  onDelete,
+  onSelectNetwork,
+  isSelected,
+  hostIp,
+  networkUniqueId,
+  containerName,
+  onContainerNameChange,
+}: CardContainerProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const { enqueueSnackbar } = useSnackbar();
 
@@ -77,10 +87,11 @@ const CardContainer = ({
   const hosts = useHostStore((state) => state.hosts);
   const allContainers = useStore((state) => state.hostContainers);
   const connectedBridgeIds = selectedHostStore(
-    (state) => state.connectedBridgeIds,
+    (state) => state.connectedBridgeIds
   );
 
   const mappedData = useBlueprintStore((state) => state.mappedData);
+  // console.log(mappedData);
 
   const [isEditingName, setIsEditingName] = useState(false);
   const [tempContainerName, setTempContainerName] = useState(containerName);
@@ -100,15 +111,6 @@ const CardContainer = ({
       [imageId: string]: VolumeData[];
     };
   }>({});
-
-  const defaultVolumeData: VolumeData[] = [
-    {
-      Name: '',
-      Driver: '',
-      Mountpoint: '',
-      Scope: '',
-    },
-  ];
 
   // 네트워크 유니크 아이디로 데이터를 매핑
   useEffect(() => {
@@ -154,7 +156,6 @@ const CardContainer = ({
     containerName,
     setMappedData,
   ]);
-  const volumes = imageVolumes[droppedImages[0]?.id] || defaultVolumeData;
 
   const splitImageNameAndTag = (image: string, id: string): ImageInfo => {
     const [name, tag] = image.split(':');
@@ -164,7 +165,7 @@ const CardContainer = ({
   const handleGetInfo = async (imageName: string) => {
     try {
       const imageDetail = await fetch(
-        `/api/image/detail?name=${imageName}`,
+        `/api/image/detail?name=${imageName}`
       ).then((res) => res.json());
       setDetailData(imageDetail);
       setIsModalOpen(true);
@@ -326,7 +327,9 @@ const CardContainer = ({
                     input: 'h-8 text-small',
                     inputWrapper: 'h-8 min-h-unit-8 py-0',
                   }}
-                  startContent={<Edit2 size={14} className="text-default-400" />}
+                  startContent={
+                    <Edit2 size={14} className="text-default-400" />
+                  }
                 />
                 <Button
                   isIconOnly
@@ -440,27 +443,34 @@ const CardContainer = ({
                       {imageVolumes[networkUniqueId]?.[image.id]?.length > 0 ? (
                         <div className="px-2 pb-2">
                           <div className="flex items-center gap-2 mb-2">
-                            <FolderOpen size={14} className="text-default-500" />
-                            <span className="text-small text-default-500">연결된 볼륨</span>
+                            <FolderOpen
+                              size={14}
+                              className="text-default-500"
+                            />
+                            <span className="text-small text-default-500">
+                              연결된 볼륨
+                            </span>
                           </div>
                           <div className="space-y-2">
-                            {imageVolumes[networkUniqueId][image.id].map((vol, index) => (
-                              <div
-                                key={index}
-                                className="flex items-center justify-between p-2 bg-default-50 rounded-medium"
-                              >
-                                <span className="text-sm truncate max-w-[300px] text-default-700">
-                                  {vol.Name}
-                                </span>
-                                <Chip
-                                  size="sm"
-                                  variant="flat"
-                                  className="bg-default-100"
+                            {imageVolumes[networkUniqueId][image.id].map(
+                              (vol, index) => (
+                                <div
+                                  key={index}
+                                  className="flex items-center justify-between p-2 bg-default-50 rounded-medium"
                                 >
-                                  {vol.Driver}
-                                </Chip>
-                              </div>
-                            ))}
+                                  <span className="text-sm truncate max-w-[300px] text-default-700">
+                                    {vol.Name}
+                                  </span>
+                                  <Chip
+                                    size="sm"
+                                    variant="flat"
+                                    className="bg-default-100"
+                                  >
+                                    {vol.Driver}
+                                  </Chip>
+                                </div>
+                              )
+                            )}
                           </div>
                         </div>
                       ) : (
@@ -476,8 +486,7 @@ const CardContainer = ({
                   ))}
                 </Accordion>
               ) : (
-                <div
-                  className="h-full flex flex-col items-center justify-center border-2 border-dashed rounded-large p-4 gap-2">
+                <div className="h-full flex flex-col items-center justify-center border-2 border-dashed rounded-large p-4 gap-2">
                   <ImageIcon size={24} className="text-default-300" />
                   <span className="text-sm text-default-400">
                     이미지를 드래그하여 추가하세요
