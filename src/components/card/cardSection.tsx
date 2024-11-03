@@ -61,7 +61,7 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
     hostIp: string,
     networkName: string,
     networkId: string,
-    uniqueId: string,
+    uniqueId: string
   ) => {
     if (
       selectedNetwork?.hostId === hostId &&
@@ -80,7 +80,7 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
     hostId: string,
     networkName: string,
     networkId: string,
-    uniqueId: string,
+    uniqueId: string
   ) => {
     if (
       selectedNetwork?.hostId === hostId &&
@@ -92,8 +92,12 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
     deleteConnectedBridgeId(hostId, uniqueId);
   };
 
-  const handleContainerNameChange = (hostId: string, networkUniqueId: string, name: string) => {
-    setContainerNames(prevNames => ({
+  const handleContainerNameChange = (
+    hostId: string,
+    networkUniqueId: string,
+    name: string
+  ) => {
+    setContainerNames((prevNames) => ({
       ...prevNames,
       [hostId]: {
         ...(prevNames[hostId] || {}),
@@ -109,7 +113,8 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
           hostData.map((host) => {
             const containers = allContainers[host.id] || [];
             const networks = connectedBridgeIds[host.id] || [];
-            const isHostSelected = selectedNetwork?.hostId === host.id || selectedHostId === host.id;
+            const isHostSelected =
+              selectedNetwork?.hostId === host.id || selectedHostId === host.id;
 
             return (
               <div key={host.id} className="relative">
@@ -119,10 +124,14 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
                   }`}
                 >
                   <div
-                    onClick={() => handleHostClick(host.id, host.hostNm, host.hostIp)}
+                    onClick={() =>
+                      handleHostClick(host.id, host.hostNm, host.hostIp)
+                    }
                     className={`relative flex flex-col bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-200 w-[540px] cursor-pointer overflow-hidden`}
                     style={{
-                      borderColor: isHostSelected ? host.themeColor.borderColor : 'transparent',
+                      borderColor: isHostSelected
+                        ? host.themeColor.borderColor
+                        : 'transparent',
                       borderWidth: '2px',
                     }}
                   >
@@ -136,9 +145,15 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-3">
                           {host.isRemote ? (
-                            <FaGlobeAsia className="w-5 h-5" style={{ color: host.themeColor.textColor }} />
+                            <FaGlobeAsia
+                              className="w-5 h-5"
+                              style={{ color: host.themeColor.textColor }}
+                            />
                           ) : (
-                            <FaHome className="w-5 h-5" style={{ color: host.themeColor.textColor }} />
+                            <FaHome
+                              className="w-5 h-5"
+                              style={{ color: host.themeColor.textColor }}
+                            />
                           )}
                           <div className="flex flex-col">
                             <span
@@ -183,16 +198,18 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
                             <CardContainer
                               key={network.uniqueId}
                               networkName={network.name}
-                              networkIp={network.gateway}
+                              networkIp={network.subnet}
                               containers={containers}
-                              containerName={containerNames[host.id]?.[network.uniqueId]}
+                              containerName={
+                                containerNames[host.id]?.[network.uniqueId]
+                              }
                               themeColor={host.themeColor}
                               onDelete={() =>
                                 handleDeleteNetwork(
                                   host.id,
                                   network.name,
                                   network.id,
-                                  network.uniqueId,
+                                  network.uniqueId
                                 )
                               }
                               onSelectNetwork={() =>
@@ -201,14 +218,20 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
                                   host.hostIp,
                                   network.name,
                                   network.id,
-                                  network.uniqueId,
+                                  network.uniqueId
                                 )
                               }
-                              isSelected={selectedNetwork?.uniqueId === network.uniqueId}
+                              isSelected={
+                                selectedNetwork?.uniqueId === network.uniqueId
+                              }
                               hostIp={host.hostIp}
                               networkUniqueId={network.uniqueId}
                               onContainerNameChange={(name) =>
-                                handleContainerNameChange(host.id, network.uniqueId, name)
+                                handleContainerNameChange(
+                                  host.id,
+                                  network.uniqueId,
+                                  name
+                                )
                               }
                             />
                           ))}
@@ -225,7 +248,9 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
             );
           })
         ) : (
-          <div className="text-center text-gray-500">No host data available</div>
+          <div className="text-center text-gray-500">
+            No host data available
+          </div>
         )}
       </div>
     </Draggable>
