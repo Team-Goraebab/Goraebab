@@ -107,13 +107,29 @@ const CardContainer = ({
       mounts: containers[0]?.mounts || [],
       env: containers[0]?.env || [],
       cmd: containers[0]?.cmd || [],
+      imageVolumes: containers[0]?.imageVolumes || [],
     },
   });
   const [imageVolumes, setImageVolumes] = useState<{
     [networkUniqueId: string]: {
       [imageId: string]: VolumeData[];
     };
-  }>({});
+  }>(() => {
+    return configData[networkUniqueId]?.imageVolumes
+      ? {
+          [networkUniqueId]: configData[networkUniqueId].imageVolumes,
+        }
+      : {};
+  });
+
+  useEffect(() => {
+    if (configData[networkUniqueId]?.imageVolumes) {
+      setImageVolumes((prev) => ({
+        ...prev,
+        [networkUniqueId]: configData[networkUniqueId].imageVolumes,
+      }));
+    }
+  }, [configData, networkUniqueId]);
 
   const handleOpenConfigModal = () => {
     setConfigData((prevConfigData) => ({
@@ -129,6 +145,7 @@ const CardContainer = ({
         mounts: configData[networkUniqueId]?.mounts || [],
         env: configData[networkUniqueId]?.env || [],
         cmd: configData[networkUniqueId]?.cmd || [],
+        imageVolumes: configData[networkUniqueId]?.imageVolumes || [],
       },
     }));
     setIsConfigModalOpen(true);
@@ -239,8 +256,6 @@ const CardContainer = ({
           tag: c.image.tag,
         }));
 
-  console.log('allImages >>', allImages);
-
   const handleDeleteImage = (imageId: string) => {
     // 이미지 삭제
     setDroppedImages((prev) => prev.filter((image) => image.id !== imageId));
@@ -255,8 +270,9 @@ const CardContainer = ({
   };
 
   const handleOpenVolumeModal = (imageId: string) => {
+    const volumes = configData[networkUniqueId]?.imageVolumes?.[imageId] || [];
     setSelectedImage(imageId);
-    setSelectedVolumes(imageVolumes[networkUniqueId]?.[imageId] || []);
+    setSelectedVolumes(volumes);
     setIsVolumeModalOpen(true);
   };
 
