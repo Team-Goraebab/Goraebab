@@ -98,10 +98,14 @@ const CardContainer = ({
   );
   const mappedData = useBlueprintStore((state) => state.mappedData);
   const hostId = mappedData[0]?.id || selectedHostId;
+  const isImageInfoValid =
+    imageInfo && imageInfo.every((info) => info.id && info.name && info.tag);
 
   const [isEditingName, setIsEditingName] = useState<boolean>(false);
   const [inputName, setInputName] = useState<string>(containerName);
-  const [droppedImages, setDroppedImages] = useState<ImageInfo[]>([]);
+  const [droppedImages, setDroppedImages] = useState<ImageInfo[]>(
+    isImageInfoValid ? imageInfo : []
+  );
   const [imageToNetwork, setImageToNetwork] = useState<ImageToNetwork[]>([]);
   const [detailData, setDetailData] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -127,12 +131,6 @@ const CardContainer = ({
       [imageId: string]: VolumeData[];
     };
   }>(imageVolumesVal);
-
-  // useEffect(() => {
-  //   if (imageInfo) {
-  //     setDroppedImages(imageInfo);
-  //   }
-  // }, []);
 
   console.log('droppedImages', droppedImages);
 
