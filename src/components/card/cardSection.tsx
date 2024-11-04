@@ -201,7 +201,7 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
                                     key={container.containerId}
                                     networkName={network.name}
                                     networkIp={network.subnet}
-                                    containers={containers}
+                                    containers={[container]}
                                     containerName={containerName}
                                     themeColor={host.themeColor}
                                     onDelete={() =>
