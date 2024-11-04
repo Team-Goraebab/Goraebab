@@ -32,6 +32,9 @@ import VersionDetailModal from '@/components/modal/daemon/versionModal';
 import BlueprintListModal from '@/components/modal/blueprint/blueprintListModal';
 import { createBlueprint } from '@/services/blueprint/api';
 import { FiList } from 'react-icons/fi';
+import { useContainerNameStore } from '@/store/containerNameStore';
+import { useSelectedNetworkStore } from '@/store/selectedNetworkStore';
+import { selectedHostStore } from '@/store/seletedHostStore';
 
 const ActionTabs = () => {
   const [isHostModalOpen, setIsHostModalOpen] = useState(false);
@@ -50,6 +53,15 @@ const ActionTabs = () => {
   const [isListModalOpen, setIsListModalOpen] = useState(false);
 
   const deleteAllHosts = useHostStore((state) => state.deleteAllHosts);
+  const clearConnectedBridges = selectedHostStore(
+    (state) => state.clearConnectedBridges
+  );
+  const clearSelectedNetwork = useSelectedNetworkStore(
+    (state) => state.clearSelectedNetwork
+  );
+  const clearAllContainerNames = useContainerNameStore(
+    (state) => state.clearAllContainerNames
+  );
   const isHandMode = useHandModeStore((state) => state.isHandMode);
   const setHandMode = useHandModeStore((state) => state.setHandMode);
   const { enqueueSnackbar } = useSnackbar();
@@ -112,6 +124,9 @@ const ActionTabs = () => {
 
   const handleDelete = () => {
     deleteAllHosts();
+    clearAllContainerNames();
+    clearSelectedNetwork();
+    clearConnectedBridges();
     setIsDeleteModalOpen(false);
     showSnackbar(
       enqueueSnackbar,
@@ -141,7 +156,7 @@ const ActionTabs = () => {
             isRemote: !isDockerRemote,
             ip: isDockerRemote ? remoteUrl : null,
             network: Array.isArray(host.networks)
-              ? host.networks.map((network) => ({
+              ? host.networks.map((network: any) => ({
                   name: network.name,
                   driver: network.driver || 'bridge',
                   ipam: {
@@ -169,7 +184,7 @@ const ActionTabs = () => {
                 }))
               : [],
             volume: Array.isArray(host.imageVolumes)
-              ? host.imageVolumes.map((volume) => ({
+              ? host.imageVolumes.map((volume: any) => ({
                   name: volume.Name,
                   driver: volume.Driver,
                 }))
