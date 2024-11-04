@@ -68,6 +68,7 @@ export const TEST_DATA = [
           isRemote: true,
           ip: '127.18.0.0',
           name: '내가 호스트야',
+          id: '127.18.0.0',
           network: [
             {
               name: '네트워크 이름',
