@@ -15,6 +15,7 @@ import {
   Button,
 } from '@nextui-org/react';
 import axios from 'axios';
+import { showSnackbar } from '@/utils/toastUtils';
 import { useBlueprintStore } from '@/store/blueprintStore';
 import { useHostStore } from '@/store/hostStore';
 import { Host } from '@/types/type';
@@ -24,24 +25,7 @@ import { getRandomThemeColor } from '@/utils/randomTemeColor';
 import { selectedHostStore } from '@/store/seletedHostStore';
 import { useContainerNameStore } from '@/store/containerNameStore';
 import { generateId } from '@/utils/randomId';
-
-// interface Blueprint {
-//   blueprintId: number;
-//   name: string;
-//   data: {
-//     host: {
-//       name: string;
-//       id: string;
-//       isRemote: boolean;
-//       ip: string;
-//       network: Array<any>;
-//       volume: Array<any>;
-//     }[];
-//   };
-//   isRemote: boolean;
-//   dateCreated: string;
-//   dateUpdated: string;
-// }
+import { useSnackbar } from 'notistack';
 
 interface BlueprintListModalProps {
   isOpen: boolean;
@@ -54,12 +38,13 @@ const formatDate = (dateString: string) => {
 };
 
 const BlueprintListModal = ({ isOpen, onClose }: BlueprintListModalProps) => {
+  const { enqueueSnackbar } = useSnackbar();
   const [blueprints, setBlueprints] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const { setContainerName, getContainerName } = useContainerNameStore();
-  const { mappedData, setMappedData } = useBlueprintStore();
-  const { addHost } = useHostStore();
+  const { setContainerName } = useContainerNameStore();
+  const { setMappedData } = useBlueprintStore();
+  const { addHost, hosts } = useHostStore();
   const addConnectedBridgeId = selectedHostStore(
     (state) => state.addConnectedBridgeId
   );
@@ -84,6 +69,16 @@ const BlueprintListModal = ({ isOpen, onClose }: BlueprintListModalProps) => {
   }, [isOpen]);
 
   const handleLoadBlueprint = (blueprint: any) => {
+    if (hosts.length >= 5) {
+      showSnackbar(
+        enqueueSnackbar,
+        '호스트는 최대 5개까지만 추가할 수 있습니다.',
+        'error',
+        '#d32f2f'
+      );
+      return;
+    }
+
     blueprint.data.host.forEach((hostData: any) => {
       const formattedHost: Host = {
         id: hostData.id,
@@ -112,8 +107,8 @@ const BlueprintListModal = ({ isOpen, onClose }: BlueprintListModalProps) => {
             mounts: container.mounts,
             env: container.env,
             cmd: container.cmd,
+            imageVolumes: hostData.volume || [],
           })),
-          imageVolumes: network.volume || [],
         })),
       };
 
@@ -123,7 +118,6 @@ const BlueprintListModal = ({ isOpen, onClose }: BlueprintListModalProps) => {
           const networkId = network.id;
           const containerId = container.containerId;
           const containerName = container.containerName;
-
           setContainerName(hostId, networkId, containerId, containerName);
 
           addConnectedBridgeId(hostId, {
@@ -147,6 +141,7 @@ const BlueprintListModal = ({ isOpen, onClose }: BlueprintListModalProps) => {
               mounts: c.mounts,
               env: c.env,
               cmd: c.cmd,
+              imageVolumes: hostData.volume || [],
             })),
           });
         });
