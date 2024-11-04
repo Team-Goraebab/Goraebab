@@ -19,25 +19,29 @@ import { useBlueprintStore } from '@/store/blueprintStore';
 import { useHostStore } from '@/store/hostStore';
 import { Host } from '@/types/type';
 import { colorsOption } from '@/data/color';
+import { TEST_DATA } from '@/data/mock';
 import { getRandomThemeColor } from '@/utils/randomTemeColor';
 import { selectedHostStore } from '@/store/seletedHostStore';
+import { useContainerNameStore } from '@/store/containerNameStore';
+import { generateId } from '@/utils/randomId';
 
-interface Blueprint {
-  blueprintId: number;
-  name: string;
-  data: {
-    host: {
-      name: string;
-      isRemote: boolean;
-      ip: string;
-      network: Array<any>;
-      volume: Array<any>;
-    }[];
-  };
-  isRemote: boolean;
-  dateCreated: string;
-  dateUpdated: string;
-}
+// interface Blueprint {
+//   blueprintId: number;
+//   name: string;
+//   data: {
+//     host: {
+//       name: string;
+//       id: string;
+//       isRemote: boolean;
+//       ip: string;
+//       network: Array<any>;
+//       volume: Array<any>;
+//     }[];
+//   };
+//   isRemote: boolean;
+//   dateCreated: string;
+//   dateUpdated: string;
+// }
 
 interface BlueprintListModalProps {
   isOpen: boolean;
@@ -50,9 +54,10 @@ const formatDate = (dateString: string) => {
 };
 
 const BlueprintListModal = ({ isOpen, onClose }: BlueprintListModalProps) => {
-  const [blueprints, setBlueprints] = useState<Blueprint[]>([]);
+  const [blueprints, setBlueprints] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
+  const { setContainerName, getContainerName } = useContainerNameStore();
   const { mappedData, setMappedData } = useBlueprintStore();
   const { addHost } = useHostStore();
   const addConnectedBridgeId = selectedHostStore(
@@ -63,7 +68,8 @@ const BlueprintListModal = ({ isOpen, onClose }: BlueprintListModalProps) => {
     setIsLoading(true);
     try {
       const response = await axios.get(`/api/blueprint/list`);
-      setBlueprints(response.data || []);
+      setBlueprints(TEST_DATA);
+      // setBlueprints(response.data || []);
     } catch (error) {
       console.error('Error fetching blueprints:', error);
     } finally {
@@ -77,21 +83,21 @@ const BlueprintListModal = ({ isOpen, onClose }: BlueprintListModalProps) => {
     }
   }, [isOpen]);
 
-  const handleLoadBlueprint = (blueprint: Blueprint) => {
-    blueprint.data.host.forEach((hostData) => {
+  const handleLoadBlueprint = (blueprint: any) => {
+    blueprint.data.host.forEach((hostData: any) => {
       const formattedHost: Host = {
-        id: generateId(),
+        id: hostData.id,
         hostNm: hostData.name,
         hostIp: hostData.ip,
         status: true,
         isRemote: hostData.isRemote,
         themeColor: getRandomThemeColor(colorsOption),
-        networks: hostData.network.map((network) => ({
-          id: generateId(),
+        networks: hostData.network.map((network: any) => ({
+          id: network.id,
           name: network.name,
-          ip: network.ip,
-          hostId: hostData.ip,
-          networkUniqueId: network.name,
+          ip: network.ipam.config[0]?.subnet || '',
+          hostId: hostData.id,
+          networkUniqueId: network.id,
           driver: network.driver,
           subnet: network.ipam.config[0]?.subnet || '',
           containers: network.containers.map((container: any) => ({
@@ -101,105 +107,44 @@ const BlueprintListModal = ({ isOpen, onClose }: BlueprintListModalProps) => {
               name: container.image.name,
               tag: container.image.tag,
             },
-            networkSettings: {
-              gateway: container.networkSettings.gateway || '',
-              ipAddress: container.networkSettings.ipAddress || '',
-            },
-            ports: container.ports.map((port: any) => ({
-              privatePort: port.privatePort,
-              publicPort: port.publicPort,
-            })),
-            mounts: container.mounts.map((mount: any) => ({
-              type: mount.type,
-              name: mount.name,
-              source: mount.source,
-              destination: mount.destination,
-              driver: mount.driver,
-              alias: mount.alias,
-              mode: mount.mode,
-            })),
+            networkSettings: container.networkSettings,
+            ports: container.ports,
+            mounts: container.mounts,
             env: container.env,
             cmd: container.cmd,
           })),
-          imageVolumes: network.volume,
+          imageVolumes: network.volume || [],
         })),
       };
 
-      const formattedMappingHost = {
-        id: generateId(),
-        hostNm: hostData.name,
-        hostIp: hostData.ip,
-        status: true,
-        isRemote: hostData.isRemote,
-        themeColor: getRandomThemeColor(colorsOption),
-        networks: hostData.network.map((network) => ({
-          id: generateId(),
-          name: network.name,
-          ip: network.ip,
-          hostId: hostData.ip,
-          networkUniqueId: network.name,
-          driver: network.driver,
-          subnet: network.ipam.config[0]?.subnet || '',
-          containerName: network.containers[0]?.containerName || undefined,
-          configs: network.containers.map((container: any) => ({
-            containerName: container.containerName,
-            image: {
-              imageId: container.image.imageId,
-              name: container.image.name,
-              tag: container.image.tag,
-            },
-            networkSettings: {
-              gateway: container.networkSettings.gateway || '',
-              ipAddress: container.networkSettings.ipAddress || '',
-            },
-            ports: container.ports.map((port: any) => ({
-              privatePort: port.privatePort,
-              publicPort: port.publicPort,
-            })),
-            mounts: container.mounts.map((mount: any) => ({
-              type: mount.type,
-              name: mount.name,
-              source: mount.source,
-              destination: mount.destination,
-              driver: mount.driver,
-              mode: mount.mode,
-            })),
-          })),
-          imageVolumes:
-            network.volume && network.volume.length > 0
-              ? network.volume.map((volume: any) => ({
-                  id: generateId(),
-                  name: volume.name,
-                  driver: volume.driver,
-                  mountPoint: '',
-                  capacity: '',
-                  status: '',
-                }))
-              : [],
-        })),
-      };
+      hostData.network.forEach((network: any) => {
+        network.containers.forEach((container: any) => {
+          const hostId = hostData.id;
+          const networkId = network.id;
+          const containerId = container.containerId;
+          const containerName = container.containerName;
 
-      formattedHost.networks.forEach((network) => {
-        console.log(network.networkSettings?.gateway);
-        network.hostId = formattedHost.id;
+          setContainerName(hostId, networkId, containerId, containerName);
 
-        addConnectedBridgeId(formattedHost.id, {
-          id: generateId(),
-          uniqueId: network.name,
-          name: network.name,
-          gateway: network.networkSettings?.gateway || '',
-          driver: network.driver,
-          subnet: network.subnet,
-          scope: '',
+          addConnectedBridgeId(hostId, {
+            id: generateId(),
+            uniqueId: networkId,
+            name: network.name,
+            gateway: container.networkSettings.gateway || '',
+            driver: network.driver,
+            subnet: network.ipam.config[0]?.subnet || '',
+            scope: '',
+            containers: network.containers.map((c: any) => ({
+              containerName: c.containerName,
+              containerId: c.containerId,
+            })),
+          });
         });
       });
-      addHost(formattedHost);
-      setMappedData([formattedMappingHost]);
-    });
-  };
 
-  const generateId = () => {
-    return Math.random().toString(36).substr(2, 9);
+      addHost(formattedHost);
+      setMappedData([formattedHost]);
+    });
   };
 
   return (
