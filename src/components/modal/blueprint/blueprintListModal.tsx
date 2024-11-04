@@ -17,9 +17,8 @@ import {
 import axios from 'axios';
 import { useBlueprintStore } from '@/store/blueprintStore';
 import { useHostStore } from '@/store/hostStore';
-import { Host, Mount, Port, Volume } from '@/types/type';
+import { Host } from '@/types/type';
 import { colorsOption } from '@/data/color';
-import { TEST_DATA } from '@/data/mock';
 import { getRandomThemeColor } from '@/utils/randomTemeColor';
 import { selectedHostStore } from '@/store/seletedHostStore';
 
@@ -64,8 +63,7 @@ const BlueprintListModal = ({ isOpen, onClose }: BlueprintListModalProps) => {
     setIsLoading(true);
     try {
       const response = await axios.get(`/api/blueprint/list`);
-      setBlueprints(TEST_DATA);
-      // setBlueprints(response.data || []);
+      setBlueprints(response.data || []);
     } catch (error) {
       console.error('Error fetching blueprints:', error);
     } finally {
@@ -80,8 +78,6 @@ const BlueprintListModal = ({ isOpen, onClose }: BlueprintListModalProps) => {
   }, [isOpen]);
 
   const handleLoadBlueprint = (blueprint: Blueprint) => {
-    // console.log('Loaded blueprint:', blueprint);
-
     blueprint.data.host.forEach((hostData) => {
       const formattedHost: Host = {
         id: generateId(),
@@ -139,12 +135,12 @@ const BlueprintListModal = ({ isOpen, onClose }: BlueprintListModalProps) => {
         networks: hostData.network.map((network) => ({
           id: generateId(),
           name: network.name,
-          ip: network.ip, // 이 부분은 필요에 따라 수정하세요.
+          ip: network.ip,
           hostId: hostData.ip,
           networkUniqueId: network.name,
           driver: network.driver,
           subnet: network.ipam.config[0]?.subnet || '',
-          containerName: network.containers[0]?.containerName || undefined, // 첫 번째 컨테이너 이름 또는 undefined
+          containerName: network.containers[0]?.containerName || undefined,
           configs: network.containers.map((container: any) => ({
             containerName: container.containerName,
             image: {
@@ -172,26 +168,21 @@ const BlueprintListModal = ({ isOpen, onClose }: BlueprintListModalProps) => {
           imageVolumes:
             network.volume && network.volume.length > 0
               ? network.volume.map((volume: any) => ({
-                  id: generateId(), // 필요에 따라 ID 생성
+                  id: generateId(),
                   name: volume.name,
                   driver: volume.driver,
-                  mountPoint: '', // 필요에 따라 설정
-                  capacity: '', // 필요에 따라 설정
-                  status: '', // 필요에 따라 설정
+                  mountPoint: '',
+                  capacity: '',
+                  status: '',
                 }))
-              : [], // 볼륨이 없을 경우 빈 배열 설정
+              : [],
         })),
       };
 
-      // formattedMappingHost.networks.forEach((network) => {
-      //   network.hostId = formattedMappingHost.id;
-      // });
-
-      // 호스트 ID를 네트워크 정보에 설정
       formattedHost.networks.forEach((network) => {
         console.log(network.networkSettings?.gateway);
         network.hostId = formattedHost.id;
-        // 연결된 브릿지 정보 추가
+
         addConnectedBridgeId(formattedHost.id, {
           id: generateId(),
           uniqueId: network.name,
@@ -202,9 +193,7 @@ const BlueprintListModal = ({ isOpen, onClose }: BlueprintListModalProps) => {
           scope: '',
         });
       });
-      console.log('formattedMappingHost', formattedMappingHost);
       addHost(formattedHost);
-      // setMappedData(blueprint.data.host);
       setMappedData([formattedMappingHost]);
     });
   };
