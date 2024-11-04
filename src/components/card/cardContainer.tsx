@@ -47,7 +47,8 @@ import { useContainerNameStore } from '@/store/containerNameStore';
 export interface CardContainerProps {
   networkName: string;
   networkIp: string;
-  containers: Container[];
+  // containers: Container[];
+  containers: any[];
   themeColor: ThemeColor;
   onDelete?: () => void;
   onSelectNetwork?: () => void;
@@ -78,12 +79,13 @@ const CardContainer = ({
   const { setContainerName, getContainerName } = useContainerNameStore();
   const { setMappedData } = useBlueprintStore();
   const selectedHostIp = selectedHostStore((state) => state.selectedHostIp);
+  const selectedHostId = selectedHostStore((state) => state.selectedHostId);
   const hosts = useHostStore((state) => state.hosts);
   const connectedBridgeIds = selectedHostStore(
     (state) => state.connectedBridgeIds
   );
   const mappedData = useBlueprintStore((state) => state.mappedData);
-  const hostId = mappedData[0].id;
+  const hostId = mappedData[0]?.id || selectedHostId;
 
   const [isEditingName, setIsEditingName] = useState<boolean>(false);
   const [inputName, setInputName] = useState<string>(containerName);
@@ -95,21 +97,49 @@ const CardContainer = ({
   const [selectedImage, setSelectedImage] = useState<string>('');
   const [selectedVolumes, setSelectedVolumes] = useState<VolumeData[]>([]);
   const [isConfigModalOpen, setIsConfigModalOpen] = useState<boolean>(false);
-  const [configs, setConfigs] = useState<{
-    [networkUniqueId: string]: any[];
-  }>({});
+  const [configData, setConfigData] = useState({
+    [networkUniqueId]: {
+      networkSettings: containers[0]?.networkSettings || {
+        gateway: '',
+        ipAddress: '',
+      },
+      ports: containers[0]?.ports || [],
+      mounts: containers[0]?.mounts || [],
+      env: containers[0]?.env || [],
+      cmd: containers[0]?.cmd || [],
+    },
+  });
   const [imageVolumes, setImageVolumes] = useState<{
     [networkUniqueId: string]: {
       [imageId: string]: VolumeData[];
     };
   }>({});
 
+  const handleOpenConfigModal = () => {
+    setConfigData((prevConfigData) => ({
+      ...prevConfigData,
+      [networkUniqueId]: {
+        networkSettings: configData[networkUniqueId]?.networkSettings || {
+          gateway: '',
+          ipAddress: '',
+        },
+        ports: configData[networkUniqueId]?.ports || [
+          { privatePort: '', publicPort: '' },
+        ],
+        mounts: configData[networkUniqueId]?.mounts || [],
+        env: configData[networkUniqueId]?.env || [],
+        cmd: configData[networkUniqueId]?.cmd || [],
+      },
+    }));
+    setIsConfigModalOpen(true);
+  };
+
   useEffect(() => {
     const mappedData = hosts.map((host) => {
       const networks = connectedBridgeIds[host.id] || [];
 
       const mappedNetworks = networks.map((network) => {
-        const networkConfigs = configs[network.uniqueId] || [];
+        const networkConfigs = configData[network.uniqueId] || [];
         const networkImageVolumes =
           imageVolumes[network.uniqueId]?.[droppedImages[0]?.id] || [];
 
@@ -141,7 +171,7 @@ const CardContainer = ({
   }, [
     hosts,
     connectedBridgeIds,
-    configs,
+    configData,
     droppedImages,
     imageVolumes,
     containerName,
@@ -169,20 +199,28 @@ const CardContainer = ({
     accept: 'IMAGE_CARD',
     drop: (item: { image: string; id: string }) => {
       if (droppedImages.length > 0) {
-        enqueueSnackbar('이미지는 하나만 추가할 수 있습니다.', {
-          variant: 'warning',
-          autoHideDuration: 3000,
-          anchorOrigin: {
-            vertical: 'top',
-            horizontal: 'right',
-          },
-        });
+        enqueueSnackbar(
+          'Please delete the current image before adding a new one.',
+          {
+            variant: 'warning',
+            autoHideDuration: 3000,
+            anchorOrigin: { vertical: 'top', horizontal: 'right' },
+          }
+        );
         return;
       }
 
-      const imageInfo = splitImageNameAndTag(item.image, item.id);
-      setDroppedImages((prev) => [...prev, imageInfo]);
-      setImageToNetwork((prev) => [...prev, { ...imageInfo, networkName }]);
+      const newImage = splitImageNameAndTag(item.image, item.id);
+      setDroppedImages([newImage]);
+
+      setImageToNetwork([
+        {
+          id: item.id,
+          name: newImage.name,
+          tag: newImage.tag,
+          networkName,
+        },
+      ]);
     },
     canDrop: () => hostIp === selectedHostIp,
     collect: (monitor) => ({
@@ -192,10 +230,16 @@ const CardContainer = ({
 
   drop(ref);
 
-  const allImages = [
-    ...containers.map((c) => splitImageNameAndTag(c.image.name, c.id)),
-    ...droppedImages,
-  ];
+  const allImages =
+    droppedImages.length > 0
+      ? droppedImages
+      : containers.map((c) => ({
+          id: c.containerId,
+          name: c.image.name,
+          tag: c.image.tag,
+        }));
+
+  console.log('allImages >>', allImages);
 
   const handleDeleteImage = (imageId: string) => {
     // 이미지 삭제
@@ -231,14 +275,13 @@ const CardContainer = ({
     handleCloseVolumeModal();
   };
 
-  const handleSaveConfig = (config: any) => {
-    setConfigs((prev) => ({
-      ...prev,
-      [networkUniqueId]: config,
+  const handleSaveConfig = (newConfig: any) => {
+    setConfigData((prevConfigData) => ({
+      ...prevConfigData,
+      [networkUniqueId]: newConfig,
     }));
     setIsConfigModalOpen(false);
   };
-
   const handleNameSubmit = () => {
     if (inputName.trim()) {
       // 스토어에 컨테이너 이름을 저장
@@ -360,20 +403,19 @@ const CardContainer = ({
               </div>
             </div>
             <ScrollShadow className="h-32">
-              {allImages.length > 0 ? (
-                <Accordion
-                  className="p-0 gap-2"
-                  itemClasses={{
-                    base: 'py-0 w-full',
-                    title: 'font-normal text-small',
-                    trigger: 'px-2 py-2 data-[hover=true]:bg-default-100',
-                    indicator: 'text-default-400',
-                  }}
-                >
-                  {allImages.map((image) => (
+              <Accordion
+                className="p-0 gap-2"
+                itemClasses={{
+                  base: 'py-0 w-full',
+                  title: 'font-normal text-small',
+                  trigger: 'px-2 py-2 data-[hover=true]:bg-default-100',
+                  indicator: 'text-default-400',
+                }}
+              >
+                {allImages[0].id &&
+                  allImages.map((image) => (
                     <AccordionItem
                       key={image.id}
-                      aria-label={image.name}
                       title={
                         <div className="flex items-center justify-between w-full">
                           <div className="flex items-center gap-2">
@@ -466,19 +508,10 @@ const CardContainer = ({
                       )}
                     </AccordionItem>
                   ))}
-                </Accordion>
-              ) : (
-                <div className="h-full flex flex-col items-center justify-center border-2 border-dashed rounded-large p-4 gap-2">
-                  <ImageIcon size={24} className="text-default-300" />
-                  <span className="text-sm text-default-400">
-                    이미지를 드래그하여 추가하세요
-                  </span>
-                </div>
-              )}
+              </Accordion>
             </ScrollShadow>
           </div>
         </CardBody>
-
         {onDelete && (
           <CardFooter className="justify-end px-4 py-2 bg-default-50">
             <Button
@@ -510,6 +543,7 @@ const CardContainer = ({
         open={isConfigModalOpen}
         onClose={() => setIsConfigModalOpen(false)}
         onSave={handleSaveConfig}
+        initialConfig={configData[networkUniqueId]}
       />
     </>
   );
