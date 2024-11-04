@@ -15,4 +15,5 @@ export const DEFAULT_CONTAINER_SETTINGS = {
   mounts: [],
   env: [],
   cmd: [],
+  imageVolumes: [],
 };
