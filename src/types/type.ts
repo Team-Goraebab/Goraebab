@@ -169,3 +169,16 @@ export interface HostStore {
     volume: VolumeData
   ) => void;
 }
+
+export interface ImageInfo {
+  id: string;
+  name: string;
+  tag: string;
+}
+
+export interface ImageToNetwork {
+  id: string;
+  name: string;
+  tag: string;
+  networkName: string;
+}
