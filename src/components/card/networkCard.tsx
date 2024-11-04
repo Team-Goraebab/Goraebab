@@ -24,6 +24,7 @@ import {
 } from 'react-icons/fi';
 import { FaNetworkWired } from 'react-icons/fa';
 import { Network } from '@/types/type';
+import { DEFAULT_CONTAINER_SETTINGS } from '@/data/blueprint';
 
 interface CardDataProps {
   data: Network;
@@ -45,7 +46,7 @@ const NetworkCard = ({ data, onDeleteSuccess }: CardDataProps) => {
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
 
   const connectedContainers = Object.values(data.Containers || {}).map(
-    (container) => `${container.Name} (${container.IPv4Address})`,
+    (container) => `${container.Name} (${container.IPv4Address})`
   );
 
   const subnet = data.IPAM?.Config?.[0]?.Subnet || 'No Subnet';
@@ -87,7 +88,7 @@ const NetworkCard = ({ data, onDeleteSuccess }: CardDataProps) => {
           enqueueSnackbar,
           '네트워크가 성공적으로 삭제되었습니다!',
           'success',
-          '#4CAF50',
+          '#4CAF50'
         );
         onDeleteSuccess();
       } else {
@@ -95,7 +96,7 @@ const NetworkCard = ({ data, onDeleteSuccess }: CardDataProps) => {
           enqueueSnackbar,
           `네트워크 삭제 실패: ${result.error}`,
           'error',
-          '#FF4853',
+          '#FF4853'
         );
       }
     } catch (error) {
@@ -104,7 +105,7 @@ const NetworkCard = ({ data, onDeleteSuccess }: CardDataProps) => {
         enqueueSnackbar,
         `네트워크 삭제 요청 중 에러: ${error}`,
         'error',
-        '#FF4853',
+        '#FF4853'
       );
     } finally {
       setLoading(false);
@@ -125,27 +126,35 @@ const NetworkCard = ({ data, onDeleteSuccess }: CardDataProps) => {
           enqueueSnackbar,
           '네트워크는 최대 3개까지만 연결할 수 있습니다.',
           'error',
-          '#FF4853',
+          '#FF4853'
         );
         return; // 연결을 중단
       }
+
+      // 컨테이너 데이터 생성
+      const containers = Object.values(data.Containers || {}).map(
+        (container) => ({
+          ...DEFAULT_CONTAINER_SETTINGS,
+          containerName: container.Name,
+          networkSettings: {
+            ...DEFAULT_CONTAINER_SETTINGS.networkSettings,
+            ipAddress: container.IPv4Address,
+          },
+        })
+      );
 
       const networkInfo = {
         id: data.Id,
         name: data.Name,
         gateway: gateway,
-        subnet: subnet,
         driver: data.Driver,
+        subnet: subnet,
         scope: data.Scope,
+        containers: containers,
       };
 
       addConnectedBridgeId(selectedHostId, {
-        name: networkInfo.name,
-        gateway: networkInfo.gateway,
-        driver: networkInfo.driver,
-        subnet: networkInfo.subnet,
-        scope: networkInfo.scope,
-        id: networkInfo.id,
+        ...networkInfo,
         uniqueId: uuidv4(),
       });
 
@@ -153,14 +162,14 @@ const NetworkCard = ({ data, onDeleteSuccess }: CardDataProps) => {
         enqueueSnackbar,
         '네트워크가 성공적으로 연결되었습니다.',
         'success',
-        '#4CAF50',
+        '#4CAF50'
       );
     } else {
       showSnackbar(
         enqueueSnackbar,
         '호스트를 선택해주세요.',
         'error',
-        '#FF4853',
+        '#FF4853'
       );
     }
   };
@@ -187,7 +196,7 @@ const NetworkCard = ({ data, onDeleteSuccess }: CardDataProps) => {
         enqueueSnackbar,
         '네트워크 정보를 가져오는데 실패했습니다.',
         'error',
-        '#FF4853',
+        '#FF4853'
       );
     }
   };

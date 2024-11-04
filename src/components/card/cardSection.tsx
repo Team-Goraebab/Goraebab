@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import { CardContainer } from '@/components';
 import { HostCardProps } from './hostCard';
 import Draggable from 'react-draggable';
@@ -8,6 +8,7 @@ import { useStore } from '@/store/cardStore';
 import { selectedHostStore } from '@/store/seletedHostStore';
 import { useHostStore } from '@/store/hostStore';
 import { useSelectedNetworkStore } from '@/store/selectedNetworkStore';
+import { useContainerNameStore } from '@/store/containerNameStore';
 import { FaTrash, FaHome, FaGlobeAsia } from 'react-icons/fa';
 
 interface CardSectionProps {
@@ -16,12 +17,6 @@ interface CardSectionProps {
 }
 
 const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
-  const [containerNames, setContainerNames] = useState<{
-    [hostId: string]: {
-      [networkUniqueId: string]: string;
-    };
-  }>({});
-
   const {
     selectedHostId,
     setSelectedHostId,
@@ -33,9 +28,9 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
     deleteConnectedBridgeId,
   } = selectedHostStore();
 
+  const { getContainerName, setContainerName } = useContainerNameStore();
   const { selectedNetwork, setSelectedNetwork, clearSelectedNetwork } =
     useSelectedNetworkStore();
-
   const allContainers = useStore((state) => state.hostContainers);
   const deleteHost = useHostStore((state) => state.deleteHost);
   const deleteNetwork = useHostStore((state) => state.deleteNetwork);
@@ -76,12 +71,7 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
     }
   };
 
-  const handleDeleteNetwork = (
-    hostId: string,
-    networkName: string,
-    networkId: string,
-    uniqueId: string
-  ) => {
+  const handleDeleteNetwork = (hostId: string, uniqueId: string) => {
     if (
       selectedNetwork?.hostId === hostId &&
       selectedNetwork?.uniqueId === uniqueId
@@ -94,16 +84,11 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
 
   const handleContainerNameChange = (
     hostId: string,
-    networkUniqueId: string,
+    networkId: string,
+    containerId: string,
     name: string
   ) => {
-    setContainerNames((prevNames) => ({
-      ...prevNames,
-      [hostId]: {
-        ...(prevNames[hostId] || {}),
-        [networkUniqueId]: name,
-      },
-    }));
+    setContainerName(hostId, networkId, containerId, name);
   };
 
   return (
@@ -127,7 +112,7 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
                     onClick={() =>
                       handleHostClick(host.id, host.hostNm, host.hostIp)
                     }
-                    className={`relative flex flex-col bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-200 w-[540px] cursor-pointer overflow-hidden`}
+                    className="relative flex flex-col bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-200 w-[540px] cursor-pointer overflow-hidden"
                     style={{
                       borderColor: isHostSelected
                         ? host.themeColor.borderColor
@@ -194,47 +179,55 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
                     <div className="p-4">
                       {networks.length > 0 ? (
                         <div className="flex flex-col gap-4 w-full">
-                          {networks.map((network) => (
-                            <CardContainer
-                              key={network.uniqueId}
-                              networkName={network.name}
-                              networkIp={network.subnet}
-                              containers={containers}
-                              containerName={
-                                containerNames[host.id]?.[network.uniqueId]
+                          {networks.map((network) => {
+                            const containerNames = network.containers.map(
+                              (container) => {
+                                return (
+                                  getContainerName(
+                                    host.id,
+                                    network.id,
+                                    container.containerId
+                                  ) || container.containerName
+                                );
                               }
-                              themeColor={host.themeColor}
-                              onDelete={() =>
-                                handleDeleteNetwork(
-                                  host.id,
-                                  network.name,
-                                  network.id,
-                                  network.uniqueId
-                                )
-                              }
-                              onSelectNetwork={() =>
-                                handleSelectNetwork(
-                                  host.id,
-                                  host.hostIp,
-                                  network.name,
-                                  network.id,
-                                  network.uniqueId
-                                )
-                              }
-                              isSelected={
-                                selectedNetwork?.uniqueId === network.uniqueId
-                              }
-                              hostIp={host.hostIp}
-                              networkUniqueId={network.uniqueId}
-                              onContainerNameChange={(name) =>
-                                handleContainerNameChange(
-                                  host.id,
-                                  network.uniqueId,
-                                  name
-                                )
-                              }
-                            />
-                          ))}
+                            );
+                            return network.containers.map((container) => (
+                              <CardContainer
+                                key={container.containerId}
+                                networkName={network.name}
+                                networkIp={network.subnet}
+                                containers={containers}
+                                containerName={containerNames.join(', ')}
+                                themeColor={host.themeColor}
+                                onDelete={() =>
+                                  handleDeleteNetwork(host.id, network.uniqueId)
+                                }
+                                onSelectNetwork={() =>
+                                  handleSelectNetwork(
+                                    host.id,
+                                    host.hostIp,
+                                    network.name,
+                                    network.id,
+                                    network.uniqueId
+                                  )
+                                }
+                                isSelected={
+                                  selectedNetwork?.uniqueId === network.uniqueId
+                                }
+                                hostIp={host.hostIp}
+                                networkUniqueId={network.uniqueId}
+                                containerId={container.containerId}
+                                onContainerNameChange={(name) =>
+                                  handleContainerNameChange(
+                                    host.id,
+                                    network.id,
+                                    container.containerId,
+                                    name
+                                  )
+                                }
+                              />
+                            ));
+                          })}
                         </div>
                       ) : (
                         <div className="text-center text-gray-500 py-4">

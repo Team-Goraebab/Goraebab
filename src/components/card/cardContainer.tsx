@@ -2,7 +2,13 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { useDrop } from 'react-dnd';
-import { Container, ThemeColor, VolumeData } from '@/types/type';
+import {
+  Container,
+  ImageInfo,
+  ThemeColor,
+  VolumeData,
+  ImageToNetwork,
+} from '@/types/type';
 import {
   Card,
   CardBody,
@@ -35,9 +41,8 @@ import ConfigurationModal from '../modal/daemon/configurationModal';
 import { selectedHostStore } from '@/store/seletedHostStore';
 import { useSnackbar } from 'notistack';
 import { useHostStore } from '@/store/hostStore';
-import { useStore } from '@/store/cardStore';
 import { useBlueprintStore } from '@/store/blueprintStore';
-import { Box } from '@mui/material';
+import { useContainerNameStore } from '@/store/containerNameStore';
 
 export interface CardContainerProps {
   networkName: string;
@@ -49,21 +54,9 @@ export interface CardContainerProps {
   isSelected?: boolean;
   hostIp: string;
   networkUniqueId: string;
+  containerId: string;
   containerName: string;
   onContainerNameChange?: (name: string) => void;
-}
-
-interface ImageInfo {
-  id: string;
-  name: string;
-  tag: string;
-}
-
-interface ImageToNetwork {
-  id: string;
-  name: string;
-  tag: string;
-  networkName: string;
 }
 
 const CardContainer = ({
@@ -76,25 +69,24 @@ const CardContainer = ({
   isSelected,
   hostIp,
   networkUniqueId,
+  containerId,
   containerName,
   onContainerNameChange,
 }: CardContainerProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const { enqueueSnackbar } = useSnackbar();
-
+  const { setContainerName, getContainerName } = useContainerNameStore();
   const { setMappedData } = useBlueprintStore();
   const selectedHostIp = selectedHostStore((state) => state.selectedHostIp);
   const hosts = useHostStore((state) => state.hosts);
-  const allContainers = useStore((state) => state.hostContainers);
   const connectedBridgeIds = selectedHostStore(
     (state) => state.connectedBridgeIds
   );
-
   const mappedData = useBlueprintStore((state) => state.mappedData);
-  // console.log(mappedData);
+  const hostId = mappedData[0].id;
 
-  const [isEditingName, setIsEditingName] = useState(false);
-  const [tempContainerName, setTempContainerName] = useState(containerName);
+  const [isEditingName, setIsEditingName] = useState<boolean>(false);
+  const [inputName, setInputName] = useState<string>(containerName);
   const [droppedImages, setDroppedImages] = useState<ImageInfo[]>([]);
   const [imageToNetwork, setImageToNetwork] = useState<ImageToNetwork[]>([]);
   const [detailData, setDetailData] = useState<any>(null);
@@ -112,7 +104,6 @@ const CardContainer = ({
     };
   }>({});
 
-  // 네트워크 유니크 아이디로 데이터를 매핑
   useEffect(() => {
     const mappedData = hosts.map((host) => {
       const networks = connectedBridgeIds[host.id] || [];
@@ -249,20 +240,24 @@ const CardContainer = ({
   };
 
   const handleNameSubmit = () => {
-    if (tempContainerName.trim()) {
-      onContainerNameChange?.(tempContainerName);
+    if (inputName.trim()) {
+      // 스토어에 컨테이너 이름을 저장
+      setContainerName(hostId, networkUniqueId, containerId, inputName);
+      onContainerNameChange?.(inputName);
       setIsEditingName(false);
     }
   };
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // 최대 20자로 제한
+    // 컨테이너 이름은 최대 20자로 제한
     const value = e.target.value.slice(0, 20);
-    setTempContainerName(value);
+    setInputName(value);
   };
 
   const handleCancelEdit = () => {
-    setTempContainerName(containerName);
+    // 저장된 컨테이너 이름을 스토어에서 가져와서 설정
+    const storedName = getContainerName(hostId, networkUniqueId, containerId);
+    setInputName(storedName || containerName);
     setIsEditingName(false);
   };
 
@@ -316,26 +311,18 @@ const CardContainer = ({
                 <Input
                   autoFocus
                   size="sm"
-                  value={tempContainerName}
+                  value={inputName}
                   onChange={handleNameChange}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') handleNameSubmit();
                     if (e.key === 'Escape') handleCancelEdit();
                   }}
                   placeholder="컨테이너 이름 입력 (최대 20자)"
-                  classNames={{
-                    input: 'h-8 text-small',
-                    inputWrapper: 'h-8 min-h-unit-8 py-0',
-                  }}
-                  startContent={
-                    <Edit2 size={14} className="text-default-400" />
-                  }
                 />
                 <Button
                   isIconOnly
                   size="sm"
                   color="primary"
-                  variant="flat"
                   onPress={handleNameSubmit}
                 >
                   <Check size={16} />
@@ -344,7 +331,6 @@ const CardContainer = ({
                   isIconOnly
                   size="sm"
                   color="danger"
-                  variant="flat"
                   onPress={handleCancelEdit}
                 >
                   <XIcon size={16} />
@@ -352,23 +338,20 @@ const CardContainer = ({
               </div>
             ) : (
               <div className="flex items-center justify-between bg-default-50 rounded-medium px-3 py-2">
-                <span className="text-sm text-default-700">
-                  {containerName || '컨테이너 이름을 설정하세요'}
+                <span className="text-sm">
+                  {inputName || '컨테이너 이름을 설정하세요'}
                 </span>
                 <Button
                   isIconOnly
                   size="sm"
-                  variant="light"
                   onPress={() => setIsEditingName(true)}
                 >
-                  <Edit2 size={16} className="text-default-400" />
+                  <Edit2 size={16} />
                 </Button>
               </div>
             )}
           </div>
-
           <Divider />
-
           <div className="w-full">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
@@ -376,7 +359,6 @@ const CardContainer = ({
                 <span className="text-small text-default-500">이미지</span>
               </div>
             </div>
-
             <ScrollShadow className="h-32">
               {allImages.length > 0 ? (
                 <Accordion
