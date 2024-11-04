@@ -1,6 +1,35 @@
 import { create } from 'zustand';
 import { v4 as uuidv4 } from 'uuid';
 
+interface Container {
+  containerName: string;
+  containerId: string;
+  image: {
+    imageId: string;
+    name: string;
+    tag: string;
+  };
+  networkSettings: {
+    gateway: string;
+    ipAddress: string;
+  };
+  ports: {
+    privatePort: number;
+    publicPort: number;
+  }[];
+  mounts: {
+    type: string;
+    name: string;
+    source: string;
+    destination: string;
+    driver: string;
+    alias: string;
+    mode: string;
+  }[];
+  env: string[];
+  cmd: string[];
+}
+
 interface BridgeInfo {
   id: string;
   uniqueId: string;
@@ -9,6 +38,7 @@ interface BridgeInfo {
   driver: string;
   subnet: string;
   scope: string;
+  containers: Container[];
 }
 
 interface SelectedHostStore {
