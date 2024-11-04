@@ -10,6 +10,7 @@ import { useHostStore } from '@/store/hostStore';
 import { useSelectedNetworkStore } from '@/store/selectedNetworkStore';
 import { useContainerNameStore } from '@/store/containerNameStore';
 import { FaTrash, FaHome, FaGlobeAsia } from 'react-icons/fa';
+import { VolumeData } from '@/types/type';
 
 interface CardSectionProps {
   hostData: HostCardProps[];
@@ -92,6 +93,35 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
     name: string
   ) => {
     setContainerName(hostId, networkId, containerId, name);
+  };
+
+  const formatImageVolumes = (id: string, containers: any) => {
+    const formattedVolumes: {
+      [networkUniqueId: string]: {
+        [containerId: string]: any[];
+      };
+    } = {};
+
+    containers.forEach((container: any) => {
+      const networkUniqueId = id;
+      const containerId = container.containerId;
+
+      if (!formattedVolumes[networkUniqueId]) {
+        formattedVolumes[networkUniqueId] = {};
+      }
+      if (!formattedVolumes[networkUniqueId][containerId]) {
+        formattedVolumes[networkUniqueId][containerId] = [];
+      }
+
+      container.imageVolumes.forEach((volume: any) => {
+        formattedVolumes[networkUniqueId][containerId].push({
+          Driver: volume.driver,
+          Name: volume.name,
+        });
+      });
+    });
+
+    return formattedVolumes;
   };
 
   return (
@@ -189,6 +219,10 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
                                 self.findIndex((n) => n.name === network.name)
                             )
                             .map((network) => {
+                              const formattedImageVolumes = formatImageVolumes(
+                                network.uniqueId,
+                                network.containers
+                              );
                               return network.containers.map((container) => {
                                 const containerName =
                                   getContainerName(
@@ -196,6 +230,11 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
                                     network.id,
                                     container.containerId
                                   ) || container.containerName;
+                                const imageInfo = {
+                                  id: container.image.imageId,
+                                  name: container.image.name,
+                                  tag: container.image.tag,
+                                };
                                 return (
                                   <CardContainer
                                     key={container.containerId}
@@ -234,6 +273,11 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
                                         name
                                       )
                                     }
+                                    imageInfo={[imageInfo]}
+                                    // imageId={container.image.imageId}
+                                    // imageName={container.image.name}
+                                    // imageTag={container.image.tag}
+                                    imageVolumesVal={formattedImageVolumes}
                                   />
                                 );
                               });

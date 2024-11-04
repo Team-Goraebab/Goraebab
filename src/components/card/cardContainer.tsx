@@ -57,6 +57,13 @@ export interface CardContainerProps {
   networkUniqueId: string;
   containerId: string;
   containerName: string;
+  // imageId: string;
+  // imageName: string;
+  // imageTag: string;
+  imageInfo: [{ id: string; name: string; tag: string }];
+  imageVolumesVal: {
+    [networkUniqueId: string]: { [imageId: string]: VolumeData[] };
+  };
   onContainerNameChange?: (name: string) => void;
 }
 
@@ -72,6 +79,11 @@ const CardContainer = ({
   networkUniqueId,
   containerId,
   containerName,
+  imageInfo,
+  // imageId,
+  // imageName,
+  // imageTag,
+  imageVolumesVal,
   onContainerNameChange,
 }: CardContainerProps) => {
   const ref = useRef<HTMLDivElement>(null);
@@ -114,42 +126,15 @@ const CardContainer = ({
     [networkUniqueId: string]: {
       [imageId: string]: VolumeData[];
     };
-  }>(() => {
-    return configData[networkUniqueId]?.imageVolumes
-      ? {
-          [networkUniqueId]: configData[networkUniqueId].imageVolumes,
-        }
-      : {};
-  });
+  }>(imageVolumesVal);
 
-  useEffect(() => {
-    if (configData[networkUniqueId]?.imageVolumes) {
-      setImageVolumes((prev) => ({
-        ...prev,
-        [networkUniqueId]: configData[networkUniqueId].imageVolumes,
-      }));
-    }
-  }, [configData, networkUniqueId]);
+  // useEffect(() => {
+  //   if (imageInfo) {
+  //     setDroppedImages(imageInfo);
+  //   }
+  // }, []);
 
-  const handleOpenConfigModal = () => {
-    setConfigData((prevConfigData) => ({
-      ...prevConfigData,
-      [networkUniqueId]: {
-        networkSettings: configData[networkUniqueId]?.networkSettings || {
-          gateway: '',
-          ipAddress: '',
-        },
-        ports: configData[networkUniqueId]?.ports || [
-          { privatePort: '', publicPort: '' },
-        ],
-        mounts: configData[networkUniqueId]?.mounts || [],
-        env: configData[networkUniqueId]?.env || [],
-        cmd: configData[networkUniqueId]?.cmd || [],
-        imageVolumes: configData[networkUniqueId]?.imageVolumes || [],
-      },
-    }));
-    setIsConfigModalOpen(true);
-  };
+  console.log('droppedImages', droppedImages);
 
   useEffect(() => {
     const mappedData = hosts.map((host) => {
@@ -228,6 +213,7 @@ const CardContainer = ({
       }
 
       const newImage = splitImageNameAndTag(item.image, item.id);
+      console.log('newImage', newImage);
       setDroppedImages([newImage]);
 
       setImageToNetwork([
@@ -257,6 +243,7 @@ const CardContainer = ({
         }));
 
   const handleDeleteImage = (imageId: string) => {
+    console.log('imageId >>>>', imageId);
     // 이미지 삭제
     setDroppedImages((prev) => prev.filter((image) => image.id !== imageId));
     // imageToNetwork에서 해당 이미지 정보 삭제
