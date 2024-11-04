@@ -137,6 +137,16 @@ const BlueprintListModal = ({ isOpen, onClose }: BlueprintListModalProps) => {
             containers: network.containers.map((c: any) => ({
               containerName: c.containerName,
               containerId: c.containerId,
+              image: {
+                id: c.image.imageId,
+                name: c.image.name,
+                tag: c.image.tag,
+              },
+              networkSettings: c.networkSettings,
+              ports: c.ports,
+              mounts: c.mounts,
+              env: c.env,
+              cmd: c.cmd,
             })),
           });
         });
