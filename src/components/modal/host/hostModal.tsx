@@ -26,6 +26,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
+import { DEFAULT_CONTAINER_SETTINGS } from '@/data/blueprint';
 
 interface HostModalProps {
   onClose: () => void;
@@ -129,7 +130,7 @@ const HostModal = ({ isOpen, onClose }: HostModalProps) => {
       subnet: selectedNetwork.IPAM?.Config?.[0]?.Subnet || '',
       scope: selectedNetwork.Scope || '',
       id: selectedNetwork.Id,
-      containers: [],
+      containers: [DEFAULT_CONTAINER_SETTINGS],
     });
 
     showSnackbar(
