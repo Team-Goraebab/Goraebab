@@ -130,7 +130,7 @@ export interface ContainerSetting {
   containerName: string;
   image: Image;
   networkSettings: NetworkSettings;
-  ports: Port[];
+  ports: Port;
   mounts: Mount[];
 }
 
@@ -171,7 +171,7 @@ export interface HostStore {
 }
 
 export interface ImageInfo {
-  id: string;
+  imageId: string;
   name: string;
   tag: string;
 }
