@@ -26,6 +26,7 @@ import { selectedHostStore } from '@/store/seletedHostStore';
 import { useContainerNameStore } from '@/store/containerNameStore';
 import { generateId } from '@/utils/randomId';
 import { useSnackbar } from 'notistack';
+import { deleteBlueprint } from '@/services/blueprint/api';
 
 interface BlueprintListModalProps {
   isOpen: boolean;
@@ -58,6 +59,27 @@ const BlueprintListModal = ({ isOpen, onClose }: BlueprintListModalProps) => {
       console.error('Error fetching blueprints:', error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleDeleteBlueprint = async (
+    blueprintId: string,
+    blueprintName: string
+  ) => {
+    try {
+      await deleteBlueprint(blueprintId);
+      showSnackbar(
+        enqueueSnackbar,
+        `${blueprintName} 설계도를 삭제했습니다.`,
+        'success',
+        '#4CAF50'
+      );
+      setBlueprints((prev) =>
+        prev.filter((bp) => bp.blueprintId !== blueprintId)
+      );
+    } catch (error) {
+      // console.error('Error deleting blueprint:', error);
+      showSnackbar(enqueueSnackbar, '삭제 실패했습니다.', 'error', '#d32f2f');
     }
   };
 
@@ -182,7 +204,9 @@ const BlueprintListModal = ({ isOpen, onClose }: BlueprintListModalProps) => {
               <TableBody>
                 {blueprints.map((blueprint) => (
                   <TableRow key={blueprint.blueprintId}>
-                    <TableCell>{blueprint.name}</TableCell>
+                    <TableCell className="max-w-xs overflow-hidden text-ellipsis whitespace-nowrap">
+                      {blueprint.name}
+                    </TableCell>
                     <TableCell>{formatDate(blueprint.dateCreated)}</TableCell>
                     <TableCell>
                       {blueprint.data.host[0]?.isRemote ? 'Remote' : 'Local'}
@@ -193,8 +217,22 @@ const BlueprintListModal = ({ isOpen, onClose }: BlueprintListModalProps) => {
                         color="primary"
                         variant="flat"
                         onClick={() => handleLoadBlueprint(blueprint)}
+                        className="mr-3"
                       >
                         불러오기
+                      </Button>
+                      <Button
+                        size="sm"
+                        color="danger"
+                        variant="flat"
+                        onClick={() =>
+                          handleDeleteBlueprint(
+                            blueprint.blueprintId,
+                            blueprint.name
+                          )
+                        }
+                      >
+                        삭제
                       </Button>
                     </TableCell>
                   </TableRow>
