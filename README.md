@@ -139,13 +139,11 @@ chmod +x start.sh
 
 # How to use Goraebab
 
+## Pull image
+
 ## Create network
 
 ## Create volume
-
-## Pull image
-
-## Run container
 
 ## Connect Remote Docker
 
@@ -163,11 +161,11 @@ You can check the API specification through `localhost:2387/swagger`.
 
 - More intuitive, beginner-friendly UI
 - Flexible option settings (ex. port)
-- 
+- Distinguish volume connections in the UI
 
 # Contributors
 [![contributors](https://contrib.rocks/image?repo=Team-Goraebab/Goraebab)](https://github.com/Team-Goraebab/Goraebab/graphs/contributors)
 
 # License
-Goraeabab is licensed under the Apache License 2.0.
+Goraeabab is licensed under the **Apache 2.0 License**. See the [LICENSE](LICENSE) file for details.
 
