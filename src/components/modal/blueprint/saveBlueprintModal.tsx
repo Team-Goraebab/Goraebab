@@ -37,8 +37,21 @@ const SaveBlueprintModal = ({
 }: SaveBlueprintModalProps) => {
   const isSaveDisabled = blueprintName.trim() === '';
 
+  const handleSave = () => {
+    if (!isSaveDisabled) {
+      onSave();
+      setBlueprintName('');
+      onClose();
+    }
+  };
+
+  const handleClose = () => {
+    setBlueprintName('');
+    onClose();
+  };
+
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
+    <Modal isOpen={isOpen} onClose={handleClose}>
       <ModalContent>
         <ModalHeader>설계도 저장</ModalHeader>
         <ModalBody>
@@ -63,16 +76,12 @@ const SaveBlueprintModal = ({
           )}
         </ModalBody>
         <ModalFooter>
-          <Button color="default" variant="light" onPress={onClose}>
+          <Button color="default" variant="light" onPress={handleClose}>
             취소
           </Button>
           <Button
             color="primary"
-            onPress={() => {
-              if (!isSaveDisabled) {
-                onSave();
-              }
-            }}
+            onPress={handleSave}
             disabled={isSaveDisabled}
             style={{
               backgroundColor: isSaveDisabled ? '#D3D3D3' : '',
