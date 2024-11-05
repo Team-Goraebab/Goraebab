@@ -38,6 +38,7 @@ import { selectedHostStore } from '@/store/seletedHostStore';
 import { useSnackbar } from 'notistack';
 import { useHostStore } from '@/store/hostStore';
 import { useBlueprintStore } from '@/store/blueprintStore';
+import { containerNamePattern } from '@/utils/patternUtils';
 
 export interface CardContainerProps {
   networkName: string;
@@ -271,7 +272,35 @@ const CardContainer = ({
     setConfigs((prevConfigs) => [...prevConfigs, config]);
     setIsConfigModalOpen(false);
   };
+
   const handleNameSubmit = () => {
+    if (tempContainerName.trim().length > 255) {
+      enqueueSnackbar('컨테이너 이름은 최대 255자까지 가능합니다.', {
+        variant: 'error',
+        autoHideDuration: 3000,
+        anchorOrigin: {
+          vertical: 'top',
+          horizontal: 'right',
+        },
+      });
+      return;
+    }
+
+    if (!containerNamePattern.test(tempContainerName.trim())) {
+      enqueueSnackbar(
+        '컨테이너 이름은 소문자, 숫자, 밑줄, 마침표, 하이픈만 사용할 수 있습니다.',
+        {
+          variant: 'error',
+          autoHideDuration: 3000,
+          anchorOrigin: {
+            vertical: 'top',
+            horizontal: 'right',
+          },
+        }
+      );
+      return;
+    }
+
     if (tempContainerName.trim()) {
       if (onContainerNameChange) {
         onContainerNameChange(containerId, tempContainerName);
@@ -345,7 +374,7 @@ const CardContainer = ({
                     if (e.key === 'Enter') handleNameSubmit();
                     if (e.key === 'Escape') handleCancelEdit();
                   }}
-                  placeholder="컨테이너 이름 입력 (최대 20자)"
+                  placeholder="컨테이너 이름 입력 (최대 255자)"
                   classNames={{
                     input: 'h-8 text-small',
                     inputWrapper: 'h-8 min-h-unit-8 py-0',
@@ -442,6 +471,7 @@ const CardContainer = ({
                             >
                               <Info size={16} />
                             </Button>
+                            j
                             <Button
                               size="sm"
                               variant="light"

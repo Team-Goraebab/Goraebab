@@ -27,6 +27,7 @@ import {
 } from '@mui/material';
 import { DEFAULT_CONTAINER_SETTINGS } from '@/data/blueprint';
 import { generateId } from '@/utils/randomId';
+import { hostNamePattern } from '@/utils/patternUtils';
 
 interface HostModalProps {
   onClose: () => void;
@@ -73,6 +74,16 @@ const HostModal = ({ isOpen, onClose }: HostModalProps) => {
   }, [hostIp, isHostIpConnected]);
 
   const handleAddHost = (): void => {
+    if (!hostNamePattern.test(hostNm)) {
+      showSnackbar(
+        enqueueSnackbar,
+        '호스트 이름은 최대 20자까지 가능하며 소문자, 숫자, 밑줄, 마침표, 하이픈만 사용할 수 있습니다.',
+        'error',
+        '#d32f2f'
+      );
+      return;
+    }
+
     if (useHostStore.getState().hosts.length >= 5) {
       showSnackbar(
         enqueueSnackbar,
@@ -83,7 +94,6 @@ const HostModal = ({ isOpen, onClose }: HostModalProps) => {
       return;
     }
 
-    // 선택한 네트워크 정보 찾기
     const selectedNetwork = availableNetworks.find(
       (net) => net.Name === networkName
     );
@@ -223,10 +233,10 @@ const HostModal = ({ isOpen, onClose }: HostModalProps) => {
     <Dialog
       open={true}
       onClose={onClose}
-      onClick={(e) => e.stopPropagation()} // 이벤트 버블링 방지
+      onClick={(e) => e.stopPropagation()}
       slotProps={{
         backdrop: {
-          onClick: () => onClose(), // 백드롭 클릭시에만 닫히도록 설정
+          onClick: () => onClose(),
         },
       }}
       fullWidth
