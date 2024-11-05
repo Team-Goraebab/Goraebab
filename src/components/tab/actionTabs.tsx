@@ -150,29 +150,49 @@ const ActionTabs = () => {
             id: network.networkUniqueId,
             driver: network.driver || 'bridge',
             ipam: {
-              config: [{ subnet: network.subnet || '' }],
+              config: [
+                {
+                  subnet: network.subnet || '172.19.0.0/16',
+                  // subnet: '172.19.0.0/16',
+                },
+              ],
             },
             containers: network.containers.map((container: any) => ({
               containerName: container.containerName,
               containerId: container.containerId,
               image: {
-                imageId: container.image?.imageId || '',
-                name: container.image?.name || '',
-                tag: container.image?.tag || '',
+                imageId: network.droppedImages[0].imageId || '',
+                name: network.droppedImages[0].name || '',
+                tag: network.droppedImages[0].tag || '',
               },
-              networkSettings: container.networkSettings || {},
-              ports: container.ports || [],
-              mounts: container.mounts || [],
-              env: container.env || [],
-              cmd: container.cmd || [],
+              networkSettings: network.configs[0].networkSettings || {
+                gateway: '192.168.1.1',
+                ipAddress: '192.168.1.100',
+              },
+              ports:
+                network.configs[0].ports.length > 0
+                  ? network.configs[0].ports
+                  : [
+                      {
+                        privatePort: 80,
+                        publicPort: 8080,
+                      },
+                    ],
+              mounts: network.configs[0].mounts || [],
+              env: network.configs[0].env || [],
+              cmd: network.configs[0].cmd || [],
             })),
           })),
-          volume: host.networks.flatMap((network: any) => network.imageVolumes),
+          volume: host.networks.flatMap(
+            (network: any) => network.imageVolumes || []
+          ),
         })),
       },
     };
 
     console.log('requestBody', requestBody);
+    console.log('map', mappedData);
+
     try {
       if (!mappedData || !Array.isArray(mappedData)) {
         showSnackbar(
