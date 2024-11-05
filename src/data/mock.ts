@@ -7,7 +7,7 @@ export const TEST_DATA = [
         {
           name: 'my_new_host',
           isRemote: false,
-          ip: '',
+          ip: 'localhost',
           id: 'host_id_1',
           network: [
             {
@@ -62,13 +62,17 @@ export const TEST_DATA = [
               name: 'volume_name',
               driver: 'volume_driver',
             },
+            {
+              name: 'volume_name',
+              driver: 'volume_driver',
+            },
           ],
         },
         {
           isRemote: true,
           ip: '127.18.0.0',
           name: '내가 호스트야',
-          id: '127.18.0.0',
+          id: 'GHHGHGH',
           network: [
             {
               name: '네트워크 이름',
