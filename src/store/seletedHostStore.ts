@@ -1,5 +1,5 @@
+import { generateId } from '@/utils/randomId';
 import { create } from 'zustand';
-import { v4 as uuidv4 } from 'uuid';
 
 interface Container {
   imageVolumes: any[];
@@ -31,7 +31,7 @@ interface Container {
   cmd: string[];
 }
 
-interface BridgeInfo {
+export interface BridgeInfo {
   id: string;
   uniqueId: string;
   name: string;
@@ -56,6 +56,11 @@ interface SelectedHostStore {
   deleteConnectedBridgeId: (hostId: string, uniqueId: string) => void;
   clearConnectedBridges: () => void;
   clearBridgesForHost: (hostId: string) => void;
+  updateContainerName: (
+    hostId: string,
+    containerId: string,
+    newName: string
+  ) => void;
 }
 
 export const selectedHostStore = create<SelectedHostStore>((set) => ({
@@ -96,8 +101,8 @@ export const selectedHostStore = create<SelectedHostStore>((set) => ({
       if (currentBridges.length >= 3) {
         return state;
       }
-
-      const bridgeWithuniqueId = { ...bridge, uniqueId: uuidv4() };
+      const networkId = generateId('network');
+      const bridgeWithuniqueId = { ...bridge, uniqueId: networkId };
 
       return {
         connectedBridgeIds: {
@@ -134,6 +139,27 @@ export const selectedHostStore = create<SelectedHostStore>((set) => ({
       delete updatedConnectedBridgeIds[hostId];
       return {
         connectedBridgeIds: updatedConnectedBridgeIds,
+      };
+    }),
+
+  // 컨테이너 이름 업데이트
+  updateContainerName: (hostId: string, containerId: string, name: string) =>
+    set((state) => {
+      const updatedBridges = state.connectedBridgeIds[hostId]?.map(
+        (bridge) => ({
+          ...bridge,
+          containers: bridge.containers.map((container) =>
+            container.containerId === containerId
+              ? { ...container, containerName: name }
+              : container
+          ),
+        })
+      );
+      return {
+        connectedBridgeIds: {
+          ...state.connectedBridgeIds,
+          [hostId]: updatedBridges,
+        },
       };
     }),
 }));
