@@ -137,6 +137,42 @@ const ActionTabs = () => {
   };
 
   const handleSaveSubmit = async () => {
+    const requestBody = {
+      blueprintName,
+      processedData: {
+        host: mappedData.map((host) => ({
+          name: host.hostNm,
+          isRemote: host.isRemote,
+          ip: host.isRemote ? remoteUrl : null,
+          id: host.id,
+          network: host.networks.map((network: any) => ({
+            name: network.name,
+            id: network.networkUniqueId,
+            driver: network.driver || 'bridge',
+            ipam: {
+              config: [{ subnet: network.subnet || '' }],
+            },
+            containers: network.containers.map((container: any) => ({
+              containerName: container.containerName,
+              containerId: container.containerId,
+              image: {
+                imageId: container.image?.imageId || '',
+                name: container.image?.name || '',
+                tag: container.image?.tag || '',
+              },
+              networkSettings: container.networkSettings || {},
+              ports: container.ports || [],
+              mounts: container.mounts || [],
+              env: container.env || [],
+              cmd: container.cmd || [],
+            })),
+          })),
+          volume: host.networks.flatMap((network: any) => network.imageVolumes),
+        })),
+      },
+    };
+
+    console.log('requestBody', requestBody);
     try {
       if (!mappedData || !Array.isArray(mappedData)) {
         showSnackbar(
@@ -148,50 +184,7 @@ const ActionTabs = () => {
         return;
       }
 
-      const requestBody = {
-        blueprintName,
-        processedData: {
-          host: mappedData.map((host) => ({
-            name: host.hostNm,
-            isRemote: !isDockerRemote,
-            ip: isDockerRemote ? remoteUrl : null,
-            network: Array.isArray(host.networks)
-              ? host.networks.map((network: any) => ({
-                  name: network.name,
-                  driver: network.driver || 'bridge',
-                  ipam: {
-                    config: [
-                      {
-                        subnet: network.subnet || '',
-                      },
-                    ],
-                  },
-                  containers: [
-                    {
-                      containerName: network.containerName || null,
-                      image: {
-                        imageId: network.droppedImages?.[0]?.id || '',
-                        name: network.droppedImages?.[0]?.name || '',
-                        tag: network.droppedImages?.[0]?.tag || '',
-                      },
-                      networkSettings: network.networkSettings || {},
-                      ports: network.ports || [],
-                      mounts: network.mounts || [],
-                      env: network.env || [],
-                      cmd: network.cmd || [],
-                    },
-                  ],
-                }))
-              : [],
-            volume: Array.isArray(host.imageVolumes)
-              ? host.imageVolumes.map((volume: any) => ({
-                  name: volume.Name,
-                  driver: volume.Driver,
-                }))
-              : [],
-          })),
-        },
-      };
+      console.log('mappedData >>>>', mappedData);
 
       const res = await createBlueprint(requestBody);
 
