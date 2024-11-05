@@ -25,10 +25,10 @@ interface ConfigurationModalProps {
   open: boolean;
   onClose: () => void;
   onSave: (config: ConfigurationData) => void;
-  initialConfig?: ConfigurationData; // Added initialConfig prop
+  initialConfig?: ConfigurationData;
 }
 
-interface ConfigurationData {
+export interface ConfigurationData {
   networkSettings: {
     gateway: string;
     ipAddress: string;
@@ -36,7 +36,7 @@ interface ConfigurationData {
   ports: {
     privatePort: number;
     publicPort: number;
-  }[];
+  };
   mounts: MountConfigProps[];
   env: string[];
   cmd: string[];
@@ -81,10 +81,10 @@ const ConfigurationModal = ({
   });
 
   const [portSettings, setPortSettings] = useState<PortSettingsProps>(
-    initialConfig?.ports[0]
+    initialConfig?.ports
       ? {
-          privatePort: initialConfig.ports[0].privatePort.toString(),
-          publicPort: initialConfig.ports[0].publicPort.toString(),
+          privatePort: initialConfig.ports.privatePort.toString(),
+          publicPort: initialConfig.ports.publicPort.toString(),
         }
       : { privatePort: '80', publicPort: '8080' }
   );
@@ -103,8 +103,8 @@ const ConfigurationModal = ({
     if (initialConfig) {
       setNetworkSettings(initialConfig.networkSettings);
       setPortSettings({
-        privatePort: initialConfig.ports[0]?.privatePort.toString() || '80',
-        publicPort: initialConfig.ports[0]?.publicPort.toString() || '8080',
+        privatePort: initialConfig.ports?.privatePort.toString() || '80',
+        publicPort: initialConfig.ports?.publicPort.toString() || '8080',
       });
       setMounts(initialConfig.mounts);
       setEnvVariables(initialConfig.env.join('\n'));
@@ -137,12 +137,10 @@ const ConfigurationModal = ({
 
     const config: ConfigurationData = {
       networkSettings,
-      ports: [
-        {
-          privatePort: parseInt(portSettings.privatePort, 10),
-          publicPort: parseInt(portSettings.publicPort, 10),
-        },
-      ],
+      ports: {
+        privatePort: parseInt(portSettings.privatePort, 10),
+        publicPort: parseInt(portSettings.publicPort, 10),
+      },
       mounts,
       env: envVariables ? envVariables.split('\n').filter(Boolean) : [],
       cmd: cmd ? cmd.split('\n').filter(Boolean) : [],
