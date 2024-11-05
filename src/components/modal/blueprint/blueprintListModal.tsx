@@ -42,7 +42,6 @@ const BlueprintListModal = ({ isOpen, onClose }: BlueprintListModalProps) => {
   const [blueprints, setBlueprints] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const { setContainerName } = useContainerNameStore();
   const { setMappedData } = useBlueprintStore();
   const { addHost, hosts } = useHostStore();
   const addConnectedBridgeId = selectedHostStore(
@@ -87,62 +86,68 @@ const BlueprintListModal = ({ isOpen, onClose }: BlueprintListModalProps) => {
         status: true,
         isRemote: hostData.isRemote,
         themeColor: getRandomThemeColor(colorsOption),
-        networks: hostData.network.map((network: any) => ({
-          id: network.id,
-          name: network.name,
-          ip: network.ipam.config[0]?.subnet || '',
-          hostId: hostData.id,
-          networkUniqueId: network.id,
-          driver: network.driver,
-          subnet: network.ipam.config[0]?.subnet || '',
-          containers: network.containers.map((container: any) => ({
-            containerName: container.containerName,
-            image: {
-              imageId: container.image.imageId,
-              name: container.image.name,
-              tag: container.image.tag,
-            },
-            networkSettings: container.networkSettings,
-            ports: container.ports,
-            mounts: container.mounts,
-            env: container.env,
-            cmd: container.cmd,
-            imageVolumes: hostData.volume || [],
-          })),
-        })),
+        networks: [],
       };
 
       hostData.network.forEach((network: any) => {
         network.containers.forEach((container: any) => {
-          const hostId = hostData.id;
-          const networkId = network.id;
-          const containerId = container.containerId;
-          const containerName = container.containerName;
-          setContainerName(hostId, networkId, containerId, containerName);
+          const networkData = {
+            id: network.id,
+            name: network.name,
+            ip: network.ipam.config[0]?.subnet || '',
+            hostId: hostData.id,
+            networkUniqueId: network.id,
+            driver: network.driver,
+            subnet: network.ipam.config[0]?.subnet || '',
+            containers: [
+              {
+                containerName: container.containerName,
+                containerId: container.containerId,
+                image: {
+                  imageId: container.image.imageId,
+                  name: container.image.name,
+                  tag: container.image.tag,
+                },
+                networkSettings: container.networkSettings,
+                ports: container.ports,
+                mounts: container.mounts,
+                env: container.env,
+                cmd: container.cmd,
+                imageVolumes: hostData.volume || [],
+              },
+            ],
+          };
 
-          addConnectedBridgeId(hostId, {
-            id: generateId(),
+          // 네트워크 데이터 추가
+          formattedHost.networks.push(networkData);
+          const networkId = generateId('networks');
+
+          // connectedBridgeId 추가
+          addConnectedBridgeId(hostData.id, {
+            id: network.id,
             uniqueId: networkId,
             name: network.name,
             gateway: container.networkSettings.gateway || '',
-            driver: network.driver,
+            driver: network.driver || '',
             subnet: network.ipam.config[0]?.subnet || '',
             scope: '',
-            containers: network.containers.map((c: any) => ({
-              containerName: c.containerName,
-              containerId: c.containerId,
-              image: {
-                id: c.image.imageId,
-                name: c.image.name,
-                tag: c.image.tag,
+            containers: [
+              {
+                containerName: container.containerName,
+                containerId: container.containerId,
+                image: {
+                  imageId: container.image.imageId,
+                  name: container.image.name,
+                  tag: container.image.tag,
+                },
+                networkSettings: container.networkSettings,
+                ports: container.ports,
+                mounts: container.mounts,
+                env: container.env,
+                cmd: container.cmd,
+                imageVolumes: hostData.volume || [],
               },
-              networkSettings: c.networkSettings,
-              ports: c.ports,
-              mounts: c.mounts,
-              env: c.env,
-              cmd: c.cmd,
-              imageVolumes: hostData.volume || [],
-            })),
+            ],
           });
         });
       });
