@@ -190,8 +190,8 @@ const ActionTabs = () => {
       },
     };
 
-    console.log('requestBody', requestBody);
-    console.log('map', mappedData);
+    // console.log('requestBody', requestBody);
+    // console.log('mappedData >>>>', mappedData);
 
     try {
       if (!mappedData || !Array.isArray(mappedData)) {
@@ -204,8 +204,6 @@ const ActionTabs = () => {
         return;
       }
 
-      console.log('mappedData >>>>', mappedData);
-
       const res = await createBlueprint(requestBody);
 
       if (res.status === 200 || res.status === 201) {
@@ -215,6 +213,7 @@ const ActionTabs = () => {
           'success',
           '#4CAF50'
         );
+        setIsSaveModalOpen(false);
       } else {
         showSnackbar(
           enqueueSnackbar,
