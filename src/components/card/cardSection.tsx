@@ -241,7 +241,6 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
                                           Driver: volume.driver,
                                         })
                                       )}
-                                      networkUniqueId={''}
                                     />
                                   );
                                 })
