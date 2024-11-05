@@ -61,18 +61,19 @@ Goraebab addresses this issue by enabling users to design Docker configurations 
 
 ### Hardware
 
+Recommended Resources
+- CPU - 6 cores, 12 threads
+- RAM - 16 GB
+- Monitor resolution - 1470 x 956
+
+
+### Software
+
 OS
 - Window 10 or higher
 - macOS 14(Sonoma) or higher
 - Linux ubnutu 20.04 or higher
 
-Recommended Resources
-- CPU - ? cores, ? threads
-- RAM - 16 GB
-- Monitor resolution - ? x ?
-
-
-### Software
 
 1. Install Docker and Docker-compose.
 
@@ -80,35 +81,55 @@ Recommended Resources
 
     - Windows
 
-      ![dfdf.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/05b0d37a-666a-49e3-962a-9dcee8904ca3/b13c1fa4-63eb-48b2-9f8f-cb300899ffd4/acea4c2d-5ba6-4f14-a2ab-6367cdba41ae.png)
+      ![windows_docker_setting.png](docs/image/windows_docker_setting.png)
 
-    - Linux
+    - Linux (Ubuntu)
+      
+      [Docker docs about Linux Setting](https://docs.docker.com/engine/daemon/remote-access/)
 
-      https://docs.docker.com/engine/daemon/remote-access/
 
+      ```bash
+      sudo systemctl edit docker.service
+      
+      [Service]
+      ExecStart=
+      ExecStart=/usr/bin/dockerd -H fd:// -H tcp://0.0.0.0:2375
+      ```
 
-    ```bash
-    sudo systemctl edit docker.service
-    
-    [Service]
-    ExecStart=
-    ExecStart=/usr/bin/dockerd -H fd:// -H tcp://0.0.0.0:2375
-    ```
+    - macOS
+  
+      ```bash
+      brew install socat
+      socat TCP-LISTEN:2375,reuseaddr,fork UNIX-CLIENT:/var/run/docker.sock
+      ```
+
+      
+3. Secure Docker and Host Connection with TLS
+   
+   [Docker docs about TLS settings](https://docs.docker.com/engine/security/protect-access/)
+   
+   It is highly recommended to use this tool with TLS configuration if it is intended for production development rather than simple learning or testing purposes. For a more secure connection between Docker and the host, it’s recommended to configure TLS (Transport Layer Security). TLS encrypts the data transmitted between Docker clients and the Docker daemon, ensuring that sensitive information and commands remain confidential and tamper-proof. By using TLS, you also authenticate both the client and server, which allows only verified users and applications to interact with Docker.
+  
 
 
 ## Execution
 
 ```bash
-// Check if port 2387, DBMS DEAFULT port is available
+# Check if port 2387, DBMS DEAFULT port is available
 
-git clone 고래밥링크
+git clone https://github.com/Team-Goraebab/Goraebab.git
 
+
+# This tool support MySQL, Mariadb, Postgresql, Oracle
+
+# Mac or Linux
 chmod +x start.sh
-./start.sh {DBMS name}  # Mac or Linux
+./start.sh {DBMS name}  
 
-or
+# or
 
-./start.bat {DBMS name} # Windows
+# Windows
+./start.bat {DBMS name} 
 
 ```
 
