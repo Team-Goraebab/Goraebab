@@ -52,8 +52,8 @@ const BlueprintListModal = ({ isOpen, onClose }: BlueprintListModalProps) => {
     setIsLoading(true);
     try {
       const response = await axios.get(`/api/blueprint/list`);
-      setBlueprints(TEST_DATA);
-      // setBlueprints(response.data || []);
+      // setBlueprints(TEST_DATA);
+      setBlueprints(response.data || []);
     } catch (error) {
       console.error('Error fetching blueprints:', error);
     } finally {
@@ -155,13 +155,14 @@ const BlueprintListModal = ({ isOpen, onClose }: BlueprintListModalProps) => {
       addHost(formattedHost);
       setMappedData([formattedHost]);
     });
+    onClose();
   };
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="2xl">
-      <ModalContent className="pb-3">
+      <ModalContent className="p-4" style={{ overflow: 'hidden' }}>
         <ModalHeader className="flex flex-col gap-1">설계도 목록</ModalHeader>
-        <ModalBody>
+        <ModalBody style={{ maxHeight: '60vh', overflowY: 'auto' }}>
           {isLoading ? (
             <div className="flex justify-center items-center p-4">
               로딩 중...
@@ -184,7 +185,7 @@ const BlueprintListModal = ({ isOpen, onClose }: BlueprintListModalProps) => {
                     <TableCell>{blueprint.name}</TableCell>
                     <TableCell>{formatDate(blueprint.dateCreated)}</TableCell>
                     <TableCell>
-                      {blueprint.data.host[0]?.isRemote ? 'Local' : 'Remote'}
+                      {blueprint.data.host[0]?.isRemote ? 'Remote' : 'Local'}
                     </TableCell>
                     <TableCell>
                       <Button
