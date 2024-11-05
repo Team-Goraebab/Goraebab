@@ -35,6 +35,8 @@ const SaveBlueprintModal = ({
   remoteUrl,
   setRemoteUrl,
 }: SaveBlueprintModalProps) => {
+  const isSaveDisabled = blueprintName.trim() === '';
+
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalContent>
@@ -64,7 +66,19 @@ const SaveBlueprintModal = ({
           <Button color="default" variant="light" onPress={onClose}>
             취소
           </Button>
-          <Button color="primary" onPress={onSave}>
+          <Button
+            color="primary"
+            onPress={() => {
+              if (!isSaveDisabled) {
+                onSave();
+              }
+            }}
+            disabled={isSaveDisabled}
+            style={{
+              backgroundColor: isSaveDisabled ? '#D3D3D3' : '',
+              cursor: isSaveDisabled ? 'not-allowed' : 'pointer',
+            }}
+          >
             저장
           </Button>
         </ModalFooter>

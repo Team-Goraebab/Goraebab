@@ -4,13 +4,6 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import {
   Button,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Input,
-  Checkbox,
   Dropdown,
   DropdownTrigger,
   DropdownMenu,
