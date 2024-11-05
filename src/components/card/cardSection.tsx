@@ -24,6 +24,7 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
     selectedHostIp,
     setSelectedHostIp,
     deleteConnectedBridgeId,
+    clearBridgesForHost,
   } = selectedHostStore();
 
   const { selectedNetwork, setSelectedNetwork, clearSelectedNetwork } =
@@ -53,6 +54,7 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
 
   const handleDeleteHost = (id: string) => {
     deleteHost(id);
+    clearBridgesForHost(id);
   };
 
   const handleSelectNetwork = (
