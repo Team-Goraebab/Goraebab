@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { v4 as uuidv4 } from 'uuid';
 import { colorsOption } from '@/data/color';
 import { Host, Network, ThemeColor } from '@/types/type';
 import axios from 'axios';
@@ -27,6 +26,7 @@ import {
   Typography,
 } from '@mui/material';
 import { DEFAULT_CONTAINER_SETTINGS } from '@/data/blueprint';
+import { generateId } from '@/utils/randomId';
 
 interface HostModalProps {
   onClose: () => void;
@@ -34,7 +34,6 @@ interface HostModalProps {
 }
 
 const HostModal = ({ isOpen, onClose }: HostModalProps) => {
-  const id = uuidv4();
   const { enqueueSnackbar } = useSnackbar();
   const addHost = useHostStore((state) => state.addHost);
   const addConnectedBridgeId = selectedHostStore(
@@ -99,8 +98,11 @@ const HostModal = ({ isOpen, onClose }: HostModalProps) => {
       return;
     }
 
+    const hostId = generateId('host');
+    const networkId = generateId('network');
+
     const newHost: Host = {
-      id,
+      id: hostId,
       hostNm,
       hostIp: isRemote ? hostIp : 'localhost',
       status: true,
@@ -111,19 +113,19 @@ const HostModal = ({ isOpen, onClose }: HostModalProps) => {
           id: selectedNetwork.Id,
           name: selectedNetwork.Name,
           ip: selectedNetwork.IPAM?.Config?.[0]?.Gateway || '',
-          hostId: id,
+          hostId: hostId,
           driver: selectedNetwork.Driver,
           subnet: selectedNetwork.IPAM?.Config?.[0]?.Subnet || '',
-          networkUniqueId: uuidv4(),
-          containers: [],
+          networkUniqueId: networkId,
+          containers: [DEFAULT_CONTAINER_SETTINGS],
         },
       ],
     };
 
     addHost(newHost);
 
-    addConnectedBridgeId(id, {
-      uniqueId: uuidv4(),
+    addConnectedBridgeId(hostId, {
+      uniqueId: networkId,
       name: selectedNetwork.Name,
       gateway: selectedNetwork.IPAM?.Config?.[0]?.Gateway || '',
       driver: selectedNetwork.Driver || '',
