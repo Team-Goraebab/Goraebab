@@ -8,9 +8,7 @@ import { useStore } from '@/store/cardStore';
 import { selectedHostStore } from '@/store/seletedHostStore';
 import { useHostStore } from '@/store/hostStore';
 import { useSelectedNetworkStore } from '@/store/selectedNetworkStore';
-import { useContainerNameStore } from '@/store/containerNameStore';
 import { FaTrash, FaHome, FaGlobeAsia } from 'react-icons/fa';
-import { VolumeData } from '@/types/type';
 
 interface CardSectionProps {
   hostData: HostCardProps[];
@@ -25,14 +23,17 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
     setSelectedHostName,
     selectedHostIp,
     setSelectedHostIp,
-    connectedBridgeIds,
     deleteConnectedBridgeId,
-    clearBridgesForHost,
   } = selectedHostStore();
 
-  const { getContainerName, setContainerName } = useContainerNameStore();
   const { selectedNetwork, setSelectedNetwork, clearSelectedNetwork } =
     useSelectedNetworkStore();
+  const updateContainerName = selectedHostStore(
+    (state) => state.updateContainerName
+  );
+  const connectedBridgeIds = selectedHostStore(
+    (state) => state.connectedBridgeIds
+  );
 
   const allContainers = useStore((state) => state.hostContainers);
   const deleteHost = useHostStore((state) => state.deleteHost);
@@ -52,7 +53,6 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
 
   const handleDeleteHost = (id: string) => {
     deleteHost(id);
-    clearBridgesForHost(id);
   };
 
   const handleSelectNetwork = (
@@ -75,7 +75,11 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
     }
   };
 
-  const handleDeleteNetwork = (hostId: string, uniqueId: string) => {
+  const handleDeleteNetwork = (
+    hostId: string,
+    networkName: string,
+    uniqueId: string
+  ) => {
     if (
       selectedNetwork?.hostId === hostId &&
       selectedNetwork?.uniqueId === uniqueId
@@ -88,40 +92,10 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
 
   const handleContainerNameChange = (
     hostId: string,
-    networkId: string,
     containerId: string,
     name: string
   ) => {
-    setContainerName(hostId, networkId, containerId, name);
-  };
-
-  const formatImageVolumes = (id: string, containers: any) => {
-    const formattedVolumes: {
-      [networkUniqueId: string]: {
-        [containerId: string]: any[];
-      };
-    } = {};
-
-    containers.forEach((container: any) => {
-      const networkUniqueId = id;
-      const containerId = container.containerId;
-
-      if (!formattedVolumes[networkUniqueId]) {
-        formattedVolumes[networkUniqueId] = {};
-      }
-      if (!formattedVolumes[networkUniqueId][containerId]) {
-        formattedVolumes[networkUniqueId][containerId] = [];
-      }
-
-      container.imageVolumes.forEach((volume: any) => {
-        formattedVolumes[networkUniqueId][containerId].push({
-          Driver: volume.driver,
-          Name: volume.name,
-        });
-      });
-    });
-
-    return formattedVolumes;
+    updateContainerName(hostId, containerId, name);
   };
 
   return (
@@ -131,9 +105,10 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
           hostData.map((host) => {
             const containers = allContainers[host.id] || [];
             const networks = connectedBridgeIds[host.id] || [];
-            console.log('networks >>>>', networks);
+
             const isHostSelected =
               selectedNetwork?.hostId === host.id || selectedHostId === host.id;
+
             return (
               <div key={host.id} className="relative">
                 <div
@@ -145,7 +120,7 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
                     onClick={() =>
                       handleHostClick(host.id, host.hostNm, host.hostIp)
                     }
-                    className="relative flex flex-col bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-200 w-[540px] cursor-pointer overflow-hidden"
+                    className={`relative flex flex-col bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-200 w-[540px] cursor-pointer overflow-hidden`}
                     style={{
                       borderColor: isHostSelected
                         ? host.themeColor.borderColor
@@ -212,76 +187,71 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
                     <div className="p-4">
                       {networks.length > 0 ? (
                         <div className="flex flex-col gap-4 w-full">
-                          {networks
-                            .filter(
-                              (network, index, self) =>
-                                index ===
-                                self.findIndex((n) => n.name === network.name)
-                            )
-                            .map((network) => {
-                              const formattedImageVolumes = formatImageVolumes(
-                                network.uniqueId,
-                                network.containers
-                              );
-                              return network.containers.map((container) => {
-                                const containerName =
-                                  getContainerName(
-                                    host.id,
-                                    network.id,
-                                    container.containerId
-                                  ) || container.containerName;
-                                const imageInfo = {
-                                  id: container.image.imageId,
-                                  name: container.image.name,
-                                  tag: container.image.tag,
-                                };
-                                return (
-                                  <CardContainer
-                                    key={container.containerId}
-                                    networkName={network.name}
-                                    networkIp={network.subnet}
-                                    containers={[container]}
-                                    containerName={containerName}
-                                    themeColor={host.themeColor}
-                                    onDelete={() =>
-                                      handleDeleteNetwork(
-                                        host.id,
+                          {networks.map((network) => (
+                            <div key={network.uniqueId}>
+                              {network.containers &&
+                              network.containers.length > 0 ? (
+                                network.containers.map((container) => {
+                                  return (
+                                    <CardContainer
+                                      key={container.containerId}
+                                      networkName={network.name}
+                                      networkIp={network.gateway}
+                                      containers={containers}
+                                      containerName={container.containerName}
+                                      themeColor={host.themeColor}
+                                      onDelete={() =>
+                                        handleDeleteNetwork(
+                                          host.id,
+                                          network.name,
+                                          network.uniqueId
+                                        )
+                                      }
+                                      onSelectNetwork={() =>
+                                        handleSelectNetwork(
+                                          host.id,
+                                          host.hostIp
+                                            ? host.hostIp
+                                            : 'localhost',
+                                          network.name,
+                                          network.id,
+                                          network.uniqueId
+                                        )
+                                      }
+                                      isSelected={
+                                        selectedNetwork?.uniqueId ===
                                         network.uniqueId
-                                      )
-                                    }
-                                    onSelectNetwork={() =>
-                                      handleSelectNetwork(
-                                        host.id,
-                                        host.hostIp,
-                                        network.name,
-                                        network.id,
-                                        network.uniqueId
-                                      )
-                                    }
-                                    isSelected={
-                                      selectedNetwork?.uniqueId ===
-                                      network.uniqueId
-                                    }
-                                    hostIp={host.hostIp}
-                                    networkUniqueId={network.uniqueId}
-                                    containerId={container.containerId}
-                                    onContainerNameChange={(name) =>
-                                      handleContainerNameChange(
-                                        host.id,
-                                        network.id,
-                                        container.containerId,
-                                        name
-                                      )
-                                    }
-                                    imageInfo={[imageInfo]}
-                                    // imageId={container.image.imageId}
-                                    // imageName={container.image.name}
-                                    // imageTag={container.image.tag}
-                                    imageVolumesVal={formattedImageVolumes}
-                                  />
-                                );
-                              });
-                            })}
+                                      }
+                                      hostIp={
+                                        host.hostIp ? host.hostIp : 'localhost'
+                                      }
+                                      onContainerNameChange={(id, name) =>
+                                        handleContainerNameChange(
+                                          host.id,
+                                          id,
+                                          name
+                                        )
+                                      }
+                                      containerId={container.containerId}
+                                      configsVal={[container]}
+                                      initialDroppedImages={[container.image]}
+                                      initialImagesVolumes={container.imageVolumes.map(
+                                        (volume) => ({
+                                          Name: volume.name,
+                                          Driver: volume.driver,
+                                        })
+                                      )}
+                                      networkUniqueId={''}
+                                    />
+                                  );
+                                })
+                              ) : (
+                                <div className="text-center text-gray-500 py-4">
+                                  연결된 컨테이너가 없습니다.
+                                </div>
+                              )}
+                            </div>
+                          ))}
                         </div>
                       ) : (
                         <div className="text-center text-gray-500 py-4">

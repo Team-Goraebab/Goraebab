@@ -2,13 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { useDrop } from 'react-dnd';
-import {
-  Container,
-  ImageInfo,
-  ThemeColor,
-  VolumeData,
-  ImageToNetwork,
-} from '@/types/type';
+import { Container, ImageInfo, ThemeColor, VolumeData } from '@/types/type';
 import {
   Card,
   CardBody,
@@ -37,34 +31,36 @@ import {
 } from 'lucide-react';
 import ImageDetailModal from '@/components/modal/image/imageDetailModal';
 import SelectVolumeModal from '../modal/volume/selectVolumeModal';
-import ConfigurationModal from '../modal/daemon/configurationModal';
+import ConfigurationModal, {
+  ConfigurationData,
+} from '../modal/daemon/configurationModal';
 import { selectedHostStore } from '@/store/seletedHostStore';
 import { useSnackbar } from 'notistack';
 import { useHostStore } from '@/store/hostStore';
 import { useBlueprintStore } from '@/store/blueprintStore';
-import { useContainerNameStore } from '@/store/containerNameStore';
 
 export interface CardContainerProps {
   networkName: string;
   networkIp: string;
-  // containers: Container[];
-  containers: any[];
+  containers: Container[];
   themeColor: ThemeColor;
   onDelete?: () => void;
   onSelectNetwork?: () => void;
   isSelected?: boolean;
   hostIp: string;
-  networkUniqueId: string;
   containerId: string;
   containerName: string;
-  // imageId: string;
-  // imageName: string;
-  // imageTag: string;
-  imageInfo: [{ id: string; name: string; tag: string }];
-  imageVolumesVal: {
-    [networkUniqueId: string]: { [imageId: string]: VolumeData[] };
-  };
-  onContainerNameChange?: (name: string) => void;
+  onContainerNameChange?: (containerId: string, name: string) => void;
+  configsVal: any[];
+  initialDroppedImages: any[];
+  initialImagesVolumes: any[];
+}
+
+interface ImageToNetwork {
+  imageId: string;
+  name: string;
+  tag: string;
+  networkName: string;
 }
 
 const CardContainer = ({
@@ -76,36 +72,26 @@ const CardContainer = ({
   onSelectNetwork,
   isSelected,
   hostIp,
-  networkUniqueId,
   containerId,
   containerName,
-  imageInfo,
-  // imageId,
-  // imageName,
-  // imageTag,
-  imageVolumesVal,
   onContainerNameChange,
+  configsVal,
+  initialDroppedImages,
+  initialImagesVolumes,
 }: CardContainerProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const { enqueueSnackbar } = useSnackbar();
-  const { setContainerName, getContainerName } = useContainerNameStore();
+
   const { setMappedData } = useBlueprintStore();
   const selectedHostIp = selectedHostStore((state) => state.selectedHostIp);
-  const selectedHostId = selectedHostStore((state) => state.selectedHostId);
   const hosts = useHostStore((state) => state.hosts);
   const connectedBridgeIds = selectedHostStore(
     (state) => state.connectedBridgeIds
   );
-  const mappedData = useBlueprintStore((state) => state.mappedData);
-  const hostId = mappedData[0]?.id || selectedHostId;
-  const isImageInfoValid =
-    imageInfo && imageInfo.every((info) => info.id && info.name && info.tag);
-
   const [isEditingName, setIsEditingName] = useState<boolean>(false);
-  const [inputName, setInputName] = useState<string>(containerName);
-  const [droppedImages, setDroppedImages] = useState<ImageInfo[]>(
-    isImageInfoValid ? imageInfo : []
-  );
+  const [tempContainerName, setTempContainerName] = useState(containerName);
+  const [droppedImages, setDroppedImages] =
+    useState<ImageInfo[]>(initialDroppedImages);
   const [imageToNetwork, setImageToNetwork] = useState<ImageToNetwork[]>([]);
   const [detailData, setDetailData] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -113,36 +99,30 @@ const CardContainer = ({
   const [selectedImage, setSelectedImage] = useState<string>('');
   const [selectedVolumes, setSelectedVolumes] = useState<VolumeData[]>([]);
   const [isConfigModalOpen, setIsConfigModalOpen] = useState<boolean>(false);
-  const [configData, setConfigData] = useState({
-    [networkUniqueId]: {
-      networkSettings: containers[0]?.networkSettings || {
-        gateway: '',
-        ipAddress: '',
+  const [configs, setConfigs] = useState<ConfigurationData[]>(
+    configsVal.map((c) => ({
+      networkSettings: {
+        gateway: c.networkSettings.gateway || '192.168.1.1',
+        ipAddress: c.networkSettings.ipAddress || '192.168.1.100',
       },
-      ports: containers[0]?.ports || [],
-      mounts: containers[0]?.mounts || [],
-      env: containers[0]?.env || [],
-      cmd: containers[0]?.cmd || [],
-      imageVolumes: containers[0]?.imageVolumes || [],
-    },
-  });
-  const [imageVolumes, setImageVolumes] = useState<{
-    [networkUniqueId: string]: {
-      [imageId: string]: VolumeData[];
-    };
-  }>(imageVolumesVal);
+      ports: {
+        privatePort: c.ports.privatePort || '80',
+        publicPort: c.ports.publicPort || '8080',
+      },
+      mounts: c.mounts || [],
+      env: c.env || [],
+      cmd: c.cmd || [],
+    }))
+  );
+  const [imageVolumes, setImageVolumes] =
+    useState<VolumeData[]>(initialImagesVolumes);
 
-  console.log('droppedImages', droppedImages);
+  const initialConfig = configs.length > 0 ? configs[0] : undefined;
 
   useEffect(() => {
     const mappedData = hosts.map((host) => {
       const networks = connectedBridgeIds[host.id] || [];
-
       const mappedNetworks = networks.map((network) => {
-        const networkConfigs = configData[network.uniqueId] || [];
-        const networkImageVolumes =
-          imageVolumes[network.uniqueId]?.[droppedImages[0]?.id] || [];
-
         return {
           id: network.id,
           name: network.name,
@@ -153,11 +133,25 @@ const CardContainer = ({
           hostId: host.id,
           networkUniqueId: network.uniqueId,
           ip: network.gateway,
-          containers: [],
-          containerName: containerName,
-          configs: networkConfigs,
-          droppedImages: droppedImages,
-          imageVolumes: networkImageVolumes,
+          containers: network.containers
+            ? network.containers.map((container) => ({
+                containerName: container.containerName,
+                containerId: container.containerId,
+                image: {
+                  imageId: container.image?.imageId || '',
+                  name: container.image?.name || '',
+                  tag: container.image?.tag || '',
+                },
+                networkSettings: container.networkSettings || {},
+                ports: container.ports || [],
+                mounts: container.mounts || [],
+                env: container.env || [],
+                cmd: container.cmd || [],
+              }))
+            : [],
+          configs: configs || [],
+          droppedImages: droppedImages || [],
+          imageVolumes: imageVolumes || [],
         };
       });
 
@@ -171,16 +165,16 @@ const CardContainer = ({
   }, [
     hosts,
     connectedBridgeIds,
-    configData,
+    configs,
     droppedImages,
     imageVolumes,
     containerName,
     setMappedData,
   ]);
 
-  const splitImageNameAndTag = (image: string, id: string): ImageInfo => {
+  const splitImageNameAndTag = (image: string, imageId: string): ImageInfo => {
     const [name, tag] = image.split(':');
-    return { id, name, tag };
+    return { imageId, name, tag };
   };
 
   const handleGetInfo = async (imageName: string) => {
@@ -195,33 +189,41 @@ const CardContainer = ({
     }
   };
 
+  const isDefaultImage = (image: ImageInfo) => {
+    return !image.imageId && !image.name && !image.tag;
+  };
+  // 이미지 유효성 상태
+  const [imageValid, setImageValid] = useState<boolean>(false);
+
+  // droppedImages 배열을 업데이트할 때마다 이미지의 유효성을 확인
+  useEffect(() => {
+    // 이미지가 유효하지 않다면 droppedImages를 빈 배열로 설정
+    if (droppedImages.length > 0 && isDefaultImage(droppedImages[0])) {
+      setImageValid(false);
+      setDroppedImages([]);
+    } else {
+      setImageValid(true);
+    }
+  }, [droppedImages]);
+
   const [{ isOver }, drop] = useDrop({
     accept: 'IMAGE_CARD',
     drop: (item: { image: string; id: string }) => {
       if (droppedImages.length > 0) {
-        enqueueSnackbar(
-          'Please delete the current image before adding a new one.',
-          {
-            variant: 'warning',
-            autoHideDuration: 3000,
-            anchorOrigin: { vertical: 'top', horizontal: 'right' },
-          }
-        );
+        enqueueSnackbar('이미지는 하나만 추가할 수 있습니다.', {
+          variant: 'warning',
+          autoHideDuration: 3000,
+          anchorOrigin: {
+            vertical: 'top',
+            horizontal: 'right',
+          },
+        });
         return;
       }
 
-      const newImage = splitImageNameAndTag(item.image, item.id);
-      console.log('newImage', newImage);
-      setDroppedImages([newImage]);
-
-      setImageToNetwork([
-        {
-          id: item.id,
-          name: newImage.name,
-          tag: newImage.tag,
-          networkName,
-        },
-      ]);
+      const imageInfo = splitImageNameAndTag(item.image, item.id);
+      setDroppedImages((prev) => [...prev, imageInfo]);
+      setImageToNetwork((prev) => [...prev, { ...imageInfo, networkName }]);
     },
     canDrop: () => hostIp === selectedHostIp,
     collect: (monitor) => ({
@@ -231,33 +233,28 @@ const CardContainer = ({
 
   drop(ref);
 
-  const allImages =
-    droppedImages.length > 0
-      ? droppedImages
-      : containers.map((c) => ({
-          id: c.containerId,
-          name: c.image.name,
-          tag: c.image.tag,
-        }));
+  const allImages = [
+    ...containers.map((c) => splitImageNameAndTag(c.image.name, c.id)),
+    ...droppedImages,
+  ];
 
   const handleDeleteImage = (imageId: string) => {
-    console.log('imageId >>>>', imageId);
     // 이미지 삭제
-    setDroppedImages((prev) => prev.filter((image) => image.id !== imageId));
+    setDroppedImages((prev) =>
+      prev.filter((image) => image.imageId !== imageId)
+    );
     // imageToNetwork에서 해당 이미지 정보 삭제
-    setImageToNetwork((prev) => prev.filter((entry) => entry.id !== imageId));
-    // imageVolumes에서 해당 이미지의 볼륨 데이터 삭제
-    setImageVolumes((prev) => {
-      const updatedVolumes = { ...prev };
-      delete updatedVolumes[imageId];
-      return updatedVolumes;
-    });
+    setImageToNetwork((prev) =>
+      prev.filter((entry) => entry.imageId !== imageId)
+    );
+
+    // 이미지 삭제 후 드롭 가능 상태로 전환
+    setImageValid(false);
   };
 
-  const handleOpenVolumeModal = (imageId: string) => {
-    const volumes = configData[networkUniqueId]?.imageVolumes?.[imageId] || [];
-    setSelectedImage(imageId);
-    setSelectedVolumes(volumes);
+  const handleOpenVolumeModal = (currentContainerId: string) => {
+    setSelectedImage(currentContainerId);
+    setSelectedVolumes(imageVolumes || []);
     setIsVolumeModalOpen(true);
   };
 
@@ -266,42 +263,29 @@ const CardContainer = ({
   };
 
   const handleAddVolume = (volumeData: VolumeData[]) => {
-    setImageVolumes((prev) => ({
-      ...prev,
-      [networkUniqueId]: {
-        ...(prev[networkUniqueId] || {}),
-        [selectedImage]: volumeData,
-      },
-    }));
+    setImageVolumes(volumeData);
     handleCloseVolumeModal();
   };
 
-  const handleSaveConfig = (newConfig: any) => {
-    setConfigData((prevConfigData) => ({
-      ...prevConfigData,
-      [networkUniqueId]: newConfig,
-    }));
+  const handleSaveConfig = (config: ConfigurationData) => {
+    setConfigs((prevConfigs) => [...prevConfigs, config]);
     setIsConfigModalOpen(false);
   };
   const handleNameSubmit = () => {
-    if (inputName.trim()) {
-      // 스토어에 컨테이너 이름을 저장
-      setContainerName(hostId, networkUniqueId, containerId, inputName);
-      onContainerNameChange?.(inputName);
+    if (tempContainerName.trim()) {
+      if (onContainerNameChange) {
+        onContainerNameChange(containerId, tempContainerName);
+      }
       setIsEditingName(false);
     }
   };
 
-  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // 컨테이너 이름은 최대 20자로 제한
-    const value = e.target.value.slice(0, 20);
-    setInputName(value);
-  };
+  useEffect(() => {
+    setTempContainerName(containerName);
+  }, [containerName]);
 
   const handleCancelEdit = () => {
-    // 저장된 컨테이너 이름을 스토어에서 가져와서 설정
-    const storedName = getContainerName(hostId, networkUniqueId, containerId);
-    setInputName(storedName || containerName);
+    setTempContainerName(containerName);
     setIsEditingName(false);
   };
 
@@ -355,18 +339,26 @@ const CardContainer = ({
                 <Input
                   autoFocus
                   size="sm"
-                  value={inputName}
-                  onChange={handleNameChange}
+                  value={tempContainerName}
+                  onChange={(e) => setTempContainerName(e.target.value)}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') handleNameSubmit();
                     if (e.key === 'Escape') handleCancelEdit();
                   }}
                   placeholder="컨테이너 이름 입력 (최대 20자)"
+                  classNames={{
+                    input: 'h-8 text-small',
+                    inputWrapper: 'h-8 min-h-unit-8 py-0',
+                  }}
+                  startContent={
+                    <Edit2 size={14} className="text-default-400" />
+                  }
                 />
                 <Button
                   isIconOnly
                   size="sm"
                   color="primary"
+                  variant="flat"
                   onPress={handleNameSubmit}
                 >
                   <Check size={16} />
@@ -375,6 +367,7 @@ const CardContainer = ({
                   isIconOnly
                   size="sm"
                   color="danger"
+                  variant="flat"
                   onPress={handleCancelEdit}
                 >
                   <XIcon size={16} />
@@ -382,20 +375,23 @@ const CardContainer = ({
               </div>
             ) : (
               <div className="flex items-center justify-between bg-default-50 rounded-medium px-3 py-2">
-                <span className="text-sm">
-                  {inputName || '컨테이너 이름을 설정하세요'}
+                <span className="text-sm text-default-700">
+                  {containerName || '컨테이너 이름을 설정하세요'}
                 </span>
                 <Button
                   isIconOnly
                   size="sm"
+                  variant="light"
                   onPress={() => setIsEditingName(true)}
                 >
-                  <Edit2 size={16} />
+                  <Edit2 size={16} className="text-default-400" />
                 </Button>
               </div>
             )}
           </div>
+
           <Divider />
+
           <div className="w-full">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
@@ -403,20 +399,22 @@ const CardContainer = ({
                 <span className="text-small text-default-500">이미지</span>
               </div>
             </div>
+
             <ScrollShadow className="h-32">
-              <Accordion
-                className="p-0 gap-2"
-                itemClasses={{
-                  base: 'py-0 w-full',
-                  title: 'font-normal text-small',
-                  trigger: 'px-2 py-2 data-[hover=true]:bg-default-100',
-                  indicator: 'text-default-400',
-                }}
-              >
-                {allImages[0].id &&
-                  allImages.map((image) => (
+              {allImages.length > 0 ? (
+                <Accordion
+                  className="p-0 gap-2"
+                  itemClasses={{
+                    base: 'py-0 w-full',
+                    title: 'font-normal text-small',
+                    trigger: 'px-2 py-2 data-[hover=true]:bg-default-100',
+                    indicator: 'text-default-400',
+                  }}
+                >
+                  {allImages.map((image) => (
                     <AccordionItem
-                      key={image.id}
+                      key={image.imageId}
+                      aria-label={image.name}
                       title={
                         <div className="flex items-center justify-between w-full">
                           <div className="flex items-center gap-2">
@@ -448,7 +446,9 @@ const CardContainer = ({
                               size="sm"
                               variant="light"
                               isIconOnly
-                              onPress={() => handleOpenVolumeModal(image.id)}
+                              onPress={() =>
+                                handleOpenVolumeModal(image.imageId)
+                              }
                             >
                               <Plus size={16} />
                             </Button>
@@ -457,7 +457,7 @@ const CardContainer = ({
                               color="danger"
                               variant="light"
                               isIconOnly
-                              onPress={() => handleDeleteImage(image.id)}
+                              onPress={() => handleDeleteImage(image.imageId)}
                             >
                               <CircleX size={16} />
                             </Button>
@@ -465,7 +465,7 @@ const CardContainer = ({
                         </div>
                       }
                     >
-                      {imageVolumes[networkUniqueId]?.[image.id]?.length > 0 ? (
+                      {imageVolumes?.length > 0 ? (
                         <div className="px-2 pb-2">
                           <div className="flex items-center gap-2 mb-2">
                             <FolderOpen
@@ -477,25 +477,23 @@ const CardContainer = ({
                             </span>
                           </div>
                           <div className="space-y-2">
-                            {imageVolumes[networkUniqueId][image.id].map(
-                              (vol, index) => (
-                                <div
-                                  key={index}
-                                  className="flex items-center justify-between p-2 bg-default-50 rounded-medium"
+                            {imageVolumes.map((vol, index) => (
+                              <div
+                                key={index}
+                                className="flex items-center justify-between p-2 bg-default-50 rounded-medium"
+                              >
+                                <span className="text-sm truncate max-w-[300px] text-default-700">
+                                  {vol.Name}
+                                </span>
+                                <Chip
+                                  size="sm"
+                                  variant="flat"
+                                  className="bg-default-100"
                                 >
-                                  <span className="text-sm truncate max-w-[300px] text-default-700">
-                                    {vol.Name}
-                                  </span>
-                                  <Chip
-                                    size="sm"
-                                    variant="flat"
-                                    className="bg-default-100"
-                                  >
-                                    {vol.Driver}
-                                  </Chip>
-                                </div>
-                              )
-                            )}
+                                  {vol.Driver}
+                                </Chip>
+                              </div>
+                            ))}
                           </div>
                         </div>
                       ) : (
@@ -509,10 +507,19 @@ const CardContainer = ({
                       )}
                     </AccordionItem>
                   ))}
-              </Accordion>
+                </Accordion>
+              ) : (
+                <div className="h-full flex flex-col items-center justify-center border-2 border-dashed rounded-large p-4 gap-2">
+                  <ImageIcon size={24} className="text-default-300" />
+                  <span className="text-sm text-default-400">
+                    이미지를 드래그하여 추가하세요
+                  </span>
+                </div>
+              )}
             </ScrollShadow>
           </div>
         </CardBody>
+
         {onDelete && (
           <CardFooter className="justify-end px-4 py-2 bg-default-50">
             <Button
@@ -544,7 +551,7 @@ const CardContainer = ({
         open={isConfigModalOpen}
         onClose={() => setIsConfigModalOpen(false)}
         onSave={handleSaveConfig}
-        initialConfig={configData[networkUniqueId]}
+        initialConfig={initialConfig}
       />
     </>
   );

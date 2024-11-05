@@ -7,7 +7,6 @@ import { showSnackbar } from '@/utils/toastUtils';
 import { selectedHostStore } from '@/store/seletedHostStore';
 import { getStatusColors } from '@/utils/statusColorsUtils';
 import { formatDateTime } from '@/utils/formatTimestamp';
-import { v4 as uuidv4 } from 'uuid';
 import { fetchData } from '@/services/apiUtils';
 import NetworkDetailModal from '../modal/network/networkDetailModal';
 import {
@@ -25,6 +24,7 @@ import {
 import { FaNetworkWired } from 'react-icons/fa';
 import { Network } from '@/types/type';
 import { DEFAULT_CONTAINER_SETTINGS } from '@/data/blueprint';
+import { generateId } from '@/utils/randomId';
 
 interface CardDataProps {
   data: Network;
@@ -150,12 +150,14 @@ const NetworkCard = ({ data, onDeleteSuccess }: CardDataProps) => {
         driver: data.Driver,
         subnet: subnet,
         scope: data.Scope,
-        containers: containers,
+        containers: [DEFAULT_CONTAINER_SETTINGS],
       };
+
+      const networkId = generateId('network');
 
       addConnectedBridgeId(selectedHostId, {
         ...networkInfo,
-        uniqueId: uuidv4(),
+        uniqueId: networkId,
       });
 
       showSnackbar(
