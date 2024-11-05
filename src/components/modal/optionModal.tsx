@@ -24,14 +24,14 @@ interface OptionModalProps {
  * @returns
  */
 const OptionModal = ({
-                       topTitle,
-                       middleTitle,
-                       bottomTitle,
-                       onTopHandler,
-                       onMiddleHandler,
-                       onBottomHandler,
-                       btnVisible = true,
-                     }: OptionModalProps) => {
+  topTitle,
+  middleTitle,
+  bottomTitle,
+  onTopHandler,
+  onMiddleHandler,
+  onBottomHandler,
+  btnVisible = true,
+}: OptionModalProps) => {
   return (
     <div className="flex flex-col z-50 items-center rounded-xl w-32 absolute bg-white shadow-lg border border-grey_2">
       <button

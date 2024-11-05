@@ -35,6 +35,8 @@ import { FiList } from 'react-icons/fi';
 import { useContainerNameStore } from '@/store/containerNameStore';
 import { useSelectedNetworkStore } from '@/store/selectedNetworkStore';
 import { selectedHostStore } from '@/store/seletedHostStore';
+import DeleteBlueprintModal from '../modal/blueprint/deleteBlueprintModal';
+import SaveBlueprintModal from '../modal/blueprint/saveBlueprintModal';
 
 const ActionTabs = () => {
   const [isHostModalOpen, setIsHostModalOpen] = useState(false);
@@ -356,72 +358,27 @@ const ActionTabs = () => {
         />
       )}
 
-      <Modal
+      <DeleteBlueprintModal
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
-      >
-        <ModalContent>
-          <ModalHeader>설계도 삭제</ModalHeader>
-          <ModalBody>설계도를 삭제하시겠습니까?</ModalBody>
-          <ModalFooter>
-            <Button
-              color="default"
-              variant="light"
-              onPress={() => setIsDeleteModalOpen(false)}
-            >
-              취소
-            </Button>
-            <Button color="danger" onPress={handleDelete}>
-              삭제
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-
-      <Modal isOpen={isSaveModalOpen} onClose={() => setIsSaveModalOpen(false)}>
-        <ModalContent>
-          <ModalHeader>설계도 저장</ModalHeader>
-          <ModalBody>
-            <Input
-              autoFocus
-              placeholder="설계도 이름을 입력하세요"
-              value={blueprintName}
-              onChange={(e) => setBlueprintName(e.target.value)}
-            />
-            <Checkbox
-              isSelected={isDockerRemote}
-              onValueChange={setIsDockerRemote}
-            >
-              Docker Remote
-            </Checkbox>
-            {isDockerRemote && (
-              <Input
-                placeholder="Remote URL을 입력하세요"
-                value={remoteUrl}
-                onChange={(e) => setRemoteUrl(e.target.value)}
-              />
-            )}
-          </ModalBody>
-          <ModalFooter>
-            <Button
-              color="default"
-              variant="light"
-              onPress={() => setIsSaveModalOpen(false)}
-            >
-              취소
-            </Button>
-            <Button color="primary" onPress={handleSaveSubmit}>
-              저장
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+        onDelete={handleDelete}
+      />
+      <SaveBlueprintModal
+        isOpen={isSaveModalOpen}
+        onClose={() => setIsSaveModalOpen(false)}
+        onSave={handleSaveSubmit}
+        blueprintName={blueprintName}
+        setBlueprintName={setBlueprintName}
+        isDockerRemote={isDockerRemote}
+        setIsDockerRemote={setIsDockerRemote}
+        remoteUrl={remoteUrl}
+        setRemoteUrl={setRemoteUrl}
+      />
       <VersionDetailModal
         open={showVersionInfo}
         onClose={() => setShowVersionInfo(false)}
         data={versionData}
       />
-
       <SystemInfoModal
         open={showSystemInfo}
         onClose={() => setShowSystemInfo(false)}
