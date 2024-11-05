@@ -30,7 +30,7 @@ export const useHostStore = create<HostStore>((set, get) => ({
     }),
 
   // 호스트 중복 확인 함수
-  isHostExist: (hostId: string) => {
+  isHostExist: (hostId: string): boolean => {
     const state = get();
     return state.hosts.some((host) => host.id === hostId);
   },

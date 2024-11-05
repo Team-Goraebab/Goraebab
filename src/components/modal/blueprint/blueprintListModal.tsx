@@ -44,7 +44,7 @@ const BlueprintListModal = ({ isOpen, onClose }: BlueprintListModalProps) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const { setMappedData } = useBlueprintStore();
-  const { addHost, hosts } = useHostStore();
+  const { addHost, hosts, isHostExist } = useHostStore();
   const addConnectedBridgeId = selectedHostStore(
     (state) => state.addConnectedBridgeId
   );
@@ -100,6 +100,20 @@ const BlueprintListModal = ({ isOpen, onClose }: BlueprintListModalProps) => {
       return;
     }
 
+    const isDuplicate = blueprint.data.host.some((hostData: any) =>
+      isHostExist(hostData.id)
+    );
+
+    if (isDuplicate) {
+      showSnackbar(
+        enqueueSnackbar,
+        '이미 불러온 설계도입니다.',
+        'error',
+        '#d32f2f'
+      );
+      return;
+    }
+
     blueprint.data.host.forEach((hostData: any) => {
       const formattedHost: Host = {
         id: hostData.id,
@@ -140,11 +154,9 @@ const BlueprintListModal = ({ isOpen, onClose }: BlueprintListModalProps) => {
             ],
           };
 
-          // 네트워크 데이터 추가
           formattedHost.networks.push(networkData);
-          const networkId = generateId('networks');
 
-          // connectedBridgeId 추가
+          const networkId = generateId('networks-');
           addConnectedBridgeId(hostData.id, {
             id: network.id,
             uniqueId: networkId,
