@@ -1,7 +1,8 @@
-// 컨테이너 초기 설정 상수
+import { generateId } from '@/utils/randomId';
+
 export const DEFAULT_CONTAINER_SETTINGS = {
   containerName: '',
-  containerId: '',
+  containerId: generateId('container'),
   image: {
     imageId: '',
     name: '',
