@@ -471,7 +471,6 @@ const CardContainer = ({
                             >
                               <Info size={16} />
                             </Button>
-                            j
                             <Button
                               size="sm"
                               variant="light"
