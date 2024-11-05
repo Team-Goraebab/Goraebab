@@ -133,22 +133,20 @@ const CardContainer = ({
           hostId: host.id,
           networkUniqueId: network.uniqueId,
           ip: network.gateway,
-          containers: network.containers
-            ? network.containers.map((container) => ({
-                containerName: container.containerName,
-                containerId: container.containerId,
-                image: {
-                  imageId: container.image?.imageId || '',
-                  name: container.image?.name || '',
-                  tag: container.image?.tag || '',
-                },
-                networkSettings: container.networkSettings || {},
-                ports: container.ports || [],
-                mounts: container.mounts || [],
-                env: container.env || [],
-                cmd: container.cmd || [],
-              }))
-            : [],
+          containers: network.containers.map((container) => ({
+            containerName: container.containerName,
+            containerId: container.containerId,
+            image: {
+              imageId: container.image?.imageId || '',
+              name: container.image?.name || '',
+              tag: container.image?.tag || '',
+            },
+            networkSettings: container.networkSettings || {},
+            ports: container.ports || [],
+            mounts: container.mounts || [],
+            env: container.env || [],
+            cmd: container.cmd || [],
+          })),
           configs: configs || [],
           droppedImages: droppedImages || [],
           imageVolumes: imageVolumes || [],
@@ -169,7 +167,6 @@ const CardContainer = ({
     droppedImages,
     imageVolumes,
     containerName,
-    setMappedData,
   ]);
 
   const splitImageNameAndTag = (image: string, imageId: string): ImageInfo => {
@@ -268,7 +265,7 @@ const CardContainer = ({
   };
 
   const handleSaveConfig = (config: ConfigurationData) => {
-    setConfigs((prevConfigs) => [...prevConfigs, config]);
+    setConfigs([config]);
     setIsConfigModalOpen(false);
   };
   const handleNameSubmit = () => {
