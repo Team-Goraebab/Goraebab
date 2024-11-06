@@ -20,7 +20,6 @@
 - [Create network](#create-network)
 - [Create volume](#create-volume)
 - [Create host](#create-host)
-- [Draw blueprint](#draw-blueprint)
 - [Load & Save blueprint](#load-&-save-blueprint)
 
 [API documentation](#api-documentation)
@@ -38,7 +37,7 @@
 # Introduce
 
 ## Problem
-With the advancement of AI, the barriers to software development have significantly lowered. As a result, beginner developers can save considerable time in the implementation phase, and most projects now reach the deployment stage. In the deployment process, Docker has become an almost essential tool. However, for novice developers, managing containers, networks, and volumes through the Docker CLI can be quite challenging. In a survey conducted among developers, ??% of respondents expressed difficulties and frustrations related to the complexity of managing containers, networks, and volumes.
+With the advancement of AI, the barriers to software development have significantly lowered. As a result, beginner developers can save considerable time in the implementation phase, and most projects now reach the deployment stage. In the deployment process, Docker has become an almost essential tool. However, for novice developers, managing containers, networks, and volumes through the Docker CLI can be quite challenging. In a survey conducted among developers, 30% of respondents expressed difficulties and frustrations related to the complexity of managing containers, networks, and volumes.
 
 ![docker difficulty](docs/image/docker_difficulty.PNG)
 
@@ -188,9 +187,6 @@ Click the "Blueprint List" button in the bottom bar to view all saved blueprints
 # API documentation
 
 You can check the API specification through `localhost:2387/swagger`.
-
-# How to contribute
-
 
 
 # Upcoming features
