@@ -51,7 +51,7 @@ Goraebab addresses this issue by enabling users to design Docker configurations 
 
 ### Frontend
 
-![Next.js](https://img.shields.io/badge/Next.js-v14.2.4-000000?style=flat&logo=next.js&logoColor=white) ![React](https://img.shields.io/badge/React-v18-61DAFB?style=flat&logo=react&logoColor=white) ![TypeScript](https://img.shields.io/badge/TypeScript-v5-3178C6?style=flat&logo=typescript&logoColor=white) ![Docker](https://img.shields.io/badge/Docker-v24.0-2496ED?style=flat&logo=docker&logoColor=white)
+![Next.js](https://img.shields.io/badge/Next.js-v14.2.4-000000?style=flat&logo=next.js&logoColor=white) ![TypeScript](https://img.shields.io/badge/TypeScript-v5-3178C6?style=flat&logo=typescript&logoColor=white) ![Docker](https://img.shields.io/badge/Docker-v24.0-2496ED?style=flat&logo=docker&logoColor=white)
 
 ### Backend
 ![Spring Boot](https://img.shields.io/badge/SpringBoot-v3.2.8-6DB33F?style=flat&logo=Spring&logoColor=white) ![MySQL](https://img.shields.io/badge/MySQL-v8.0-4479A1?style=flat&logo=mysql&labelColor=4479A1&logoColor=FFF) ![MariaDB](https://img.shields.io/badge/MariaDB-v11.7-003545?style=flat&logo=mariadb&logoColor=white) ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-v.17-4169E1?style=flat&logo=postgresql&logoColor=white) ![Gradle](https://img.shields.io/badge/Gradle-v8.8-02303A?style=flat&logo=Gradle&logoColor=white) ![Docker](https://img.shields.io/badge/Docker-v.24.0-2496ED?style=flat&logo=Docker&logoColor=white) ![Github actions](https://img.shields.io/badge/Github%20actions-v4-5f5f5f?style=flat&logo=github&logoColor=white) ![Swagger](https://img.shields.io/badge/Swagger-85EA2D?style=flat&logo=Swagger&logoColor=white) 
@@ -185,6 +185,54 @@ Click the "Blueprint List" button in the bottom bar to view all saved blueprints
 # API documentation
 
 You can check the API specification through `localhost:2387/swagger`.
+
+# How to contribute
+
+### 1. Fork the Repository
+- Click the "Fork" button at the top right corner of this repository to create a copy under your own GitHub account.
+
+### 2. Clone the Forked Repository
+- Clone the repository to your local machine using the following command
+- **You must clone only Frontend or Backend Repository, not Goraebab Integrated Repository**
+  ```bash
+  # Frontend
+  git clone https://github.com/your-username/Goraebab-Frontend.git
+
+  # Backend
+  git clone https://github.com/your-username/Goraebab-Backend.git
+  ```
+
+### 3. Create a Branch
+- Create a new branch to work on your changes.
+  ```bash
+  git checkout -b feature/your-feature-name
+  ```
+
+### 4. Write Code
+- In Goraebab-Backend, we follow the [Google Developer Documentation Style Guide](https://developers.google.com/style) to ensure consistent and high-quality documentation.  
+
+### 5.  Commit Your Changes
+- Commit your changes with a meaningful commit message
+  ```bash
+  # Frontend
+  git commit -m "TagName: commit message"
+  # ex) git commit -m "Feat: Add new feature"
+
+  # Backend
+  git commit -m "[TagName/#{IssueNumber}] commit message" 
+  # ex) git commit -m "[feature/#23] Add new feature" 
+  ```
+
+### 6. Push to Your Fork
+- Push your branch to your forked repository:
+  ```bash
+  git push origin feature/your-feature-name
+  ```
+
+### 7. Open a Pull Request
+- Navigate to the original repository and click on the "New Pull Request" button.
+
+
 
 
 # Upcoming features
