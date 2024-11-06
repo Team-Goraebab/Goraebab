@@ -6,6 +6,7 @@ import { useSnackbar } from 'notistack';
 import { showSnackbar } from '@/utils/toastUtils';
 import { v4 as uuidv4 } from 'uuid';
 import { Button } from '@/components';
+import { generateId } from '@/utils/randomId';
 
 interface VolumeModalProps {
   onClose: () => void;
@@ -56,8 +57,9 @@ const VolumeModal = ({ onClose, onCreate }: VolumeModalProps) => {
       return;
     }
 
-    const id = uuidv4(); // 볼륨 ID 생성
-    onCreate(id, name, driver, mountPoint, capacity);
+    const volumeId = generateId('volume');
+
+    onCreate(volumeId, name, driver, mountPoint, capacity);
     onClose();
   };
 

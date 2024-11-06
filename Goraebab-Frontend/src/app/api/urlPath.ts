@@ -1,7 +1,9 @@
-export const API_URL = 'http://localhost:2387';
-export const DOCKER_URL = 'http://localhost:2375';
+export const API_URL = 'http://host.docker.internal:2387';
+export const BACKEND_API_URL = 'http://localhost:2387';
+export const DOCKER_URL = 'http://host.docker.internal:2375';
 export const HUB_URL = 'https://hub.docker.com/v2';
-export const BASE_URL = '/api/v1';
+// export const BASE_URL = '/api/v1';
+export const BASE_URL = 'http://localhost:2387';
 
 // blueprint
 export const STORAGE = '/storage';

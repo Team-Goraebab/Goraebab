@@ -24,13 +24,13 @@ interface ModalProps {
  * @returns
  */
 const Modal = ({
-                 question,
-                 confirmText,
-                 closeText,
-                 isOpen,
-                 onClose,
-                 onConfirm,
-               }: ModalProps) => {
+  question,
+  confirmText,
+  closeText,
+  isOpen,
+  onClose,
+  onConfirm,
+}: ModalProps) => {
   if (!isOpen) return null;
 
   return (

@@ -4,8 +4,8 @@ import React, { useState } from 'react';
 import { Dialog } from '@mui/material';
 import { useSnackbar } from 'notistack';
 import { showSnackbar } from '@/utils/toastUtils';
-import { v4 as uuidv4 } from 'uuid';
 import { Button } from '@/components';
+import { generateId } from '@/utils/randomId';
 
 interface BridgeModalProps {
   onClose: () => void;
@@ -84,8 +84,9 @@ const BridgeModal = ({ onClose, onCreate }: BridgeModalProps) => {
       return;
     }
 
-    const id = uuidv4();
-    onCreate(id, name, subnet, gateway, driver);
+    const networkId = generateId('network');
+
+    onCreate(networkId, name, subnet, gateway, driver);
     onClose();
   };
 

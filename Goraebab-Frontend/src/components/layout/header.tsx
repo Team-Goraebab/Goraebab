@@ -36,7 +36,6 @@ const Header = () => {
     };
   }, []);
 
-  // Sidebar animation variants
   const sidebarVariants = {
     expanded: {
       width: '288px',
@@ -48,13 +47,11 @@ const Header = () => {
     },
   };
 
-  // Button animation variants
   const buttonVariants = {
     expanded: { x: 0, opacity: 1 },
     collapsed: { x: -10, opacity: 0 },
   };
 
-  // Icon animation variants
   const iconVariants = {
     hover: { scale: 1.1, rotate: 0 },
     settings: { rotate: 180 },
@@ -62,17 +59,17 @@ const Header = () => {
   };
 
   return (
-    <div className="relative">
+    <div className="relative overscroll-x-none">
       <motion.div
         initial="expanded"
         animate={isCollapsed ? 'collapsed' : 'expanded'}
         variants={sidebarVariants}
-        className="fixed left-0 z-[1] h-screen"
+        className="fixed left-0 top-0 z-[1] h-screen ove"
       >
         <Card
-          className="h-full transition-all duration-300 border-r border-divider shadow-lg rounded-none bg-background/70 backdrop-blur-md">
+          className="h-full duration-300 border-r border-divider shadow-lg rounded-none bg-background/70 backdrop-blur-md">
           <div className="flex flex-col h-full pt-4">
-            <ScrollShadow className="flex-grow px-2">
+            <div className="flex-grow px-2">
               <div className="flex flex-col gap-1 pl-3">
                 {MENU_ITEMS.map((item) => (
                   <Tooltip
@@ -128,7 +125,7 @@ const Header = () => {
                   </Tooltip>
                 ))}
               </div>
-            </ScrollShadow>
+            </div>
             <div className="px-3">
               <Divider className="my-4" />
             </div>

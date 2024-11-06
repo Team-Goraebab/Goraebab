@@ -1,3 +1,4 @@
+import { NetworkInfo, VolumeInfo } from '@/store/blueprintAllStore';
 import { useHostStore } from '@/store/hostStore';
 import { selectedHostStore } from '@/store/seletedHostStore';
 import { ThemeColor } from '@/types/type';
@@ -9,6 +10,8 @@ export type HostCardProps = {
   hostIp: string;
   isRemote: boolean;
   themeColor: ThemeColor;
+  network: NetworkInfo[];
+  volume: VolumeInfo[];
   onClick?: () => void;
   className?: string;
   isSelectedNetwork?: boolean;
@@ -26,14 +29,14 @@ export type HostCardProps = {
  * @returns
  */
 const HostCard = ({
-                    id,
-                    hostNm,
-                    hostIp,
-                    isRemote,
-                    themeColor,
-                    className = '',
-                    isSelectedNetwork = false, // 기본값은 false
-                  }: HostCardProps) => {
+  id,
+  hostNm,
+  hostIp,
+  isRemote,
+  themeColor,
+  className = '',
+  isSelectedNetwork = false, // 기본값은 false
+}: HostCardProps) => {
   const {
     selectedHostId,
     setSelectedHostId,
