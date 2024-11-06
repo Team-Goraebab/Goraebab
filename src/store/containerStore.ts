@@ -42,6 +42,8 @@ interface Container {
 
 interface ContainerStore {
   containers: { [containerId: string]: Container };
+  succeededContainers: string[];
+  setSucceededContainers: (containers: string[]) => void;
   addContainer: (container: Container) => void;
   getContainerById: (containerId: string) => Container | undefined;
   clearAllContainers: () => void;
@@ -87,4 +89,11 @@ export const useContainerStore = create<ContainerStore>((set, get) => ({
     );
     return host ? host.hostIp : 'localhost';
   },
+
+  // 성공한 컨테이너 목록
+  succeededContainers: [],
+
+  // 성공한 컨테이너 저장
+  setSucceededContainers: (containers) =>
+    set({ succeededContainers: containers }),
 }));
