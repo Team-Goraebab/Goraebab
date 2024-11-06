@@ -28,13 +28,13 @@
 # Introduce
 
 ## Problem
-With the advancement of AI, the barriers to software development have significantly lowered. As a result, beginner developers can save considerable time in the implementation phase, and most projects now reach the deployment stage. In the deployment process, Docker has become an almost essential tool. However, for novice developers, managing containers, networks, and volumes through the Docker CLI can be quite challenging. In a survey conducted among developers, ??% of respondents expressed difficulties and frustrations related to the complexity of managing containers, networks, and volumes.
+ With the advancement of AI, the barriers to software development have significantly lowered. As a result, beginner developers can save considerable time in the implementation phase, and most projects now reach the deployment stage. In the deployment process, Docker has become an almost essential tool. However, for novice developers, managing containers, networks, and volumes through the Docker CLI can be quite challenging. In a survey conducted among developers, ??% of respondents expressed difficulties and frustrations related to the complexity of managing containers, networks, and volumes.
 
 [차트 이미지]
 
 ## Solution
 
-Goraebab addresses this issue by enabling users to design Docker configurations visually in a GUI environment. Instead of manually managing containers, networks, and volumes through the CLI, developers can create, modify, and deploy entire Docker architectures through an intuitive, drag-and-drop interface. In addition, Goraebab provides educational tips and explanations about Docker, allowing beginners to learn while they develop. This approach simplifies complex configurations, reduces errors, speeds up the deployment process, and helps novice developers gain confidence with Docker concepts.
+ Goraebab addresses this issue by enabling users to design Docker configurations visually in a GUI environment. Instead of manually managing containers, networks, and volumes through the CLI, developers can create, modify, and deploy entire Docker architectures through an intuitive, drag-and-drop interface. In addition, Goraebab provides educational tips and explanations about Docker, allowing beginners to learn while they develop. This approach simplifies complex configurations, reduces errors, speeds up the deployment process, and helps novice developers gain confidence with Docker concepts.
 
 
 # Architecture
@@ -140,6 +140,9 @@ chmod +x start.sh
 # How to use Goraebab
 
 ## Pull image
+ To add an image, click the Image button in the left sidebar, then click the "+ Image" button in the right sidebar. For image addition, the Docker engine must be connected, indicated by a green connected status icon in the bottom bar if the connection is active. Images can be imported from your local computer or Docker Hub, with options to specify the image name and tag. 
+When retrieving images from Docker Hub, you can search for the desired image and select it; each image shows download counts, providing a measure of reliability. When importing from your local computer, you can either drag and drop the file or select a file path. The right sidebar displays the list of images you’ve added, and by using the toggle button, you can view detailed information for each image.
+
 
 ## Create network
 
