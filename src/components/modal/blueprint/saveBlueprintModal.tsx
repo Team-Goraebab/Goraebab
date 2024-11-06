@@ -50,6 +50,13 @@ const SaveBlueprintModal = ({
     onClose();
   };
 
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    if (newValue.length <= 20) {
+      setBlueprintName(newValue);
+    }
+  };
+
   return (
     <Modal isOpen={isOpen} onClose={handleClose}>
       <ModalContent>
@@ -57,9 +64,9 @@ const SaveBlueprintModal = ({
         <ModalBody>
           <Input
             autoFocus
-            placeholder="설계도 이름을 입력하세요"
+            placeholder="설계도 이름을 입력하세요 (최대 20자)"
             value={blueprintName}
-            onChange={(e) => setBlueprintName(e.target.value)}
+            onChange={handleNameChange}
           />
           <Checkbox
             isSelected={isDockerRemote}
