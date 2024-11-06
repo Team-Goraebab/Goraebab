@@ -266,9 +266,7 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
             );
           })
         ) : (
-          <div className="text-center text-gray-500">
-            No host data available
-          </div>
+          <div className="text-center text-gray-500">호스트가 없습니다.</div>
         )}
       </div>
     </Draggable>
