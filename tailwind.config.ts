@@ -79,18 +79,6 @@ const config: Config = {
         black_7: '#1F1F1F',
         black_8: '#0d0d0d',
       },
-      scale: {
-        102: '1.02',
-      },
-      keyframes: {
-        bounceScale: {
-          '0%, 100%': { transform: 'scale(1)' },
-          '50%': { transform: 'scale(1.02)' },
-        },
-      },
-      animation: {
-        bounceScale: 'bounceScale 1s ease-in-out infinite',
-      },
     },
   },
   darkMode: 'class',
