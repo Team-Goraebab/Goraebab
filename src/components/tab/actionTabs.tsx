@@ -32,20 +32,20 @@ import DeleteBlueprintModal from '../modal/blueprint/deleteBlueprintModal';
 import SaveBlueprintModal from '../modal/blueprint/saveBlueprintModal';
 
 const ActionTabs = () => {
-  const [isHostModalOpen, setIsHostModalOpen] = useState(false);
-  const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [blueprintName, setBlueprintName] = useState('');
-  const [isDockerRemote, setIsDockerRemote] = useState(false);
+  const [isHostModalOpen, setIsHostModalOpen] = useState<boolean>(false);
+  const [isSaveModalOpen, setIsSaveModalOpen] = useState<boolean>(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
+  const [blueprintName, setBlueprintName] = useState<string>('');
+  const [isDockerRemote, setIsDockerRemote] = useState<boolean>(false);
   const [remoteUrl, setRemoteUrl] = useState('');
   const [engineStatus, setEngineStatus] = useState<
     'connect' | 'disconnect' | 'connecting'
   >('disconnect');
   const [versionData, setVersionData] = useState<any>();
   const [systemData, setSystemData] = useState<any>();
-  const [showVersionInfo, setShowVersionInfo] = useState(false);
-  const [showSystemInfo, setShowSystemInfo] = useState(false);
-  const [isListModalOpen, setIsListModalOpen] = useState(false);
+  const [showVersionInfo, setShowVersionInfo] = useState<boolean>(false);
+  const [showSystemInfo, setShowSystemInfo] = useState<boolean>(false);
+  const [isListModalOpen, setIsListModalOpen] = useState<boolean>(false);
 
   const deleteAllHosts = useHostStore((state) => state.deleteAllHosts);
   const clearConnectedBridges = selectedHostStore(
@@ -148,7 +148,6 @@ const ActionTabs = () => {
               config: [
                 {
                   subnet: network.subnet || '172.19.0.0/16',
-                  // subnet: '172.19.0.0/16',
                 },
               ],
             },
@@ -185,14 +184,11 @@ const ActionTabs = () => {
       },
     };
 
-    // console.log('requestBody', requestBody);
-    // console.log('mappedData >>>>', mappedData);
-
     try {
       if (!mappedData || !Array.isArray(mappedData)) {
         showSnackbar(
           enqueueSnackbar,
-          '매핑된 데이터가 유효하지 않습니다.',
+          '설계도가 유효하지 않습니다.',
           'error',
           '#FF4853'
         );
@@ -202,17 +198,65 @@ const ActionTabs = () => {
       const res = await createBlueprint(requestBody);
 
       if (res.status === 200 || res.status === 201) {
+        const succeededContainers = res.data.succeededContainers || [];
+        const failedContainers = res.data.failedContainers || [];
+
         showSnackbar(
           enqueueSnackbar,
-          '설계도를 성공적으로 전송했습니다!',
+          `설계도를 성공적으로 전송했습니다!`,
           'success',
           '#4CAF50'
         );
+
+        // 성공한 컨테이너
+        if (succeededContainers.length > 0) {
+          showSnackbar(
+            enqueueSnackbar,
+            `성공한 컨테이너: ${succeededContainers
+              .map((container: any) => container.containerName)
+              .join(', ')}`,
+            'info',
+            '#7F7F7F'
+          );
+        }
+
+        // 실패한 컨테이너
+        if (failedContainers.length > 0) {
+          showSnackbar(
+            enqueueSnackbar,
+            `실패한 컨테이너: ${failedContainers
+              .map((container: any) => container.containerName)
+              .join(', ')}`,
+            'info',
+            '#7F7F7F'
+          );
+        }
+
         setIsSaveModalOpen(false);
+      } else if (res.status === 400) {
+        showSnackbar(
+          enqueueSnackbar,
+          `설계도 전송 실패: ${
+            res.data.error || res.data.message || '잘못된 요청입니다.'
+          }`,
+          'error',
+          '#FF4853'
+        );
+      } else if (res.status === 500) {
+        showSnackbar(
+          enqueueSnackbar,
+          `설계도 전송 실패: ${
+            res.data.message || '서버 내부 오류가 발생했습니다.'
+          }`,
+          'error',
+          '#FF4853'
+        );
       } else {
         showSnackbar(
           enqueueSnackbar,
-          `설계도 전송 실패: ${res.data.error}`,
+          `설계도 전송 실패: ${
+            res.data.error || '알 수 없는 오류가 발생했습니다.'
+          }`,
           'error',
           '#FF4853'
         );
@@ -220,7 +264,7 @@ const ActionTabs = () => {
     } catch (error) {
       showSnackbar(
         enqueueSnackbar,
-        '설계도 전송 실패 중 에러가 발생했습니다.',
+        `설계도 전송 실패 중 에러가 발생했습니다.`,
         'error',
         '#FF4853'
       );
