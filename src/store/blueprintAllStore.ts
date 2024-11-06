@@ -27,7 +27,7 @@ interface MountInfo {
   mode: string;
 }
 
-interface VolumeInfo {
+export interface VolumeInfo {
   name: string;
   driver: string;
 }
@@ -41,7 +41,6 @@ interface ContainerInfo {
   mounts: MountInfo[];
   env: string[];
   cmd: string[];
-  imageVolumes: VolumeInfo[];
 }
 
 export interface NetworkInfo {
@@ -50,11 +49,6 @@ export interface NetworkInfo {
   driver: string;
   ipam: { config: { subnet: string }[] };
   containers: ContainerInfo[];
-}
-
-interface VolumeInfo {
-  name: string;
-  driver: string;
 }
 
 interface HostInfo {
@@ -77,7 +71,7 @@ interface State {
     themeColor?: any
   ) => void;
   addNetworkToHost: (hostId: string, network: NetworkInfo) => void;
-  addVolumeToHost: (hostId: string, volume: VolumeInfo) => void;
+  addVolumeToHost: (hostId: string, volumes: VolumeInfo[]) => void;
   addContainerToNetwork: (
     hostId: string,
     networkId: string,
@@ -130,12 +124,12 @@ export const useBlueprintAllStore = create<State>((set, get) => ({
       ),
     })),
 
-  // 볼륨 추가
-  addVolumeToHost: (hostId, volume) =>
+  // 호스트에 여러 볼륨 추가
+  addVolumeToHost: (hostId, volumes) =>
     set((state) => ({
       hosts: state.hosts.map((host) =>
         host.id === hostId
-          ? { ...host, volume: [...host.volume, volume] }
+          ? { ...host, volume: [...host.volume, ...volumes] }
           : host
       ),
     })),
@@ -162,7 +156,6 @@ export const useBlueprintAllStore = create<State>((set, get) => ({
                           mounts: [],
                           env: [],
                           cmd: [],
-                          imageVolumes: [],
                         },
                       ],
                     }
