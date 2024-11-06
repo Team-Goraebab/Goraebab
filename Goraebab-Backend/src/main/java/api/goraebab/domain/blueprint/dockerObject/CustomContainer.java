@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CustomContainer {
 
+  private String containerId;
+
   private String containerName;
 
   @JsonProperty("image")
@@ -32,9 +34,10 @@ public class CustomContainer {
 
 
   @Builder
-  public CustomContainer(String containerName, CustomImage customImage,
+  public CustomContainer(String containerId, String containerName, CustomImage customImage,
       CustomNetworkSettings customNetworkSettings, List<CustomPort> customPorts,
       List<CustomMount> customMounts, List<String> customEnv, List<String> customCmd) {
+    this.containerId = containerId;
     this.containerName = containerName;
     this.customImage = customImage;
     this.customNetworkSettings = customNetworkSettings;

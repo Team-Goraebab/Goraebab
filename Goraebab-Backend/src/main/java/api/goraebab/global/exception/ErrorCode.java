@@ -46,7 +46,8 @@ public enum ErrorCode {
     CONTAINER_SYNC_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, 500, "An error occurred during the container synchronization process."),
     CONTAINER_REMOVAL_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, 500, "Failed to stop or remove the specified container."),
     CONTAINER_CREATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, 500, "Failed to create the specified Docker container."),
-    CONVERSION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, 500, "Failed to convert the processed data to JSON format.");
+    CONVERSION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, 500, "Failed to convert the processed data to JSON format."),
+    NETWORK_CREATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, 500, "Failed to create the specified Docker network.");
 
     private final HttpStatus status;
 

@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CustomNetwork {
 
+  private String id;
+
   private String name;
 
   private String driver;
@@ -22,7 +24,9 @@ public class CustomNetwork {
 
 
   @Builder
-  public CustomNetwork(String name, String driver, CustomIpam customIpam, List<CustomContainer> customContainers) {
+  public CustomNetwork(String id, String name, String driver, CustomIpam customIpam,
+      List<CustomContainer> customContainers) {
+    this.id = id;
     this.name = name;
     this.driver = driver;
     this.customIpam = customIpam;

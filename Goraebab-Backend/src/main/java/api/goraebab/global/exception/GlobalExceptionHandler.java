@@ -17,7 +17,12 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(CustomException.class)
     protected ResponseEntity<ErrorResponse> handleCustomException(CustomException e) {
-        final ErrorResponse response = ErrorResponse.of(e.getErrorCode());
+        final ErrorResponse response;
+        if (e.getFailedContainers() != null && !e.getFailedContainers().isEmpty()) {
+            response = ErrorResponse.ofFailedContainers(e.getErrorCode(), e.getFailedContainers(), e.getSucceededContainers());
+        } else {
+            response = ErrorResponse.of(e.getErrorCode());
+        }
         return new ResponseEntity<>(response, e.getErrorCode().getStatus());
     }
 
@@ -34,7 +39,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
     }
 
-   @ExceptionHandler(DataIntegrityViolationException.class)
+    @ExceptionHandler(DataIntegrityViolationException.class)
     protected ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(DataIntegrityViolationException e) {
         List<String> errors = List.of(e.getMessage());
         ErrorResponse response = ErrorResponse.of(ErrorCode.DATA_INTEGRITY_VIOLATION, errors);

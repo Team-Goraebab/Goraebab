@@ -1,5 +1,7 @@
 package api.goraebab.domain.blueprint.dto;
 
+import api.goraebab.domain.blueprint.dockerObject.CustomHost;
+import api.goraebab.domain.blueprint.dockerObject.ProcessedData;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,7 +23,7 @@ public class BlueprintsResDto {
     private String name;
 
     @Schema(description = "The raw data associated with the blueprint.")
-    private String data;
+    private ProcessedData data;
 
     @Schema(description = "The flag indicating whether the blueprint is stored remotely.", example = "true")
     private Boolean isRemote;
