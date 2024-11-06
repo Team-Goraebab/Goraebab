@@ -62,7 +62,7 @@ Goraebab addresses this issue by enabling users to design Docker configurations 
 
 ## System Architecture
 <p align="center">
-  <img src=https://github.com/user-attachments/assets/0c438ec9-eae1-4588-ad81-3df2ed1c4eb5 width="700" height= "500"/>
+  <img src=https://github.com/user-attachments/assets/0c438ec9-eae1-4588-ad81-3df2ed1c4eb5 width="500" height= "300"/>
 </p>
 
 &nbsp;
