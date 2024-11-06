@@ -24,8 +24,6 @@
 
 [API documentation](#api-documentation)
 
-[How to contribute](#how-to-contribute)
-
 [Upcoming features](#upcoming-features)
 
 [Contributors](#contributors)
