@@ -24,7 +24,6 @@ import {
 import { FaNetworkWired } from 'react-icons/fa';
 import { Network } from '@/types/type';
 import { DEFAULT_CONTAINER_SETTINGS } from '@/data/blueprint';
-import { generateId } from '@/utils/randomId';
 import {
   NetworkInfo,
   useBlueprintAllStore,
@@ -41,12 +40,6 @@ const NetworkCard = ({ data, onDeleteSuccess }: CardDataProps) => {
   const { selectedHostId } = selectedHostStore();
   const addNetworkToHost = useBlueprintAllStore(
     (state) => state.addNetworkToHost
-  );
-  const deleteNetworkFromHost = useBlueprintAllStore(
-    (state) => state.deleteNetworkFromHost
-  );
-  const updateContainer = useBlueprintAllStore(
-    (state) => state.updateContainer
   );
   const addVolumeToHost = useBlueprintAllStore(
     (state) => state.addVolumeToHost

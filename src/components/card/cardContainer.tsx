@@ -36,13 +36,13 @@ import ConfigurationModal, {
 } from '../modal/daemon/configurationModal';
 import { selectedHostStore } from '@/store/seletedHostStore';
 import { useSnackbar } from 'notistack';
-import { useBlueprintStore } from '@/store/blueprintStore';
 import { containerNamePattern } from '@/utils/patternUtils';
 import { useBlueprintAllStore, VolumeInfo } from '@/store/blueprintAllStore';
 
 export interface CardContainerProps {
   networkName: string;
   networkIp: string;
+  networkId: string;
   containers: Container[];
   themeColor: ThemeColor;
   onDelete?: () => void;
@@ -68,6 +68,7 @@ interface ImageToNetwork {
 const CardContainer = ({
   networkName,
   networkIp,
+  networkId,
   containers,
   themeColor,
   onDelete,
@@ -85,17 +86,11 @@ const CardContainer = ({
   const ref = useRef<HTMLDivElement>(null);
   const { enqueueSnackbar } = useSnackbar();
 
-  const { setMappedData } = useBlueprintStore();
   const selectedHostIp = selectedHostStore((state) => state.selectedHostIp);
-  const hosts = useBlueprintAllStore((state) => state.hosts);
-
   const updateContainer = useBlueprintAllStore(
     (state) => state.updateContainer
   );
 
-  const connectedBridgeIds = selectedHostStore(
-    (state) => state.connectedBridgeIds
-  );
   const [isEditingName, setIsEditingName] = useState<boolean>(false);
   const [tempContainerName, setTempContainerName] = useState(containerName);
   const [droppedImages, setDroppedImages] =
@@ -128,59 +123,6 @@ const CardContainer = ({
     useState<VolumeData[]>(initialImagesVolumes);
 
   const initialConfig = configs.length > 0 ? configs[0] : undefined;
-
-  useEffect(() => {
-    const mappedData = hosts.map((host) => {
-      const networks = connectedBridgeIds[host.id] || [];
-      const mappedNetworks = networks.map((network) => {
-        return {
-          id: network.id,
-          name: network.name,
-          gateway: network.gateway,
-          driver: network.driver,
-          subnet: network.subnet,
-          scope: network.scope,
-          hostId: host.id,
-          networkUniqueId: network.uniqueId,
-          ip: network.gateway,
-          containers: network.containers
-            ? network.containers.map((container) => ({
-                containerName: container.containerName,
-                containerId: container.containerId,
-                image: {
-                  imageId: container.image?.imageId || '',
-                  name: container.image?.name || '',
-                  tag: container.image?.tag || '',
-                },
-                networkSettings: container.networkSettings || {},
-                ports: container.ports || [],
-                mounts: container.mounts || [],
-                env: container.env || [],
-                cmd: container.cmd || [],
-              }))
-            : [],
-          configs: configs || [],
-          droppedImages: droppedImages || [],
-          imageVolumes: imageVolumes || [],
-        };
-      });
-
-      return {
-        ...host,
-        networks: mappedNetworks,
-      };
-    });
-
-    setMappedData(mappedData);
-  }, [
-    hosts,
-    connectedBridgeIds,
-    configs,
-    droppedImages,
-    imageVolumes,
-    containerName,
-    setMappedData,
-  ]);
 
   const splitImageNameAndTag = (image: string, imageId: string): ImageInfo => {
     const [name, tag] = image.split(':');
@@ -239,7 +181,7 @@ const CardContainer = ({
       setImageToNetwork((prev) => [...prev, { ...imageInfo, networkName }]);
 
       // 컨테이너의 이미지 정보 업데이트
-      updateContainer(hostIp, networkName, containerId, { image: imageInfo });
+      updateContainer(hostId, networkId, containerId, { image: imageInfo });
     },
     canDrop: () => hostIp === selectedHostIp,
     collect: (monitor) => ({ isOver: monitor.isOver() }),
@@ -299,7 +241,7 @@ const CardContainer = ({
   const handleSaveConfig = (config: ConfigurationData) => {
     setConfigs([config]);
     setIsConfigModalOpen(false);
-    updateContainer(hostIp, networkName, containerId, { ...configs[0] });
+    updateContainer(hostId, networkId, containerId, config);
   };
 
   const handleNameSubmit = () => {
@@ -511,7 +453,7 @@ const CardContainer = ({
                               size="sm"
                               variant="light"
                               isIconOnly
-                              onPress={() => handleOpenVolumeModal}
+                              onPress={handleOpenVolumeModal}
                             >
                               <Plus size={16} />
                             </Button>

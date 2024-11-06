@@ -29,17 +29,14 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
 
   const { selectedNetwork, setSelectedNetwork, clearSelectedNetwork } =
     useSelectedNetworkStore();
-  const updateContainerName = selectedHostStore(
-    (state) => state.updateContainerName
-  );
-  const connectedBridgeIds = selectedHostStore(
-    (state) => state.connectedBridgeIds
-  );
 
   const allContainers = useStore((state) => state.hostContainers);
   const deleteHost = useBlueprintAllStore((state) => state.deleteHost);
   const deleteNetworkFromHost = useBlueprintAllStore(
     (state) => state.deleteNetworkFromHost
+  );
+  const updateContainer = useBlueprintAllStore(
+    (state) => state.updateContainer
   );
 
   const handleHostClick = (id: string, name: string, ip: string) => {
@@ -94,10 +91,11 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
 
   const handleContainerNameChange = (
     hostId: string,
+    networkId: string,
     containerId: string,
     name: string
   ) => {
-    updateContainerName(hostId, containerId, name);
+    updateContainer(hostId, networkId, containerId, { containerName: name });
   };
 
   return (
@@ -210,6 +208,7 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
                                     <CardContainer
                                       key={container.containerId}
                                       networkName={network.name}
+                                      networkId={network.id}
                                       networkIp={network.ipam.config[0]?.subnet}
                                       containers={containers}
                                       containerName={container.containerName}
@@ -242,6 +241,7 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
                                       onContainerNameChange={(id, name) =>
                                         handleContainerNameChange(
                                           host.id,
+                                          network.id,
                                           id,
                                           name
                                         )
