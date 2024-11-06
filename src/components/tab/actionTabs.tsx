@@ -30,6 +30,9 @@ import { useSelectedNetworkStore } from '@/store/selectedNetworkStore';
 import { selectedHostStore } from '@/store/seletedHostStore';
 import DeleteBlueprintModal from '../modal/blueprint/deleteBlueprintModal';
 import SaveBlueprintModal from '../modal/blueprint/saveBlueprintModal';
+import { useContainerStore } from '@/store/containerStore';
+import { useMenuStore } from '@/store/menuStore';
+import { generateId } from '@/utils/randomId';
 
 const ActionTabs = () => {
   const [isHostModalOpen, setIsHostModalOpen] = useState<boolean>(false);
@@ -46,6 +49,9 @@ const ActionTabs = () => {
   const [showVersionInfo, setShowVersionInfo] = useState<boolean>(false);
   const [showSystemInfo, setShowSystemInfo] = useState<boolean>(false);
   const [isListModalOpen, setIsListModalOpen] = useState<boolean>(false);
+
+  const { setSucceededContainers } = useContainerStore.getState();
+  const { setActiveId } = useMenuStore();
 
   const deleteAllHosts = useHostStore((state) => state.deleteAllHosts);
   const clearConnectedBridges = selectedHostStore(
@@ -131,6 +137,10 @@ const ActionTabs = () => {
     );
   };
 
+  const hostId = generateId('host-');
+  const networkId = generateId('network-');
+  const contianerId = generateId('contianer-');
+
   const handleSaveSubmit = async () => {
     const requestBody = {
       blueprintName,
@@ -139,10 +149,10 @@ const ActionTabs = () => {
           name: host.hostNm,
           isRemote: host.isRemote,
           ip: host.isRemote ? remoteUrl : null,
-          id: host.id,
+          id: hostId,
           network: host.networks.map((network: any) => ({
             name: network.name,
-            id: network.networkUniqueId,
+            id: networkId,
             driver: network.driver || 'bridge',
             ipam: {
               config: [
@@ -153,7 +163,7 @@ const ActionTabs = () => {
             },
             containers: network.containers.map((container: any) => ({
               containerName: container.containerName,
-              containerId: container.containerId,
+              containerId: contianerId,
               image: {
                 imageId: network.droppedImages[0].imageId || '',
                 name: network.droppedImages[0].name || '',
@@ -163,15 +173,14 @@ const ActionTabs = () => {
                 gateway: '192.168.1.1',
                 ipAddress: '192.168.1.100',
               },
-              ports:
-                network.configs[0].ports.length > 0
-                  ? network.configs[0].ports
-                  : [
-                      {
-                        privatePort: 80,
-                        publicPort: 8080,
-                      },
-                    ],
+              ports: Array.isArray(network.configs[0].ports)
+                ? network.configs[0].ports
+                : [
+                    {
+                      privatePort: 80,
+                      publicPort: 8080,
+                    },
+                  ],
               mounts: network.configs[0].mounts || [],
               env: network.configs[0].env || [],
               cmd: network.configs[0].cmd || [],
@@ -183,6 +192,8 @@ const ActionTabs = () => {
         })),
       },
     };
+
+    console.log(mappedData);
 
     try {
       if (!mappedData || !Array.isArray(mappedData)) {
@@ -198,8 +209,13 @@ const ActionTabs = () => {
       const res = await createBlueprint(requestBody);
 
       if (res.status === 200 || res.status === 201) {
-        const succeededContainers = res.data.succeededContainers || [];
         const failedContainers = res.data.failedContainers || [];
+        const succeededContainers = res.data.succeededContainers || [];
+
+        setSucceededContainers([]);
+        setSucceededContainers(
+          succeededContainers.map((container: any) => container.containerName)
+        );
 
         showSnackbar(
           enqueueSnackbar,
@@ -207,6 +223,8 @@ const ActionTabs = () => {
           'success',
           '#4CAF50'
         );
+
+        setActiveId(1);
 
         // 성공한 컨테이너
         if (succeededContainers.length > 0) {
@@ -264,7 +282,7 @@ const ActionTabs = () => {
     } catch (error) {
       showSnackbar(
         enqueueSnackbar,
-        `설계도 전송 실패 중 에러가 발생했습니다.`,
+        `설계도 전송 실패: 서버 혹은 네트워크(Port) 확인이 필요합니다.`,
         'error',
         '#FF4853'
       );
