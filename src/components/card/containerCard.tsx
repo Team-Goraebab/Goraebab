@@ -47,20 +47,29 @@ const ContainerCard = ({ data, onDeleteSuccess }: CardDataProps) => {
   const cardRef = useRef<HTMLDivElement>(null);
   const { bg1, bg2 } = getStatusColors(data.State);
 
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [showOptions, setShowOptions] = useState(false);
-  const [showModal, setShowModal] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [detailData, setDetailData] = useState(null);
-  const [isLogModalOpen, setIsLogModalOpen] = useState(false);
+  const [isExpanded, setIsExpanded] = useState<boolean>(false);
+  const [showOptions, setShowOptions] = useState<boolean>(false);
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [detailData, setDetailData] = useState<any>(null);
+  const [isLogModalOpen, setIsLogModalOpen] = useState<boolean>(false);
+  const [isStyled, setIsStyled] = useState<boolean>(false);
 
   const { succeededContainers } = useContainerStore();
   const containerName = data.Names ? data.Names[0].replace(/^\//, '') : 'N/A';
   const imageName = data.Image || 'N/A';
-
   const isSuccessContainer = succeededContainers.includes(containerName);
-  const borderColor = isSuccessContainer
-    ? 'border-green-500'
+
+  useEffect(() => {
+    if (isSuccessContainer) {
+      setIsStyled(true);
+      const timer = setTimeout(() => setIsStyled(false), 6000);
+      return () => clearTimeout(timer);
+    }
+  }, [isSuccessContainer]);
+
+  const customStyle = isStyled
+    ? 'border-2 drop-shadow-md scale-102 animate-bounceScale'
     : 'border-gray-200';
 
   const items = [
@@ -198,9 +207,7 @@ const ContainerCard = ({ data, onDeleteSuccess }: CardDataProps) => {
   return (
     <div
       ref={cardRef}
-      className={`bg-white ${borderColor} border rounded-lg mb-2 overflow-hidden transition-transform duration-300 transform ${
-        isSuccessContainer ? 'hover:scale-105' : ''
-      }`}
+      className={`bg-white ${customStyle} border rounded-lg mb-2 overflow-hidden transition-transform duration-300 transform`}
     >
       <div
         className="flex justify-between items-center px-4 py-2 bg-gray-50 cursor-pointer"
