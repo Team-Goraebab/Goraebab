@@ -28,15 +28,14 @@ interface ConfigurationModalProps {
   initialConfig?: ConfigurationData;
 }
 
+interface NetworkSettingsType {
+  gateway: string;
+  ipAddress: string;
+}
+
 export interface ConfigurationData {
-  networkSettings: {
-    gateway: string;
-    ipAddress: string;
-  };
-  ports: {
-    privatePort: number;
-    publicPort: number;
-  };
+  networkSettings: NetworkSettingsType;
+  ports: PortSettingsProps[];
   mounts: MountConfigProps[];
   env: string[];
   cmd: string[];
@@ -51,8 +50,8 @@ interface MountConfigProps {
 }
 
 interface PortSettingsProps {
-  privatePort: string;
-  publicPort: string;
+  privatePort: number;
+  publicPort: number;
 }
 
 const ConfigurationModal = ({
@@ -80,13 +79,16 @@ const ConfigurationModal = ({
     driver: 'local',
   });
 
-  const [portSettings, setPortSettings] = useState<PortSettingsProps>(
-    initialConfig?.ports
+  const [portSettings, setPortSettings] = useState<{
+    privatePort: number;
+    publicPort: number;
+  }>(
+    initialConfig?.ports && initialConfig.ports.length > 0
       ? {
-          privatePort: initialConfig.ports.privatePort.toString(),
-          publicPort: initialConfig.ports.publicPort.toString(),
+          privatePort: Number(initialConfig.ports[0].privatePort),
+          publicPort: Number(initialConfig.ports[0].publicPort),
         }
-      : { privatePort: '80', publicPort: '8080' }
+      : { privatePort: 80, publicPort: 8080 }
   );
 
   const [mounts, setMounts] = useState<MountConfigProps[]>(
@@ -102,11 +104,19 @@ const ConfigurationModal = ({
   useEffect(() => {
     if (initialConfig) {
       setNetworkSettings(initialConfig.networkSettings);
+
       setPortSettings({
-        privatePort: initialConfig.ports?.privatePort.toString() || '80',
-        publicPort: initialConfig.ports?.publicPort.toString() || '8080',
+        privatePort:
+          initialConfig.ports && initialConfig.ports.length > 0
+            ? Number(initialConfig.ports[0].privatePort)
+            : 80,
+        publicPort:
+          initialConfig.ports && initialConfig.ports.length > 0
+            ? Number(initialConfig.ports[0].publicPort)
+            : 8080,
       });
-      setMounts(initialConfig.mounts);
+
+      setMounts(initialConfig.mounts || []);
       setEnvVariables(initialConfig.env.join('\n'));
       setCmd(initialConfig.cmd.join('\n'));
     }
@@ -137,10 +147,12 @@ const ConfigurationModal = ({
 
     const config: ConfigurationData = {
       networkSettings,
-      ports: {
-        privatePort: parseInt(portSettings.privatePort, 10),
-        publicPort: parseInt(portSettings.publicPort, 10),
-      },
+      ports: [
+        {
+          privatePort: portSettings.privatePort,
+          publicPort: portSettings.publicPort,
+        },
+      ],
       mounts,
       env: envVariables ? envVariables.split('\n').filter(Boolean) : [],
       cmd: cmd ? cmd.split('\n').filter(Boolean) : [],
