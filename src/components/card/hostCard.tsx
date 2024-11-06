@@ -1,3 +1,4 @@
+import { NetworkInfo } from '@/store/blueprintAllStore';
 import { useHostStore } from '@/store/hostStore';
 import { selectedHostStore } from '@/store/seletedHostStore';
 import { ThemeColor } from '@/types/type';
@@ -9,6 +10,7 @@ export type HostCardProps = {
   hostIp: string;
   isRemote: boolean;
   themeColor: ThemeColor;
+  network: NetworkInfo[];
   onClick?: () => void;
   className?: string;
   isSelectedNetwork?: boolean;
