@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Dialog } from '@mui/material';
 import {
   FaNetworkWired,
@@ -14,7 +14,7 @@ import NetworkSettings from './content/networkSettings';
 import PortSettings from './content/portSettings';
 import Button from '@/components/button/button';
 
-const TAB_DATA = [
+const TAB_DATA: { label: string; icon: JSX.Element; index: number }[] = [
   { label: '네트워크 설정', icon: <FaNetworkWired />, index: 0 },
   { label: '포트 설정', icon: <FaDatabase />, index: 1 },
   { label: '마운트 설정', icon: <FaEnvira />, index: 2 },
@@ -25,9 +25,10 @@ interface ConfigurationModalProps {
   open: boolean;
   onClose: () => void;
   onSave: (config: ConfigurationData) => void;
+  initialConfig?: ConfigurationData;
 }
 
-interface ConfigurationData {
+export interface ConfigurationData {
   networkSettings: {
     gateway: string;
     ipAddress: string;
@@ -35,7 +36,7 @@ interface ConfigurationData {
   ports: {
     privatePort: number;
     publicPort: number;
-  }[];
+  };
   mounts: MountConfigProps[];
   env: string[];
   cmd: string[];
@@ -47,34 +48,69 @@ interface MountConfigProps {
   destination: string;
   name: string;
   driver: string;
-  // mode: string;
+}
+
+interface PortSettingsProps {
+  privatePort: string;
+  publicPort: string;
 }
 
 const ConfigurationModal = ({
-                              open,
-                              onClose,
-                              onSave,
-                            }: ConfigurationModalProps) => {
-  const [activeTab, setActiveTab] = useState(0);
-  const [networkSettings, setNetworkSettings] = useState({
-    gateway: '192.168.1.1',
-    ipAddress: '192.168.1.100',
-  });
-  const [portSettings, setPortSettings] = useState({
-    privatePort: '80',
-    publicPort: '8080',
-  });
-  const [mounts, setMounts] = useState<MountConfigProps[]>([]);
+  open,
+  onClose,
+  onSave,
+  initialConfig,
+}: ConfigurationModalProps) => {
+  const [activeTab, setActiveTab] = useState<number>(0);
+
+  const [networkSettings, setNetworkSettings] = useState<
+    ConfigurationData['networkSettings']
+  >(
+    initialConfig?.networkSettings || {
+      gateway: '192.168.1.1',
+      ipAddress: '192.168.1.100',
+    }
+  );
+
   const [mountConfig, setMountConfig] = useState<MountConfigProps>({
     type: 'bind',
     source: '',
     destination: '/data',
     name: '',
     driver: 'local',
-    // mode: 'rw',
   });
-  const [envVariables, setEnvVariables] = useState('');
-  const [cmd, setCmd] = useState('');
+
+  const [portSettings, setPortSettings] = useState<PortSettingsProps>(
+    initialConfig?.ports
+      ? {
+          privatePort: initialConfig.ports.privatePort.toString(),
+          publicPort: initialConfig.ports.publicPort.toString(),
+        }
+      : { privatePort: '80', publicPort: '8080' }
+  );
+
+  const [mounts, setMounts] = useState<MountConfigProps[]>(
+    initialConfig?.mounts || []
+  );
+
+  const [envVariables, setEnvVariables] = useState<string>(
+    initialConfig?.env?.join('\n') || ''
+  );
+
+  const [cmd, setCmd] = useState<string>(initialConfig?.cmd?.join('\n') || '');
+
+  useEffect(() => {
+    if (initialConfig) {
+      setNetworkSettings(initialConfig.networkSettings);
+      setPortSettings({
+        privatePort: initialConfig.ports?.privatePort.toString() || '80',
+        publicPort: initialConfig.ports?.publicPort.toString() || '8080',
+      });
+      setMounts(initialConfig.mounts);
+      setEnvVariables(initialConfig.env.join('\n'));
+      setCmd(initialConfig.cmd.join('\n'));
+    }
+  }, [initialConfig]);
 
   const handleSave = () => {
     if (!networkSettings.gateway || !networkSettings.ipAddress) {
@@ -90,30 +126,22 @@ const ConfigurationModal = ({
         (mount) =>
           !mount.destination ||
           (mount.type === 'bind' && !mount.source) ||
-          (mount.type === 'volume' && !mount.name),
+          (mount.type === 'volume' && !mount.name)
       )
     ) {
       alert(
-        '마운트 설정의 대상 경로와 각 타입에 맞는 필수 항목을 모두 입력해 주세요.',
+        '마운트 설정의 대상 경로와 각 타입에 맞는 필수 항목을 모두 입력해 주세요.'
       );
       return;
     }
 
     const config: ConfigurationData = {
-      networkSettings: {
-        gateway: networkSettings.gateway || '',
-        ipAddress: networkSettings.ipAddress || '',
+      networkSettings,
+      ports: {
+        privatePort: parseInt(portSettings.privatePort, 10),
+        publicPort: parseInt(portSettings.publicPort, 10),
       },
-      ports:
-        portSettings.privatePort && portSettings.publicPort
-          ? [
-            {
-              privatePort: parseInt(portSettings.privatePort, 10),
-              publicPort: parseInt(portSettings.publicPort, 10),
-            },
-          ]
-          : [],
-      mounts: mounts.length > 0 ? mounts : [],
+      mounts,
       env: envVariables ? envVariables.split('\n').filter(Boolean) : [],
       cmd: cmd ? cmd.split('\n').filter(Boolean) : [],
     };
@@ -132,14 +160,13 @@ const ConfigurationModal = ({
   };
 
   const addMount = () => {
-    setMounts([...mounts, mountConfig]);
+    setMounts([...mounts, { ...mountConfig }]);
     setMountConfig({
       type: 'bind',
       source: '',
       destination: '/data',
       name: '',
       driver: 'local',
-      // mode: 'rw',
     });
   };
 

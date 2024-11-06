@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { v4 as uuidv4 } from 'uuid';
 import { colorsOption } from '@/data/color';
 import { Host, Network, ThemeColor } from '@/types/type';
 import axios from 'axios';
@@ -10,16 +9,25 @@ import { showSnackbar } from '@/utils/toastUtils';
 import { useHostStore } from '@/store/hostStore';
 import { selectedHostStore } from '@/store/seletedHostStore';
 import {
-  Box, Button,
-  Dialog, DialogActions,
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
   DialogContent,
   DialogTitle,
   FormControl,
-  FormControlLabel, InputLabel, MenuItem, Radio,
-  RadioGroup, Select,
+  FormControlLabel,
+  InputLabel,
+  MenuItem,
+  Radio,
+  RadioGroup,
+  Select,
   TextField,
   Typography,
 } from '@mui/material';
+import { DEFAULT_CONTAINER_SETTINGS } from '@/data/blueprint';
+import { generateId } from '@/utils/randomId';
+import { hostNamePattern } from '@/utils/patternUtils';
 
 interface HostModalProps {
   onClose: () => void;
@@ -27,11 +35,10 @@ interface HostModalProps {
 }
 
 const HostModal = ({ isOpen, onClose }: HostModalProps) => {
-  const id = uuidv4();
   const { enqueueSnackbar } = useSnackbar();
   const addHost = useHostStore((state) => state.addHost);
   const addConnectedBridgeId = selectedHostStore(
-    (state) => state.addConnectedBridgeId,
+    (state) => state.addConnectedBridgeId
   );
 
   const [isRemote, setIsRemote] = useState<boolean>(false);
@@ -42,7 +49,7 @@ const HostModal = ({ isOpen, onClose }: HostModalProps) => {
   const [availableNetworks, setAvailableNetworks] = useState<Network[]>([]);
   const [isHostIpConnected, setIsHostIpConnected] = useState<boolean>(false);
   const [connectionMessage, setConnectionMessage] = useState<string | null>(
-    null,
+    null
   );
 
   const fetchNetworks = async () => {
@@ -67,19 +74,28 @@ const HostModal = ({ isOpen, onClose }: HostModalProps) => {
   }, [hostIp, isHostIpConnected]);
 
   const handleAddHost = (): void => {
+    if (!hostNamePattern.test(hostNm)) {
+      showSnackbar(
+        enqueueSnackbar,
+        '호스트 이름은 최대 20자까지 가능하며 소문자, 숫자, 밑줄, 마침표, 하이픈만 사용할 수 있습니다.',
+        'error',
+        '#d32f2f'
+      );
+      return;
+    }
+
     if (useHostStore.getState().hosts.length >= 5) {
       showSnackbar(
         enqueueSnackbar,
         '호스트는 최대 5개까지만 추가할 수 있습니다.',
         'error',
-        '#d32f2f',
+        '#d32f2f'
       );
       return;
     }
 
-    // 선택한 네트워크 정보 찾기
     const selectedNetwork = availableNetworks.find(
-      (net) => net.Name === networkName,
+      (net) => net.Name === networkName
     );
 
     if (!selectedNetwork) {
@@ -87,13 +103,16 @@ const HostModal = ({ isOpen, onClose }: HostModalProps) => {
         enqueueSnackbar,
         '선택된 네트워크를 찾을 수 없습니다.',
         'error',
-        '#d32f2f',
+        '#d32f2f'
       );
       return;
     }
 
+    const hostId = generateId('host');
+    const networkId = generateId('network');
+
     const newHost: Host = {
-      id,
+      id: hostId,
       hostNm,
       hostIp: isRemote ? hostIp : 'localhost',
       status: true,
@@ -104,39 +123,40 @@ const HostModal = ({ isOpen, onClose }: HostModalProps) => {
           id: selectedNetwork.Id,
           name: selectedNetwork.Name,
           ip: selectedNetwork.IPAM?.Config?.[0]?.Gateway || '',
-          hostId: id,
+          hostId: hostId,
           driver: selectedNetwork.Driver,
           subnet: selectedNetwork.IPAM?.Config?.[0]?.Subnet || '',
-          networkUniqueId: uuidv4(),
-          containers: [],
+          networkUniqueId: networkId,
+          containers: [DEFAULT_CONTAINER_SETTINGS],
         },
       ],
     };
 
     addHost(newHost);
 
-    addConnectedBridgeId(id, {
-      uniqueId: uuidv4(),
+    addConnectedBridgeId(hostId, {
+      uniqueId: networkId,
       name: selectedNetwork.Name,
       gateway: selectedNetwork.IPAM?.Config?.[0]?.Gateway || '',
       driver: selectedNetwork.Driver || '',
       subnet: selectedNetwork.IPAM?.Config?.[0]?.Subnet || '',
       scope: selectedNetwork.Scope || '',
       id: selectedNetwork.Id,
+      containers: [DEFAULT_CONTAINER_SETTINGS],
     });
 
     showSnackbar(
       enqueueSnackbar,
       '호스트가 성공적으로 추가되었습니다!',
       'success',
-      '#4CAF50',
+      '#4CAF50'
     );
     onClose();
   };
 
   const defaultColor = colorsOption.find((color) => !color.sub);
   const defaultSubColor = colorsOption.find(
-    (color) => color.label === defaultColor?.label && color.sub,
+    (color) => color.label === defaultColor?.label && color.sub
   );
 
   const [selectedColor, setSelectedColor] = useState<ThemeColor>({
@@ -165,7 +185,7 @@ const HostModal = ({ isOpen, onClose }: HostModalProps) => {
 
   const handleNetworkChange = (selectedNetworkName: string) => {
     const selectedNetwork = availableNetworks.find(
-      (net) => net.Name === selectedNetworkName,
+      (net) => net.Name === selectedNetworkName
     );
     setNetworkName(selectedNetworkName);
     setNetworkIp(selectedNetwork?.IPAM?.Config?.[0]?.Gateway || '');
@@ -173,10 +193,10 @@ const HostModal = ({ isOpen, onClose }: HostModalProps) => {
 
   const handleColorSelection = (colorLabel: string) => {
     const mainColor = colorsOption.find(
-      (color) => color.label === colorLabel && !color.sub,
+      (color) => color.label === colorLabel && !color.sub
     );
     const subColor = colorsOption.find(
-      (color) => color.label === colorLabel && color.sub,
+      (color) => color.label === colorLabel && color.sub
     );
 
     setSelectedColor({
@@ -213,10 +233,10 @@ const HostModal = ({ isOpen, onClose }: HostModalProps) => {
     <Dialog
       open={true}
       onClose={onClose}
-      onClick={(e) => e.stopPropagation()}  // 이벤트 버블링 방지
+      onClick={(e) => e.stopPropagation()}
       slotProps={{
         backdrop: {
-          onClick: () => onClose(),  // 백드롭 클릭시에만 닫히도록 설정
+          onClick: () => onClose(),
         },
       }}
       fullWidth

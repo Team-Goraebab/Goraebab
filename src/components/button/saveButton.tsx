@@ -27,7 +27,7 @@ const SaveButton = () => {
           enqueueSnackbar,
           '매핑된 데이터가 유효하지 않습니다.',
           'error',
-          '#FF4853',
+          '#FF4853'
         );
         return;
       }
@@ -37,10 +37,10 @@ const SaveButton = () => {
         processedData: {
           host: mappedData.map((host) => ({
             name: host.hostNm,
-            isLocal: !isDockerRemote,
+            isRemote: !isDockerRemote,
             ip: isDockerRemote ? remoteUrl : null,
             network: Array.isArray(host.networks)
-              ? host.networks.map((network) => ({
+              ? host.networks.map((network: any) => ({
                   name: network.name,
                   driver: network.driver || 'bridge',
                   ipam: {
@@ -68,7 +68,7 @@ const SaveButton = () => {
                 }))
               : [],
             volume: Array.isArray(host.imageVolumes)
-              ? host.imageVolumes.map((volume) => ({
+              ? host.imageVolumes.map((volume: any) => ({
                   name: volume.Name,
                   driver: volume.Driver,
                 }))
@@ -109,8 +109,7 @@ const SaveButton = () => {
 
   return (
     <>
-      <div
-        className="h-[40px] px-4 bg-white border-gray_3 border text-blue_6 hover:text-white hover:bg-blue_5 active:bg-blue_6 rounded-lg flex items-center justify-center transition duration-200 ease-in-out">
+      <div className="h-[40px] px-4 bg-white border-gray_3 border text-blue_6 hover:text-white hover:bg-blue_5 active:bg-blue_6 rounded-lg flex items-center justify-center transition duration-200 ease-in-out">
         <button
           className="flex items-center gap-2 text-center"
           onClick={handleSave}
