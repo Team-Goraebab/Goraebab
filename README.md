@@ -60,6 +60,11 @@ Goraebab addresses this issue by enabling users to design Docker configurations 
 ![Spring Boot](https://img.shields.io/badge/SpringBoot-v3.2.8-6DB33F?style=flat&logo=Spring&logoColor=white) ![MySQL](https://img.shields.io/badge/MySQL-v8.0-4479A1?style=flat&logo=mysql&labelColor=4479A1&logoColor=FFF) ![MariaDB](https://img.shields.io/badge/MariaDB-v11.7-003545?style=flat&logo=mariadb&logoColor=white) ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-v.17-4169E1?style=flat&logo=postgresql&logoColor=white) ![Gradle](https://img.shields.io/badge/Gradle-v8.8-02303A?style=flat&logo=Gradle&logoColor=white) ![Docker](https://img.shields.io/badge/Docker-v.24.0-2496ED?style=flat&logo=Docker&logoColor=white) ![Github actions](https://img.shields.io/badge/Github%20actions-v4-5f5f5f?style=flat&logo=github&logoColor=white) ![Swagger](https://img.shields.io/badge/Swagger-85EA2D?style=flat&logo=Swagger&logoColor=white) 
 
 
+## System Architecture
+<p align="center">
+  <img src=https://github.com/user-attachments/assets/0c438ec9-eae1-4588-ad81-3df2ed1c4eb5 width="700" height= "500"/>
+</p>
+
 &nbsp;
 
 
