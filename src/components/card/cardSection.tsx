@@ -6,9 +6,9 @@ import { HostCardProps } from './hostCard';
 import Draggable from 'react-draggable';
 import { useStore } from '@/store/cardStore';
 import { selectedHostStore } from '@/store/seletedHostStore';
-import { useHostStore } from '@/store/hostStore';
 import { useSelectedNetworkStore } from '@/store/selectedNetworkStore';
 import { FaTrash, FaHome, FaGlobeAsia } from 'react-icons/fa';
+import { NetworkInfo, useBlueprintAllStore } from '@/store/blueprintAllStore';
 
 interface CardSectionProps {
   hostData: HostCardProps[];
@@ -37,8 +37,10 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
   );
 
   const allContainers = useStore((state) => state.hostContainers);
-  const deleteHost = useHostStore((state) => state.deleteHost);
-  const deleteNetwork = useHostStore((state) => state.deleteNetwork);
+  const deleteHost = useBlueprintAllStore((state) => state.deleteHost);
+  const deleteNetworkFromHost = useBlueprintAllStore(
+    (state) => state.deleteNetworkFromHost
+  );
 
   const handleHostClick = (id: string, name: string, ip: string) => {
     const newSelectedHostId = selectedHostId === id ? null : id;
@@ -48,13 +50,11 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
     setSelectedHostId(newSelectedHostId);
     setSelectedHostName(newSelectedHostName);
     setSelectedHostIp(newSelectedHostIp);
-    sessionStorage.setItem('selectedHostIp', newSelectedHostIp);
     clearSelectedNetwork();
   };
 
   const handleDeleteHost = (id: string) => {
     deleteHost(id);
-    clearBridgesForHost(id);
   };
 
   const handleSelectNetwork = (
@@ -88,7 +88,7 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
     ) {
       clearSelectedNetwork();
     }
-    deleteNetwork(hostId, uniqueId);
+    deleteNetworkFromHost(hostId, uniqueId);
     deleteConnectedBridgeId(hostId, uniqueId);
   };
 
@@ -106,7 +106,7 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
         {hostData && hostData.length > 0 ? (
           hostData.map((host) => {
             const containers = allContainers[host.id] || [];
-            const networks = connectedBridgeIds[host.id] || [];
+            const networks: NetworkInfo[] = host.network || [];
 
             const isHostSelected =
               selectedNetwork?.hostId === host.id || selectedHostId === host.id;
@@ -189,24 +189,37 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
                     <div className="p-4">
                       {networks.length > 0 ? (
                         <div className="flex flex-col gap-4 w-full">
-                          {networks.map((network) => (
-                            <div key={network.uniqueId}>
+                          {networks.map((network: NetworkInfo) => (
+                            <div key={network.id}>
                               {network.containers &&
                               network.containers.length > 0 ? (
                                 network.containers.map((container) => {
+                                  const containerVolumes = container.mounts
+                                    .filter((mount) => mount.type === 'volume')
+                                    .map((mount) => {
+                                      const volume = host.volume.find(
+                                        (vol) => vol.name === mount.name
+                                      );
+                                      return {
+                                        Name: volume?.name || '',
+                                        Driver: volume?.driver || '',
+                                      };
+                                    });
+
                                   return (
                                     <CardContainer
                                       key={container.containerId}
                                       networkName={network.name}
-                                      networkIp={network.gateway}
+                                      networkIp={network.ipam.config[0]?.subnet}
                                       containers={containers}
                                       containerName={container.containerName}
                                       themeColor={host.themeColor}
+                                      hostId={host.id}
                                       onDelete={() =>
                                         handleDeleteNetwork(
                                           host.id,
                                           network.name,
-                                          network.uniqueId
+                                          network.id
                                         )
                                       }
                                       onSelectNetwork={() =>
@@ -217,12 +230,11 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
                                             : 'localhost',
                                           network.name,
                                           network.id,
-                                          network.uniqueId
+                                          network.id
                                         )
                                       }
                                       isSelected={
-                                        selectedNetwork?.uniqueId ===
-                                        network.uniqueId
+                                        selectedNetwork?.uniqueId === network.id
                                       }
                                       hostIp={
                                         host.hostIp ? host.hostIp : 'localhost'
@@ -237,12 +249,7 @@ const CardSection = ({ hostData, isHandMode }: CardSectionProps) => {
                                       containerId={container.containerId}
                                       configsVal={[container]}
                                       initialDroppedImages={[container.image]}
-                                      initialImagesVolumes={container.imageVolumes.map(
-                                        (volume) => ({
-                                          Name: volume.name,
-                                          Driver: volume.driver,
-                                        })
-                                      )}
+                                      initialImagesVolumes={containerVolumes}
                                     />
                                   );
                                 })

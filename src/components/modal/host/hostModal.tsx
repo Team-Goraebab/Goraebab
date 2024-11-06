@@ -2,12 +2,11 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { colorsOption } from '@/data/color';
-import { Host, Network, ThemeColor } from '@/types/type';
+import { Network, ThemeColor } from '@/types/type';
 import axios from 'axios';
 import { useSnackbar } from 'notistack';
 import { showSnackbar } from '@/utils/toastUtils';
-import { useHostStore } from '@/store/hostStore';
-import { selectedHostStore } from '@/store/seletedHostStore';
+import { useBlueprintAllStore } from '@/store/blueprintAllStore';
 import {
   Box,
   Button,
@@ -36,9 +35,9 @@ interface HostModalProps {
 
 const HostModal = ({ isOpen, onClose }: HostModalProps) => {
   const { enqueueSnackbar } = useSnackbar();
-  const addHost = useHostStore((state) => state.addHost);
-  const addConnectedBridgeId = selectedHostStore(
-    (state) => state.addConnectedBridgeId
+  const addHost = useBlueprintAllStore((state) => state.addHost);
+  const addNetworkToHost = useBlueprintAllStore(
+    (state) => state.addNetworkToHost
   );
 
   const [isRemote, setIsRemote] = useState<boolean>(false);
@@ -56,7 +55,6 @@ const HostModal = ({ isOpen, onClose }: HostModalProps) => {
     try {
       const response = await fetch(`/api/network/list?hostIp=${hostIp}`);
       const data = await response.json();
-
       if (Array.isArray(data)) {
         setAvailableNetworks(data);
       } else {
@@ -84,16 +82,6 @@ const HostModal = ({ isOpen, onClose }: HostModalProps) => {
       return;
     }
 
-    if (useHostStore.getState().hosts.length >= 5) {
-      showSnackbar(
-        enqueueSnackbar,
-        '호스트는 최대 5개까지만 추가할 수 있습니다.',
-        'error',
-        '#d32f2f'
-      );
-      return;
-    }
-
     const selectedNetwork = availableNetworks.find(
       (net) => net.Name === networkName
     );
@@ -111,38 +99,24 @@ const HostModal = ({ isOpen, onClose }: HostModalProps) => {
     const hostId = generateId('host');
     const networkId = generateId('network');
 
-    const newHost: Host = {
-      id: hostId,
+    // 새로운 호스트 추가
+    addHost(
       hostNm,
-      hostIp: isRemote ? hostIp : 'localhost',
-      status: true,
+      hostId,
       isRemote,
-      themeColor: selectedColor,
-      networks: [
-        {
-          id: selectedNetwork.Id,
-          name: selectedNetwork.Name,
-          ip: selectedNetwork.IPAM?.Config?.[0]?.Gateway || '',
-          hostId: hostId,
-          driver: selectedNetwork.Driver,
-          subnet: selectedNetwork.IPAM?.Config?.[0]?.Subnet || '',
-          networkUniqueId: networkId,
-          containers: [DEFAULT_CONTAINER_SETTINGS],
-        },
-      ],
-    };
+      isRemote ? hostIp : 'localhost',
+      selectedColor
+    );
 
-    addHost(newHost);
-
-    addConnectedBridgeId(hostId, {
-      uniqueId: networkId,
+    // 네트워크 연결 설정 - 선택된 네트워크를 호스트에 자동 연결
+    addNetworkToHost(hostId, {
+      id: networkId,
       name: selectedNetwork.Name,
-      gateway: selectedNetwork.IPAM?.Config?.[0]?.Gateway || '',
-      driver: selectedNetwork.Driver || '',
-      subnet: selectedNetwork.IPAM?.Config?.[0]?.Subnet || '',
-      scope: selectedNetwork.Scope || '',
-      id: selectedNetwork.Id,
-      containers: [DEFAULT_CONTAINER_SETTINGS],
+      driver: selectedNetwork.Driver,
+      ipam: {
+        config: [{ subnet: selectedNetwork.IPAM?.Config?.[0]?.Subnet || '' }],
+      },
+      containers: [DEFAULT_CONTAINER_SETTINGS], // 초기 기본 컨테이너 설정
     });
 
     showSnackbar(

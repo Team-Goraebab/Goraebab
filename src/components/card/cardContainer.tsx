@@ -36,9 +36,9 @@ import ConfigurationModal, {
 } from '../modal/daemon/configurationModal';
 import { selectedHostStore } from '@/store/seletedHostStore';
 import { useSnackbar } from 'notistack';
-import { useHostStore } from '@/store/hostStore';
 import { useBlueprintStore } from '@/store/blueprintStore';
 import { containerNamePattern } from '@/utils/patternUtils';
+import { useBlueprintAllStore, VolumeInfo } from '@/store/blueprintAllStore';
 
 export interface CardContainerProps {
   networkName: string;
@@ -49,6 +49,7 @@ export interface CardContainerProps {
   onSelectNetwork?: () => void;
   isSelected?: boolean;
   hostIp: string;
+  hostId: string;
   containerId: string;
   containerName: string;
   onContainerNameChange?: (containerId: string, name: string) => void;
@@ -73,6 +74,7 @@ const CardContainer = ({
   onSelectNetwork,
   isSelected,
   hostIp,
+  hostId,
   containerId,
   containerName,
   onContainerNameChange,
@@ -85,7 +87,12 @@ const CardContainer = ({
 
   const { setMappedData } = useBlueprintStore();
   const selectedHostIp = selectedHostStore((state) => state.selectedHostIp);
-  const hosts = useHostStore((state) => state.hosts);
+  const hosts = useBlueprintAllStore((state) => state.hosts);
+
+  const updateContainer = useBlueprintAllStore(
+    (state) => state.updateContainer
+  );
+
   const connectedBridgeIds = selectedHostStore(
     (state) => state.connectedBridgeIds
   );
@@ -209,6 +216,12 @@ const CardContainer = ({
     }
   }, [droppedImages]);
 
+  useEffect(() => {
+    setImageValid(
+      droppedImages.length > 0 && !isDefaultImage(droppedImages[0])
+    );
+  }, [droppedImages]);
+
   const [{ isOver }, drop] = useDrop({
     accept: 'IMAGE_CARD',
     drop: (item: { image: string; id: string }) => {
@@ -216,10 +229,7 @@ const CardContainer = ({
         enqueueSnackbar('이미지는 하나만 추가할 수 있습니다.', {
           variant: 'warning',
           autoHideDuration: 3000,
-          anchorOrigin: {
-            vertical: 'top',
-            horizontal: 'right',
-          },
+          anchorOrigin: { vertical: 'top', horizontal: 'right' },
         });
         return;
       }
@@ -227,11 +237,12 @@ const CardContainer = ({
       const imageInfo = splitImageNameAndTag(item.image, item.id);
       setDroppedImages((prev) => [...prev, imageInfo]);
       setImageToNetwork((prev) => [...prev, { ...imageInfo, networkName }]);
+
+      // 컨테이너의 이미지 정보 업데이트
+      updateContainer(hostIp, networkName, containerId, { image: imageInfo });
     },
     canDrop: () => hostIp === selectedHostIp,
-    collect: (monitor) => ({
-      isOver: monitor.isOver(),
-    }),
+    collect: (monitor) => ({ isOver: monitor.isOver() }),
   });
 
   drop(ref);
@@ -242,21 +253,17 @@ const CardContainer = ({
   ];
 
   const handleDeleteImage = (imageId: string) => {
-    // 이미지 삭제
     setDroppedImages((prev) =>
       prev.filter((image) => image.imageId !== imageId)
     );
-    // imageToNetwork에서 해당 이미지 정보 삭제
     setImageToNetwork((prev) =>
       prev.filter((entry) => entry.imageId !== imageId)
     );
-
-    // 이미지 삭제 후 드롭 가능 상태로 전환
     setImageValid(false);
   };
 
-  const handleOpenVolumeModal = (currentContainerId: string) => {
-    setSelectedImage(currentContainerId);
+  const handleOpenVolumeModal = () => {
+    setSelectedImage(containerId);
     setSelectedVolumes(imageVolumes || []);
     setIsVolumeModalOpen(true);
   };
@@ -266,13 +273,33 @@ const CardContainer = ({
   };
 
   const handleAddVolume = (volumeData: VolumeData[]) => {
-    setImageVolumes(volumeData);
+    // VolumeData를 VolumeInfo로 변환
+    const volumeDataAsVolumeInfo: VolumeInfo[] = volumeData.map((v) => ({
+      name: v.Name,
+      driver: v.Driver,
+    }));
+
+    // VolumeInfo를 다시 VolumeData로 변환하여 setImageVolumes에 전달
+    const volumeInfoAsVolumeData: VolumeData[] = volumeDataAsVolumeInfo.map(
+      (v) => ({
+        Name: v.name,
+        Driver: v.driver,
+      })
+    );
+
+    // 변환된 데이터를 setImageVolumes와 addVolumeToHost에 전달
+    setImageVolumes(volumeInfoAsVolumeData);
     handleCloseVolumeModal();
+
+    useBlueprintAllStore
+      .getState()
+      .addVolumeToHost(hostId, volumeDataAsVolumeInfo);
   };
 
   const handleSaveConfig = (config: ConfigurationData) => {
     setConfigs([config]);
     setIsConfigModalOpen(false);
+    updateContainer(hostIp, networkName, containerId, { ...configs[0] });
   };
 
   const handleNameSubmit = () => {
@@ -304,9 +331,16 @@ const CardContainer = ({
     }
 
     if (tempContainerName.trim()) {
+      // 상태 업데이트 및 스토어 업데이트
       if (onContainerNameChange) {
         onContainerNameChange(containerId, tempContainerName);
       }
+
+      // containerName 업데이트
+      setTempContainerName(tempContainerName);
+      updateContainer(hostIp, networkName, containerId, {
+        containerName: tempContainerName,
+      });
       setIsEditingName(false);
     }
   };
@@ -407,7 +441,7 @@ const CardContainer = ({
             ) : (
               <div className="flex items-center justify-between bg-default-50 rounded-medium px-3 py-2">
                 <span className="text-sm text-default-700">
-                  {containerName || '컨테이너 이름을 설정하세요'}
+                  {tempContainerName || '컨테이너 이름을 설정하세요'}
                 </span>
                 <Button
                   isIconOnly
@@ -477,9 +511,7 @@ const CardContainer = ({
                               size="sm"
                               variant="light"
                               isIconOnly
-                              onPress={() =>
-                                handleOpenVolumeModal(image.imageId)
-                              }
+                              onPress={() => handleOpenVolumeModal}
                             >
                               <Plus size={16} />
                             </Button>

@@ -25,6 +25,11 @@ import { FaNetworkWired } from 'react-icons/fa';
 import { Network } from '@/types/type';
 import { DEFAULT_CONTAINER_SETTINGS } from '@/data/blueprint';
 import { generateId } from '@/utils/randomId';
+import {
+  NetworkInfo,
+  useBlueprintAllStore,
+  VolumeInfo,
+} from '@/store/blueprintAllStore';
 
 interface CardDataProps {
   data: Network;
@@ -33,11 +38,19 @@ interface CardDataProps {
 
 const NetworkCard = ({ data, onDeleteSuccess }: CardDataProps) => {
   const { enqueueSnackbar } = useSnackbar();
-
-  const { selectedHostId, addConnectedBridgeId } = selectedHostStore();
-  const { connectedBridgeIds } = selectedHostStore((state) => ({
-    connectedBridgeIds: state.connectedBridgeIds,
-  }));
+  const { selectedHostId } = selectedHostStore();
+  const addNetworkToHost = useBlueprintAllStore(
+    (state) => state.addNetworkToHost
+  );
+  const deleteNetworkFromHost = useBlueprintAllStore(
+    (state) => state.deleteNetworkFromHost
+  );
+  const updateContainer = useBlueprintAllStore(
+    (state) => state.updateContainer
+  );
+  const addVolumeToHost = useBlueprintAllStore(
+    (state) => state.addVolumeToHost
+  );
   const { bg1, bg2 } = getStatusColors('primary');
   const [showModal, setShowModal] = useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -77,9 +90,7 @@ const NetworkCard = ({ data, onDeleteSuccess }: CardDataProps) => {
     try {
       const res = await fetch('/api/network/delete', {
         method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: data.Id }),
       });
       const result = await res.json();
@@ -119,46 +130,23 @@ const NetworkCard = ({ data, onDeleteSuccess }: CardDataProps) => {
 
   const handleConnect = () => {
     if (selectedHostId) {
-      // 현재 호스트에 연결된 네트워크가 3개 이상인지 확인
-      const currentConnections = connectedBridgeIds[selectedHostId] || [];
-      if (currentConnections.length >= 3) {
-        showSnackbar(
-          enqueueSnackbar,
-          '네트워크는 최대 3개까지만 연결할 수 있습니다.',
-          'error',
-          '#FF4853'
-        );
-        return; // 연결을 중단
-      }
-
-      // 컨테이너 데이터 생성
-      const containers = Object.values(data.Containers || {}).map(
-        (container) => ({
-          ...DEFAULT_CONTAINER_SETTINGS,
-          containerName: container.Name,
-          networkSettings: {
-            ...DEFAULT_CONTAINER_SETTINGS.networkSettings,
-            ipAddress: container.IPv4Address,
-          },
-        })
-      );
-
-      const networkInfo = {
+      // 연결할 네트워크 생성
+      const networkInfo: NetworkInfo = {
         id: data.Id,
         name: data.Name,
-        gateway: gateway,
         driver: data.Driver,
-        subnet: subnet,
-        scope: data.Scope,
+        ipam: { config: [{ subnet }] },
         containers: [DEFAULT_CONTAINER_SETTINGS],
       };
 
-      const networkId = generateId('network');
+      // 네트워크와 관련 컨테이너 및 볼륨 추가
+      addNetworkToHost(selectedHostId, networkInfo);
 
-      addConnectedBridgeId(selectedHostId, {
-        ...networkInfo,
-        uniqueId: networkId,
-      });
+      // 예제 볼륨 데이터
+      const volumeInfo: VolumeInfo[] = [
+        { name: 'example-volume', driver: 'local' },
+      ];
+      addVolumeToHost(selectedHostId, volumeInfo);
 
       showSnackbar(
         enqueueSnackbar,
@@ -179,9 +167,7 @@ const NetworkCard = ({ data, onDeleteSuccess }: CardDataProps) => {
   const fetchNetworkDetail = async (id: string) => {
     try {
       const data = await fetchData(`/api/network/detail?id=${id}`);
-      if (!data) {
-        throw new Error('Failed to fetch network detail');
-      }
+      if (!data) throw new Error('Failed to fetch network detail');
       return data;
     } catch (error) {
       throw error;
