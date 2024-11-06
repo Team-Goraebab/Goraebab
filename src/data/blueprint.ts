@@ -9,10 +9,15 @@ export const DEFAULT_CONTAINER_SETTINGS = {
     tag: '',
   },
   networkSettings: {
-    gateway: '',
-    ipAddress: '',
+    gateway: '192.168.1.1',
+    ipAddress: '192.168.1.1',
   },
-  ports: [],
+  ports: [
+    {
+      privatePort: 80,
+      publicPort: 8080,
+    },
+  ],
   mounts: [],
   env: [],
   cmd: [],
