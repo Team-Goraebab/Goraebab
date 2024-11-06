@@ -47,6 +47,8 @@ interface MountConfigProps {
   destination: string;
   name: string;
   driver: string;
+  alias: string;
+  mode: string;
 }
 
 interface PortSettingsProps {
@@ -77,6 +79,8 @@ const ConfigurationModal = ({
     destination: '/data',
     name: '',
     driver: 'local',
+    alias: '',
+    mode: 'rw',
   });
 
   const [portSettings, setPortSettings] = useState<{
@@ -179,6 +183,8 @@ const ConfigurationModal = ({
       destination: '/data',
       name: '',
       driver: 'local',
+      alias: '',
+      mode: 'rw',
     });
   };
 
