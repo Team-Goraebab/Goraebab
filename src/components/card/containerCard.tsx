@@ -18,14 +18,13 @@ import {
   FiChevronUp,
   FiCpu,
   FiFileText,
-  FiGlobe,
-  FiHardDrive,
   FiImage,
   FiInfo,
   FiPauseCircle,
   FiTrash,
   FiXCircle,
 } from 'react-icons/fi';
+import { useContainerStore } from '@/store/containerStore';
 
 interface CardDataProps {
   data: any;
@@ -55,8 +54,14 @@ const ContainerCard = ({ data, onDeleteSuccess }: CardDataProps) => {
   const [detailData, setDetailData] = useState(null);
   const [isLogModalOpen, setIsLogModalOpen] = useState(false);
 
+  const { succeededContainers } = useContainerStore();
   const containerName = data.Names ? data.Names[0].replace(/^\//, '') : 'N/A';
   const imageName = data.Image || 'N/A';
+
+  const isSuccessContainer = succeededContainers.includes(containerName);
+  const borderColor = isSuccessContainer
+    ? 'border-green-500'
+    : 'border-gray-200';
 
   const items = [
     { label: 'Name', value: containerName, icon: FiCpu },
@@ -125,7 +130,7 @@ const ContainerCard = ({ data, onDeleteSuccess }: CardDataProps) => {
           enqueueSnackbar,
           '컨테이너가 성공적으로 삭제되었습니다!',
           'success',
-          '#4CAF50',
+          '#4CAF50'
         );
         onDeleteSuccess();
       } else {
@@ -133,7 +138,7 @@ const ContainerCard = ({ data, onDeleteSuccess }: CardDataProps) => {
           enqueueSnackbar,
           `컨테이너 삭제 실패: ${result.error}`,
           'error',
-          '#FF4853',
+          '#FF4853'
         );
       }
     } catch (error) {
@@ -143,7 +148,7 @@ const ContainerCard = ({ data, onDeleteSuccess }: CardDataProps) => {
           enqueueSnackbar,
           `컨테이너 삭제 요청 중 에러: ${error}`,
           'error',
-          '#FF4853',
+          '#FF4853'
         );
       }
     } finally {
@@ -193,7 +198,9 @@ const ContainerCard = ({ data, onDeleteSuccess }: CardDataProps) => {
   return (
     <div
       ref={cardRef}
-      className="bg-white border rounded-lg mb-2 overflow-hidden"
+      className={`bg-white ${borderColor} border rounded-lg mb-2 overflow-hidden transition-transform duration-300 transform ${
+        isSuccessContainer ? 'hover:scale-105' : ''
+      }`}
     >
       <div
         className="flex justify-between items-center px-4 py-2 bg-gray-50 cursor-pointer"
