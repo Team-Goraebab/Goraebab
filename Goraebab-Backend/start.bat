@@ -18,7 +18,7 @@ if /I "%DBMS%"=="mysql" (
     set DB_URL=jdbc:sqlserver://172.18.0.20:1433;databaseName=goraebab
     set DB_DRIVER_CLASS_NAME=com.microsoft.sqlserver.jdbc.SQLServerDriver
 ) else (
-    echo Unknown DBMS. Choose between 'mysql', 'mariadb', 'postgresql'.
+    echo Unknown DBMS. Choose between 'mysql', 'mariadb', 'postgresql', oracle.
     exit /b 1
 )
 
