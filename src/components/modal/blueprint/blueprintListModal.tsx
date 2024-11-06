@@ -18,15 +18,12 @@ import axios from 'axios';
 import { showSnackbar } from '@/utils/toastUtils';
 import { useBlueprintStore } from '@/store/blueprintStore';
 import { useHostStore } from '@/store/hostStore';
-import { Host } from '@/types/type';
-import { colorsOption } from '@/data/color';
-import { TEST_DATA } from '@/data/mock';
-import { getRandomThemeColor } from '@/utils/randomTemeColor';
 import { selectedHostStore } from '@/store/seletedHostStore';
-import { useContainerNameStore } from '@/store/containerNameStore';
-import { generateId } from '@/utils/randomId';
 import { useSnackbar } from 'notistack';
 import { deleteBlueprint } from '@/services/blueprint/api';
+import { useBlueprintAllStore } from '@/store/blueprintAllStore';
+import { getRandomThemeColor } from '@/utils/randomTemeColor';
+import { colorsOption } from '@/data/color';
 
 interface BlueprintListModalProps {
   isOpen: boolean;
@@ -43,11 +40,8 @@ const BlueprintListModal = ({ isOpen, onClose }: BlueprintListModalProps) => {
   const [blueprints, setBlueprints] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const { setMappedData } = useBlueprintStore();
-  const { addHost, hosts, isHostExist } = useHostStore();
-  const addConnectedBridgeId = selectedHostStore(
-    (state) => state.addConnectedBridgeId
-  );
+  const { hosts, isHostExist } = useHostStore();
+  const { setHosts } = useBlueprintAllStore.getState();
 
   const fetchBlueprints = async () => {
     setIsLoading(true);
@@ -114,81 +108,12 @@ const BlueprintListModal = ({ isOpen, onClose }: BlueprintListModalProps) => {
       return;
     }
 
-    blueprint.data.host.forEach((hostData: any) => {
-      const formattedHost: Host = {
-        id: hostData.id,
-        hostNm: hostData.name,
-        hostIp: hostData.ip,
-        status: true,
-        isRemote: hostData.isRemote,
-        themeColor: getRandomThemeColor(colorsOption),
-        networks: [],
-      };
+    const newHosts = blueprint.data.host.map((hostData: any) => ({
+      ...hostData,
+      themeColor: hostData.themeColor || getRandomThemeColor(colorsOption),
+    }));
 
-      hostData.network.forEach((network: any) => {
-        network.containers.forEach((container: any) => {
-          const networkData = {
-            id: network.id,
-            name: network.name,
-            ip: network.ipam.config[0]?.subnet || '',
-            hostId: hostData.id,
-            networkUniqueId: network.id,
-            driver: network.driver,
-            subnet: network.ipam.config[0]?.subnet || '',
-            containers: [
-              {
-                containerName: container.containerName,
-                containerId: container.containerId,
-                image: {
-                  imageId: container.image.imageId,
-                  name: container.image.name,
-                  tag: container.image.tag,
-                },
-                networkSettings: container.networkSettings,
-                ports: container.ports,
-                mounts: container.mounts,
-                env: container.env,
-                cmd: container.cmd,
-                imageVolumes: hostData.volume || [],
-              },
-            ],
-          };
-
-          formattedHost.networks.push(networkData);
-
-          const networkId = generateId('networks-');
-          addConnectedBridgeId(hostData.id, {
-            id: network.id,
-            uniqueId: networkId,
-            name: network.name,
-            gateway: container.networkSettings.gateway || '',
-            driver: network.driver || '',
-            subnet: network.ipam.config[0]?.subnet || '',
-            scope: '',
-            containers: [
-              {
-                containerName: container.containerName,
-                containerId: container.containerId,
-                image: {
-                  imageId: container.image.imageId,
-                  name: container.image.name,
-                  tag: container.image.tag,
-                },
-                networkSettings: container.networkSettings,
-                ports: container.ports,
-                mounts: container.mounts,
-                env: container.env,
-                cmd: container.cmd,
-                imageVolumes: hostData.volume || [],
-              },
-            ],
-          });
-        });
-      });
-
-      addHost(formattedHost);
-      setMappedData([formattedHost]);
-    });
+    setHosts(newHosts);
     onClose();
   };
 
