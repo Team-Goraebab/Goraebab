@@ -73,7 +73,14 @@ interface State {
   addContainerToNetwork: (
     hostId: string,
     networkId: string,
-    container: ContainerInfo
+    containerId: string,
+    containerName: string
+  ) => void;
+  updateContainer: (
+    hostId: string,
+    networkId: string,
+    containerId: string,
+    updatedContainer: Partial<ContainerInfo>
   ) => void;
   getJsonData: () => {
     blueprintId: number;
@@ -122,8 +129,8 @@ export const useBlueprintAllStore = create<State>((set, get) => ({
       ),
     })),
 
-  // 컨테이너 추가
-  addContainerToNetwork: (hostId, networkId, container) =>
+  // 초기 컨테이너 추가
+  addContainerToNetwork: (hostId, networkId, containerId, containerName) =>
     set((state) => ({
       hosts: state.hosts.map((host) =>
         host.id === hostId
@@ -133,7 +140,43 @@ export const useBlueprintAllStore = create<State>((set, get) => ({
                 network.id === networkId
                   ? {
                       ...network,
-                      containers: [container],
+                      containers: [
+                        ...network.containers,
+                        {
+                          containerId,
+                          containerName,
+                          image: { imageId: '', name: '', tag: '' },
+                          networkSettings: { gateway: '', ipAddress: '' },
+                          ports: [],
+                          mounts: [],
+                          env: [],
+                          cmd: [],
+                        },
+                      ],
+                    }
+                  : network
+              ),
+            }
+          : host
+      ),
+    })),
+
+  // 컨테이너 업데이트
+  updateContainer: (hostId, networkId, containerId, updatedContainer) =>
+    set((state) => ({
+      hosts: state.hosts.map((host) =>
+        host.id === hostId
+          ? {
+              ...host,
+              network: host.network.map((network) =>
+                network.id === networkId
+                  ? {
+                      ...network,
+                      containers: network.containers.map((container) =>
+                        container.containerId === containerId
+                          ? { ...container, ...updatedContainer }
+                          : container
+                      ),
                     }
                   : network
               ),
