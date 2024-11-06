@@ -63,6 +63,8 @@ interface HostInfo {
 
 interface State {
   hosts: HostInfo[];
+  clearHosts: () => void;
+  setHosts: (newHosts: HostInfo[]) => void;
   addHost: (
     name: string,
     id: string,
@@ -84,8 +86,8 @@ interface State {
     containerId: string,
     updatedContainer: Partial<ContainerInfo>
   ) => void;
-  deleteHost: (hostId: string) => void; // 호스트 삭제
-  deleteNetworkFromHost: (hostId: string, networkId: string) => void; // 네트워크 삭제
+  deleteHost: (hostId: string) => void;
+  deleteNetworkFromHost: (hostId: string, networkId: string) => void;
   getJsonData: () => {
     blueprintId: number;
     name: string;
@@ -96,6 +98,11 @@ interface State {
 // Zustand 스토어 생성
 export const useBlueprintAllStore = create<State>((set, get) => ({
   hosts: [],
+
+  setHosts: (newHosts: HostInfo[]) => set({ hosts: newHosts }),
+
+  // 호스트 전체 삭제
+  clearHosts: () => set({ hosts: [] }),
 
   // 호스트 추가
   addHost: (name, id, isRemote, ip, themeColor) =>
