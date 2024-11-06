@@ -130,7 +130,7 @@ export interface ContainerSetting {
   containerName: string;
   image: Image;
   networkSettings: NetworkSettings;
-  ports: Port[];
+  ports: Port;
   mounts: Mount[];
 }
 
