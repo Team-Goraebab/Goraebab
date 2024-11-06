@@ -106,10 +106,12 @@ const CardContainer = ({
         gateway: c.networkSettings.gateway || '192.168.1.1',
         ipAddress: c.networkSettings.ipAddress || '192.168.1.100',
       },
-      ports: {
-        privatePort: c.ports.privatePort || '80',
-        publicPort: c.ports.publicPort || '8080',
-      },
+      ports: [
+        {
+          privatePort: c.ports.privatePort || '80',
+          publicPort: c.ports.publicPort || '8080',
+        },
+      ],
       mounts: c.mounts || [],
       env: c.env || [],
       cmd: c.cmd || [],
