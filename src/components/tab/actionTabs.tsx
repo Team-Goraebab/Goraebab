@@ -14,10 +14,8 @@ import { HiOutlineHand, HiOutlineHome } from 'react-icons/hi';
 import { AiOutlineSave, AiOutlineDelete } from 'react-icons/ai';
 import { FaDocker, FaPlay, FaPause, FaStop, FaEllipsisV } from 'react-icons/fa';
 import { HiOutlineCursorClick } from 'react-icons/hi';
-import { useHostStore } from '@/store/hostStore';
 import { useHandModeStore } from '@/store/handModeStore';
 import { useSnackbar } from 'notistack';
-import { useBlueprintStore } from '@/store/blueprintStore';
 import { showSnackbar } from '@/utils/toastUtils';
 import HostModal from '@/components/modal/host/hostModal';
 import SystemInfoModal from '@/components/modal/daemon/systemModal';
@@ -25,15 +23,18 @@ import VersionDetailModal from '@/components/modal/daemon/versionModal';
 import BlueprintListModal from '@/components/modal/blueprint/blueprintListModal';
 import { createBlueprint } from '@/services/blueprint/api';
 import { FiList } from 'react-icons/fi';
-import { useContainerNameStore } from '@/store/containerNameStore';
-import { useSelectedNetworkStore } from '@/store/selectedNetworkStore';
-import { selectedHostStore } from '@/store/seletedHostStore';
 import DeleteBlueprintModal from '../modal/blueprint/deleteBlueprintModal';
 import SaveBlueprintModal from '../modal/blueprint/saveBlueprintModal';
 import { useContainerStore } from '@/store/containerStore';
 import { useMenuStore } from '@/store/menuStore';
-import { generateId } from '@/utils/randomId';
 import { useRefreshStore } from '@/store/refreshStore';
+import { HostInfo, useBlueprintAllStore } from '@/store/blueprintAllStore';
+
+type HostInfoWithoutThemeColor = Omit<HostInfo, 'themeColor'>;
+
+interface ProcessedData {
+  host: HostInfoWithoutThemeColor[];
+}
 
 const ActionTabs = () => {
   const [isHostModalOpen, setIsHostModalOpen] = useState<boolean>(false);
@@ -54,21 +55,11 @@ const ActionTabs = () => {
   const { setSucceededContainers } = useContainerStore.getState();
   const { setActiveId } = useMenuStore();
   const { setRefresh } = useRefreshStore();
+  const { clearHosts } = useBlueprintAllStore.getState();
 
-  const deleteAllHosts = useHostStore((state) => state.deleteAllHosts);
-  const clearConnectedBridges = selectedHostStore(
-    (state) => state.clearConnectedBridges
-  );
-  const clearSelectedNetwork = useSelectedNetworkStore(
-    (state) => state.clearSelectedNetwork
-  );
-  const clearAllContainerNames = useContainerNameStore(
-    (state) => state.clearAllContainerNames
-  );
   const isHandMode = useHandModeStore((state) => state.isHandMode);
   const setHandMode = useHandModeStore((state) => state.setHandMode);
   const { enqueueSnackbar } = useSnackbar();
-  const mappedData = useBlueprintStore((state) => state.mappedData);
 
   async function fetchConnectDaemon() {
     try {
@@ -126,10 +117,7 @@ const ActionTabs = () => {
   };
 
   const handleDelete = () => {
-    deleteAllHosts();
-    clearAllContainerNames();
-    clearSelectedNetwork();
-    clearConnectedBridges();
+    clearHosts();
     setIsDeleteModalOpen(false);
     showSnackbar(
       enqueueSnackbar,
@@ -139,71 +127,29 @@ const ActionTabs = () => {
     );
   };
 
-  const hostId = generateId('host-');
-  const networkId = generateId('network-');
-  const contianerId = generateId('contianer-');
-
   const handleSaveSubmit = async () => {
+    const { blueprintId, name, data } = useBlueprintAllStore
+      .getState()
+      .getJsonData();
+
+    const removeThemeColor = (data: { host: HostInfo[] }): ProcessedData => {
+      return {
+        host: data.host.map((host) => {
+          const { themeColor, ...hostWithoutThemeColor } = host;
+          return hostWithoutThemeColor;
+        }),
+      };
+    };
+
+    // themeColor를 제거한 데이터를 생성
+    const dataWithoutThemeColor = removeThemeColor(data);
+
     const requestBody = {
-      blueprintName,
-      processedData: {
-        host: mappedData.map((host) => ({
-          name: host.hostNm,
-          isRemote: host.isRemote,
-          ip: host.isRemote ? remoteUrl : null,
-          id: hostId,
-          network: host.networks.map((network: any) => ({
-            name: network.name,
-            id: networkId,
-            driver: network.driver || 'bridge',
-            ipam: {
-              config: [
-                {
-                  subnet: network.subnet || '172.19.0.0/16',
-                },
-              ],
-            },
-            containers: network.containers.map((container: any) => ({
-              containerName: container.containerName,
-              containerId: contianerId,
-              image: {
-                imageId: network.droppedImages[0].imageId || '',
-                name: network.droppedImages[0].name || '',
-                tag: network.droppedImages[0].tag || '',
-              },
-              networkSettings: network.configs[0].networkSettings || {
-                gateway: '192.168.1.1',
-                ipAddress: '192.168.1.100',
-              },
-              ports: network.configs[0].ports || [
-                {
-                  privatePort: 80,
-                  publicPort: 8080,
-                },
-              ],
-              mounts: network.configs[0].mounts || [],
-              env: network.configs[0].env || [],
-              cmd: network.configs[0].cmd || [],
-            })),
-          })),
-          volume: host.networks.flatMap(
-            (network: any) => network.imageVolumes || []
-          ),
-        })),
-      },
+      blueprintName: blueprintName,
+      processedData: dataWithoutThemeColor,
     };
 
     try {
-      if (!mappedData || !Array.isArray(mappedData)) {
-        showSnackbar(
-          enqueueSnackbar,
-          '설계도가 유효하지 않습니다.',
-          'error',
-          '#FF4853'
-        );
-        return;
-      }
-
       const res = await createBlueprint(requestBody);
 
       if (res.status === 200 || res.status === 201) {
@@ -387,7 +333,6 @@ const ActionTabs = () => {
             </Button>
           </Tooltip>
           <div className="h-6 w-px bg-gray-300" />
-
           <Button
             isIconOnly
             className={`${!isHandMode ? 'bg-blue_1 text-blue_6' : 'bg-white'}`}
@@ -395,7 +340,6 @@ const ActionTabs = () => {
           >
             <HiOutlineCursorClick size={20} />
           </Button>
-
           <Button
             isIconOnly
             className={`${isHandMode ? 'bg-blue_1 text-blue_6' : 'bg-white'}`}
