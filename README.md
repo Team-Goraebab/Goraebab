@@ -145,23 +145,24 @@ chmod +x start.sh
 # How to use Goraebab
 
 ## Create host
-By clicking the home button in the bottom bar, you can create a host. When creating a host, you can set the host's name, type (local or remote), and the network to be connected. After creating the host, click the settings button to configure the network, ports, mounts, environment variables, and commands. By clicking the edit button, you can set the container name, and in the images tab, you can drag an image from the left sidebar to select the image to use for the container. By clicking the plus button, you can connect a volume, and you can view the connected volumes by pressing the toggle button.
+By clicking the "Home" button in the bottom bar, you can create a host. When creating a host, you can set the host's name, type (local or remote), and the network to be connected. After creating the host, click the "Settings" button to configure the network, ports, mounts, environment variables, and commands. By clicking the "Edit" button, you can set the container name, and in the images tab, you can drag an image from the left sidebar to select the image to use for the container. By clicking the "Plus" button, you can connect a volume, and you can view the connected volumes by pressing the toggle button.
 
 ## Pull image
-To add an image, click the Image button in the left sidebar, then click the "+ Image" button in the right sidebar. For image addition, the Docker engine must be connected, indicated by a green connected status icon in the bottom bar if the connection is active. Images can be imported from your local computer or Docker Hub, with options to specify the image name and tag.   
+To add an image, click the "Image" button in the left sidebar, then click the "+ Image" button in the right sidebar. For image addition, the Docker engine must be connected, indicated by a green connected status icon in the bottom bar if the connection is active. Images can be imported from your local computer or Docker Hub, with options to specify the image name and tag.   
 When retrieving images from Docker Hub, you can search for the desired image and select it; each image shows download counts, providing a measure of reliability. When importing from your local computer, you can either drag and drop the file or select a file path. The right sidebar displays the list of images you’ve added, and by clicking the toggle button, you can view detailed information for each image.   
 
 ## Create network
-Click the network button in the left sidebar, then press the "+ Custom Bridge" button in the right sidebar to create a network. You can set the network's name, subnet, gateway, and mode. You can also view the network's detailed information by clicking the "Network Info" button or using the toggle button. To link a host to the network, click the desired host and then press the link button to complete the connection. The connected host will be highlighted with a blue border.
+Click the "Network" button in the left sidebar, then press the "+ Custom Bridge" button in the right sidebar to create a network. You can set the network's name, subnet, gateway, and mode. You can also view the network's detailed information by clicking the "Network Info" button or using the toggle button. To link a host to the network, click the desired host and then press the link button to complete the connection. The connected host will be highlighted with a blue border.
 
 ## Create volume
-Click the volume button in the left sidebar, then click the "+ Volume" button in the right sidebar to create a volume. When creating a volume, you can specify the volume's name, mount point, capacity, and type (e.g., Local, NFS, GlusterFS, Ceph). After creating the volume, click the "Volume Info" button or the toggle button to view detailed information about the volume.
+Click the "Volume" button in the left sidebar, then click the "+ Volume" button in the right sidebar to create a volume. When creating a volume, you can specify the volume's name, mount point, capacity, and type (e.g., Local, NFS, GlusterFS, Ceph). After creating the volume, click the "Volume Info" button or the toggle button to view detailed information about the volume.
 
 ## Connect Remote Docker
 
 ## Draw blueprint
 
 ## Load & Save blueprint
+Click the "Blueprint List" button in the bottom bar to view all saved blueprints. The list shows each blueprint's name, creation date, and whether it is local or remote, and you can load or delete blueprints from this view. To save a new blueprint after creating it, click the "Save Blueprint" button in the bottom bar. Once saved, a container will be created and run in the Docker environment based on the blueprint settings. You can view the running container by clicking the "Container" button in the left sidebar.
 
 # API documentation
 
