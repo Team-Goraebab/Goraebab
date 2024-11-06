@@ -144,9 +144,13 @@ chmod +x start.sh
 
 # How to use Goraebab
 
+## Create host
+By clicking the home button in the bottom bar, you can create a host. When creating a host, you can set the host's name, type (local or remote), and the network to be connected. After creating the host, click the settings button to configure the network, ports, mounts, environment variables, and commands. By clicking the edit button, you can set the container name, and in the images tab, you can drag an image from the left sidebar to select the image to use for the container. By clicking the plus button, you can connect a volume, and you can view the connected volumes by pressing the toggle button.
+
 ## Pull image
 To add an image, click the Image button in the left sidebar, then click the "+ Image" button in the right sidebar. For image addition, the Docker engine must be connected, indicated by a green connected status icon in the bottom bar if the connection is active. Images can be imported from your local computer or Docker Hub, with options to specify the image name and tag.   
 When retrieving images from Docker Hub, you can search for the desired image and select it; each image shows download counts, providing a measure of reliability. When importing from your local computer, you can either drag and drop the file or select a file path. The right sidebar displays the list of images you’ve added, and by clicking the toggle button, you can view detailed information for each image.   
+
 
 ## Create network
 Click the network button in the left sidebar, then press the "+ Custom Bridge" button in the right sidebar to create a network. You can set the network's name, subnet, gateway, and mode. You can also view the network's detailed information by clicking the "Network Info" button or using the toggle button. To link a host to the network, click the desired host and then press the link button to complete the connection. The connected host will be highlighted with a blue border.
