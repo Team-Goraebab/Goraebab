@@ -1,15 +1,16 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import CardSection from '@/components/card/cardSection';
 import { TransformProvider } from '@/context/useTransformContext';
 import useHandModeSubscription from '@/hook/useHandModeSubscription';
-import { useHostStore } from '@/store/hostStore';
+import { useBlueprintAllStore } from '@/store/blueprintAllStore';
 
 const Main = () => {
   const [isHandMode, setIsHandMode] = React.useState(false);
 
-  const hosts = useHostStore((state) => state.hosts);
+  // useBlueprintAllStore에서 hosts 데이터를 가져옵니다.
+  const hosts = useBlueprintAllStore((state) => state.hosts);
 
   useHandModeSubscription((newIsHandMode) => {
     setIsHandMode(newIsHandMode);
@@ -24,7 +25,9 @@ const Main = () => {
             hostData={[
               {
                 ...host,
-                hostIp: host.hostIp ?? 'localhost',
+                hostNm: host.name,
+                hostIp: host.ip ?? 'localhost',
+                themeColor: host.themeColor,
               },
             ]}
             isHandMode={isHandMode}
