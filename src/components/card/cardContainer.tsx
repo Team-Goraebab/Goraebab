@@ -269,7 +269,7 @@ const CardContainer = ({
   };
 
   const handleSaveConfig = (config: ConfigurationData) => {
-    setConfigs((prevConfigs) => [...prevConfigs, config]);
+    setConfigs([config]);
     setIsConfigModalOpen(false);
   };
 
