@@ -173,14 +173,12 @@ const ActionTabs = () => {
                 gateway: '192.168.1.1',
                 ipAddress: '192.168.1.100',
               },
-              ports: Array.isArray(network.configs[0].ports)
-                ? network.configs[0].ports
-                : [
-                    {
-                      privatePort: 80,
-                      publicPort: 8080,
-                    },
-                  ],
+              ports: network.configs[0].ports || [
+                {
+                  privatePort: 80,
+                  publicPort: 8080,
+                },
+              ],
               mounts: network.configs[0].mounts || [],
               env: network.configs[0].env || [],
               cmd: network.configs[0].cmd || [],
