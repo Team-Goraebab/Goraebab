@@ -20,9 +20,11 @@
 - [Create network](#create-network)
 - [Create volume](#create-volume)
 - [Create host](#create-host)
-- [Load & Save blueprint](#load-&-save-blueprint)
+- [Load & Save blueprint](#load--save-blueprint)
 
 [API documentation](#api-documentation)
+
+[How to contribute](#how-to-contribute)
 
 [Upcoming features](#upcoming-features)
 
