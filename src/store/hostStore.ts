@@ -5,6 +5,7 @@ interface HostStore {
   hosts: Host[];
   networks: HostNetwork[];
   addHost: (host: Host) => void;
+  isHostExist: (hostId: string) => void;
   deleteHost: (hostId: string) => void;
   deleteNetwork: (hostId: string, uniqueId: string) => void;
   deleteAllHosts: () => void;
@@ -27,6 +28,12 @@ export const useHostStore = create<HostStore>((set, get) => ({
         hosts: [...state.hosts, { ...host, networks: [] }],
       };
     }),
+
+  // 호스트 중복 확인 함수
+  isHostExist: (hostId: string): boolean => {
+    const state = get();
+    return state.hosts.some((host) => host.id === hostId);
+  },
 
   // 호스트 삭제
   deleteHost: (hostId) =>

@@ -15,7 +15,13 @@ import {
   CardBody,
   type Selection,
 } from '@nextui-org/react';
-import { FolderIcon, TagIcon, FileTextIcon, TrashIcon, DockIcon } from 'lucide-react';
+import {
+  FolderIcon,
+  TagIcon,
+  FileTextIcon,
+  TrashIcon,
+  DockIcon,
+} from 'lucide-react';
 import { useSnackbar } from 'notistack';
 import { v4 as uuidv4 } from 'uuid';
 import { showSnackbar } from '@/utils/toastUtils';
@@ -32,7 +38,7 @@ interface ModalProps {
     file: File | null,
     size: string,
     source: 'local' | 'dockerHub',
-    dockerImageInfo?: any,
+    dockerImageInfo?: any
   ) => void;
 }
 
@@ -68,7 +74,7 @@ const ImageModal: React.FC<ModalProps> = ({ isOpen, onClose, onSave }) => {
     if (file) {
       const validExtensions = ['.tar', '.tar.gz', '.tar.bz2', '.tar.xz'];
       const isValidExtension = validExtensions.some((ext) =>
-        file.name.toLowerCase().endsWith(ext),
+        file.name.toLowerCase().endsWith(ext)
       );
 
       if (!isValidExtension) {
@@ -76,7 +82,7 @@ const ImageModal: React.FC<ModalProps> = ({ isOpen, onClose, onSave }) => {
           enqueueSnackbar,
           'tar, tar.gz, tar.bz2, tar.xz 파일만 업로드 가능합니다.',
           'error',
-          '#FF4853',
+          '#FF4853'
         );
         return;
       }
@@ -87,7 +93,7 @@ const ImageModal: React.FC<ModalProps> = ({ isOpen, onClose, onSave }) => {
           enqueueSnackbar,
           '파일 용량이 5000MB를 초과했습니다.',
           'error',
-          '#FF4853',
+          '#FF4853'
         );
       } else {
         setFile(file);
@@ -106,7 +112,12 @@ const ImageModal: React.FC<ModalProps> = ({ isOpen, onClose, onSave }) => {
 
   const validateInputs = () => {
     if (!file && activeTab === 'local') {
-      showSnackbar(enqueueSnackbar, '이미지를 선택해주세요.', 'error', '#FF4853');
+      showSnackbar(
+        enqueueSnackbar,
+        '이미지를 선택해주세요.',
+        'error',
+        '#FF4853'
+      );
       return false;
     }
     if (!name) {
@@ -118,7 +129,12 @@ const ImageModal: React.FC<ModalProps> = ({ isOpen, onClose, onSave }) => {
       return false;
     }
     if (activeTab === 'dockerHub' && !dockerImageInfo) {
-      showSnackbar(enqueueSnackbar, 'Docker Hub 이미지를 선택해주세요.', 'error', '#FF4853');
+      showSnackbar(
+        enqueueSnackbar,
+        'Docker Hub 이미지를 선택해주세요.',
+        'error',
+        '#FF4853'
+      );
       return false;
     }
     return true;
@@ -182,10 +198,11 @@ const ImageModal: React.FC<ModalProps> = ({ isOpen, onClose, onSave }) => {
     }
 
     return (
-      <label
-        className="flex flex-col items-center justify-center w-full h-[200px] mt-4 border-2 border-dashed rounded-large border-primary cursor-pointer hover:bg-default-100 transition-colors">
+      <label className="flex flex-col items-center justify-center w-full h-[200px] mt-4 border-2 border-dashed rounded-large border-primary cursor-pointer hover:bg-default-100 transition-colors">
         <FolderIcon size={48} className="text-primary mb-4" />
-        <p className="text-default-700">파일을 드래그하거나 클릭하여 선택하세요</p>
+        <p className="text-default-700">
+          파일을 드래그하거나 클릭하여 선택하세요
+        </p>
         <input
           type="file"
           className="hidden"
@@ -239,7 +256,9 @@ const ImageModal: React.FC<ModalProps> = ({ isOpen, onClose, onSave }) => {
               </ModalHeader>
               <ModalBody>
                 {activeTab === 'dockerHub' ? (
-                  <DockerHubContent onSelectImage={handleDockerHubImageSelect} />
+                  <DockerHubContent
+                    onSelectImage={handleDockerHubImageSelect}
+                  />
                 ) : (
                   renderFileUpload()
                 )}
@@ -248,14 +267,18 @@ const ImageModal: React.FC<ModalProps> = ({ isOpen, onClose, onSave }) => {
                     label="이름"
                     value={name}
                     onValueChange={setName}
-                    startContent={<FileTextIcon size={18} className="text-default-400" />}
+                    startContent={
+                      <FileTextIcon size={18} className="text-default-400" />
+                    }
                     variant="bordered"
                   />
                   <Input
                     label="태그"
                     value={tag}
                     onValueChange={setTag}
-                    startContent={<TagIcon size={18} className="text-default-400" />}
+                    startContent={
+                      <TagIcon size={18} className="text-default-400" />
+                    }
                     variant="bordered"
                   />
                 </div>
@@ -273,14 +296,19 @@ const ImageModal: React.FC<ModalProps> = ({ isOpen, onClose, onSave }) => {
         </ModalContent>
       </Modal>
 
-      <Modal isOpen={isWarningModalOpen} onClose={() => setIsWarningModalOpen(false)} size="sm">
+      <Modal
+        isOpen={isWarningModalOpen}
+        onClose={() => setIsWarningModalOpen(false)}
+        size="sm"
+      >
         <ModalContent>
           {(onClose) => (
             <>
               <ModalHeader>경고</ModalHeader>
               <ModalBody>
                 <p>
-                  로컬 파일이 이미 존재합니다. Docker Hub로 전환하면 현재 선택된 파일이 삭제됩니다. 계속하시겠습니까?
+                  로컬 파일이 이미 존재합니다. Docker Hub로 전환하면 현재 선택된
+                  파일이 삭제됩니다. 계속하시겠습니까?
                 </p>
               </ModalBody>
               <ModalFooter>

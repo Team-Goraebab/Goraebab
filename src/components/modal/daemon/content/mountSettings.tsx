@@ -8,12 +8,12 @@ import MountDetail from './mountDetail';
 
 interface MountConfigProps {
   type: 'bind' | 'volume';
-  alias?: string;
+  alias: string;
   source: string;
   destination: string;
   name: string;
   driver: string;
-  // mode: string;
+  mode: string;
 }
 
 interface MountSettingsProps {

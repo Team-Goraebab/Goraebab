@@ -7,7 +7,9 @@ import {
   ScrollShadow,
   Tooltip,
   Divider,
-  Badge, CardHeader, CardFooter,
+  CardHeader,
+  CardFooter,
+  Input,
 } from '@nextui-org/react';
 import { useMenuStore } from '@/store/menuStore';
 import { selectedHostStore } from '@/store/seletedHostStore';
@@ -21,7 +23,7 @@ import NetworkCard from '../card/networkCard';
 import VolumeCard from '../card/volumeCard';
 import ImageCard from '../card/imageCard';
 import ContainerCardGroup from '@/components/card/containerCardGroup';
-import DaemonConnectBar from '../bar/daemonConnectBar';
+import { useRefreshStore } from '@/store/refreshStore';
 
 type DataHandlerType = {
   data: any[];
@@ -49,7 +51,7 @@ interface ComponentMapItem {
 const loadData = async (
   apiUrl: string,
   setData: React.Dispatch<React.SetStateAction<any[]>>,
-  dataKey?: string,
+  dataKey?: string
 ) => {
   try {
     const response = await fetch(apiUrl, { cache: 'no-store' });
@@ -62,7 +64,9 @@ const loadData = async (
 
 const Sidebar = () => {
   const { activeId } = useMenuStore();
+  const { refresh } = useRefreshStore();
   const selectedHostIp = selectedHostStore((state) => state.selectedHostIp);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const [networkData, setNetworkData] = useState<any[]>([]);
   const [volumeData, setVolumeData] = useState<any[]>([]);
@@ -118,7 +122,11 @@ const Sidebar = () => {
       const { url, dataKey } = apiMap[activeId] || {};
       if (!url) return;
 
-      await loadData(url, dataHandlers[activeId as 1 | 2 | 3 | 4].setData, dataKey);
+      await loadData(
+        url,
+        dataHandlers[activeId as 1 | 2 | 3 | 4].setData,
+        dataKey
+      );
       setTimeout(() => {
         loadData(url, dataHandlers[activeId as 1 | 2 | 3 | 4].setData, dataKey);
       }, 2000);
@@ -167,26 +175,55 @@ const Sidebar = () => {
           }, {} as Record<string, { containers: Container[]; networkMode: string }>)
         : {};
 
-      return Object.entries(groupedContainers).map(([groupName, { containers }]) => (
-        <ContainerCardGroup
-          key={`${groupName}-${selectedHostIp}`}
-          projectName={groupName}
-          containers={containers}
-          onDeleteSuccess={handleDeleteSuccess}
-        />
-      ));
+      return Object.entries(groupedContainers).map(
+        ([groupName, { containers }]) => (
+          <ContainerCardGroup
+            key={`${groupName}-${selectedHostIp}`}
+            projectName={groupName}
+            containers={containers}
+            onDeleteSuccess={handleDeleteSuccess}
+          />
+        )
+      );
     }
 
     return data && data.length > 0
-      ? data.map((item, index) =>
-        CardComponent ? (
-          <CardComponent
-            key={`${item.Id || index}-${selectedHostIp}`}
-            data={item}
-            onDeleteSuccess={handleDeleteSuccess}
-          />
-        ) : null,
-      )
+      ? data
+          .filter((item) => {
+            if (currentComponent.title === '컨테이너') {
+              return (
+                item.Name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                (item.Labels &&
+                  item.Labels['com.docker.compose.project']
+                    ?.toLowerCase()
+                    .includes(searchTerm.toLowerCase()))
+              );
+            } else if (currentComponent.title === '이미지') {
+              const repoTag =
+                item.RepoTags && item.RepoTags[0]
+                  ? item.RepoTags[0].toLowerCase()
+                  : '';
+              return repoTag.includes(searchTerm.toLowerCase());
+            } else if (currentComponent.title === '네트워크') {
+              return item.Name?.toLowerCase().includes(
+                searchTerm.toLowerCase()
+              );
+            } else if (currentComponent.title === '볼륨') {
+              return item.Name?.toLowerCase().includes(
+                searchTerm.toLowerCase()
+              );
+            }
+            return false; // 기본값 추가
+          })
+          .map((item, index) =>
+            CardComponent ? (
+              <CardComponent
+                key={`${item.Id || index}-${selectedHostIp}`}
+                data={item}
+                onDeleteSuccess={handleDeleteSuccess}
+              />
+            ) : null
+          )
       : renderNoDataMessage(noDataMessage);
   };
 
@@ -211,38 +248,36 @@ const Sidebar = () => {
   useEffect(() => {
     setImageData([]);
     refreshData();
-  }, [selectedHostIp]);
+  }, [selectedHostIp, refresh]);
 
   return (
-    <Card
-      className="fixed z-[9] top-0 right-0 w-[280px] h-full rounded-none shadow-lg bg-background/70 backdrop-blur-md">
+    <Card className="fixed z-[9] top-0 right-0 w-[280px] h-full rounded-none shadow-lg bg-background/70 backdrop-blur-md">
       <CardHeader className="flex flex-row justify-between items-center px-4 py-3 bg-default-50">
         <div className="flex items-center gap-2">
           <h2 className="text-md font-semibold">
             {currentComponent?.title || '데이터'}
           </h2>
-          <div
-            className="px-2 py-1 bg-blue_1 rounded-lg font-medium text-sm"
-          >
+          <div className="px-2 py-1 bg-blue_1 rounded-lg font-medium text-sm">
             {dataHandlers[activeId as 1 | 2 | 3 | 4]?.data.length || 0}
           </div>
         </div>
-        <Tooltip content="새로고침">
-          <Button
-            isIconOnly
-            variant="light"
-            size="sm"
-            onClick={refreshData}
-          >
-            <RxReload size={16} />
-          </Button>
-        </Tooltip>
+        <div className="flex items-center gap-2">
+          <Tooltip content="새로고침">
+            <Button isIconOnly variant="light" size="sm" onClick={refreshData}>
+              <RxReload size={16} />
+            </Button>
+          </Tooltip>
+        </div>
       </CardHeader>
       <Divider />
+      <Input
+        placeholder="검색"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        radius={'none'}
+      />
       <ScrollShadow className="flex-grow h-[calc(100vh-180px)] px-4 py-4">
-        <div className="flex flex-col gap-2">
-          {renderDataList()}
-        </div>
+        <div className="flex flex-col gap-1">{renderDataList()}</div>
       </ScrollShadow>
       <Divider />
       <CardFooter className="px-4 py-4">

@@ -7,7 +7,6 @@ import { showSnackbar } from '@/utils/toastUtils';
 import { selectedHostStore } from '@/store/seletedHostStore';
 import { getStatusColors } from '@/utils/statusColorsUtils';
 import { formatDateTime } from '@/utils/formatTimestamp';
-import { v4 as uuidv4 } from 'uuid';
 import { fetchData } from '@/services/apiUtils';
 import NetworkDetailModal from '../modal/network/networkDetailModal';
 import {
@@ -24,6 +23,12 @@ import {
 } from 'react-icons/fi';
 import { FaNetworkWired } from 'react-icons/fa';
 import { Network } from '@/types/type';
+import { DEFAULT_CONTAINER_SETTINGS } from '@/data/blueprint';
+import {
+  NetworkInfo,
+  useBlueprintAllStore,
+  VolumeInfo,
+} from '@/store/blueprintAllStore';
 
 interface CardDataProps {
   data: Network;
@@ -32,12 +37,13 @@ interface CardDataProps {
 
 const NetworkCard = ({ data, onDeleteSuccess }: CardDataProps) => {
   const { enqueueSnackbar } = useSnackbar();
-  const id = uuidv4();
-
-  const { selectedHostId, addConnectedBridgeId } = selectedHostStore();
-  const { connectedBridgeIds } = selectedHostStore((state) => ({
-    connectedBridgeIds: state.connectedBridgeIds,
-  }));
+  const { selectedHostId } = selectedHostStore();
+  const addNetworkToHost = useBlueprintAllStore(
+    (state) => state.addNetworkToHost
+  );
+  const addVolumeToHost = useBlueprintAllStore(
+    (state) => state.addVolumeToHost
+  );
   const { bg1, bg2 } = getStatusColors('primary');
   const [showModal, setShowModal] = useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -77,9 +83,7 @@ const NetworkCard = ({ data, onDeleteSuccess }: CardDataProps) => {
     try {
       const res = await fetch('/api/network/delete', {
         method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: data.Id }),
       });
       const result = await res.json();
@@ -119,36 +123,23 @@ const NetworkCard = ({ data, onDeleteSuccess }: CardDataProps) => {
 
   const handleConnect = () => {
     if (selectedHostId) {
-      // 현재 호스트에 연결된 네트워크가 3개 이상인지 확인
-      const currentConnections = connectedBridgeIds[selectedHostId] || [];
-      if (currentConnections.length >= 3) {
-        showSnackbar(
-          enqueueSnackbar,
-          '네트워크는 최대 3개까지만 연결할 수 있습니다.',
-          'error',
-          '#FF4853'
-        );
-        return; // 연결을 중단
-      }
-
-      const networkInfo = {
+      // 연결할 네트워크 생성
+      const networkInfo: NetworkInfo = {
         id: data.Id,
         name: data.Name,
-        gateway: gateway,
-        subnet: subnet,
         driver: data.Driver,
-        scope: data.Scope,
+        ipam: { config: [{ subnet }] },
+        containers: [DEFAULT_CONTAINER_SETTINGS],
       };
 
-      addConnectedBridgeId(selectedHostId, {
-        name: networkInfo.name,
-        gateway: networkInfo.gateway,
-        driver: networkInfo.driver,
-        subnet: networkInfo.subnet,
-        scope: networkInfo.scope,
-        id: networkInfo.id,
-        uniqueId: uuidv4(),
-      });
+      // 네트워크와 관련 컨테이너 및 볼륨 추가
+      addNetworkToHost(selectedHostId, networkInfo);
+
+      // 예제 볼륨 데이터
+      const volumeInfo: VolumeInfo[] = [
+        { name: 'example-volume', driver: 'local' },
+      ];
+      addVolumeToHost(selectedHostId, volumeInfo);
 
       showSnackbar(
         enqueueSnackbar,
@@ -169,12 +160,9 @@ const NetworkCard = ({ data, onDeleteSuccess }: CardDataProps) => {
   const fetchNetworkDetail = async (id: string) => {
     try {
       const data = await fetchData(`/api/network/detail?id=${id}`);
-      if (!data) {
-        throw new Error('Failed to fetch network detail');
-      }
+      if (!data) throw new Error('Failed to fetch network detail');
       return data;
     } catch (error) {
-      console.error('Error fetching network detail:', error);
       throw error;
     }
   };
@@ -185,7 +173,6 @@ const NetworkCard = ({ data, onDeleteSuccess }: CardDataProps) => {
       setDetailData(networkDetail);
       setIsModalOpen(true);
     } catch (error) {
-      console.error('Error fetching network detail:', error);
       showSnackbar(
         enqueueSnackbar,
         '네트워크 정보를 가져오는데 실패했습니다.',
@@ -201,7 +188,7 @@ const NetworkCard = ({ data, onDeleteSuccess }: CardDataProps) => {
 
   return (
     <div className="relative bg-white border rounded-lg transition-all duration-300 mb-2 overflow-hidden">
-      <div className="flex justify-between items-center px-4 py-2 bg-gray-50 border-b">
+      <div className="flex justify-between items-center px-4 py-2 bg-gray-50">
         <div className="flex items-center space-x-2">
           <FaNetworkWired size={16} className="text-grey_5" />
           <span className="font-pretendard text-sm">Network</span>

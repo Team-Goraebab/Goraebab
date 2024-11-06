@@ -10,8 +10,8 @@ export interface Volume {
 export interface VolumeData {
   Name: string;
   Driver: string;
-  Mountpoint: string;
-  Scope: string;
+  Mountpoint?: string;
+  Scope?: string;
 }
 
 export interface Image {
@@ -22,10 +22,10 @@ export interface Image {
   size: string;
 }
 
-export interface ContainerInfo {
-  Name: string;
-  IPv4Address: string;
-}
+// export interface ContainerInfo {
+//   Name: string;
+//   IPv4Address: string;
+// }
 
 export interface Network {
   Id: string;
@@ -141,6 +141,44 @@ export type Cmd = string;
 export type ExtendedHostNetwork = HostNetwork & {
   containerName: string;
   configs: ContainerSetting[];
-  droppedImages: Image[];
+  droppedImages: Image;
   imageVolumes: VolumeData[];
 };
+
+export interface ContainerInfData {
+  name: string;
+  settings: any;
+}
+
+export interface HostData {
+  images: string[];
+  volumes: { [imageId: string]: VolumeData[] };
+  containerName: string | null;
+  containerSettings: any;
+}
+
+export interface HostStore {
+  hostData: { [hostId: string]: HostData };
+  addHostData: (hostId: string, data: HostData) => void;
+  updateContainerName: (hostId: string, name: string) => void;
+  updateContainerSettings: (hostId: string, settings: any) => void;
+  addImage: (hostId: string, image: string) => void;
+  addVolumeToImage: (
+    hostId: string,
+    imageId: string,
+    volume: VolumeData
+  ) => void;
+}
+
+export interface ImageInfo {
+  imageId: string;
+  name: string;
+  tag: string;
+}
+
+export interface ImageToNetwork {
+  id: string;
+  name: string;
+  tag: string;
+  networkName: string;
+}
