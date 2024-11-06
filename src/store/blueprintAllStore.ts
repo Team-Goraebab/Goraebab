@@ -27,6 +27,11 @@ interface MountInfo {
   mode: string;
 }
 
+interface VolumeInfo {
+  name: string;
+  driver: string;
+}
+
 interface ContainerInfo {
   containerName: string;
   containerId: string;
@@ -36,9 +41,10 @@ interface ContainerInfo {
   mounts: MountInfo[];
   env: string[];
   cmd: string[];
+  imageVolumes: VolumeInfo[];
 }
 
-interface NetworkInfo {
+export interface NetworkInfo {
   name: string;
   id: string;
   driver: string;
@@ -56,6 +62,7 @@ interface HostInfo {
   id: string;
   isRemote: boolean;
   ip: string | null;
+  themeColor: any;
   network: NetworkInfo[];
   volume: VolumeInfo[];
 }
@@ -66,7 +73,8 @@ interface State {
     name: string,
     id: string,
     isRemote: boolean,
-    ip: string | null
+    ip: string | null,
+    themeColor?: any
   ) => void;
   addNetworkToHost: (hostId: string, network: NetworkInfo) => void;
   addVolumeToHost: (hostId: string, volume: VolumeInfo) => void;
@@ -82,6 +90,8 @@ interface State {
     containerId: string,
     updatedContainer: Partial<ContainerInfo>
   ) => void;
+  deleteHost: (hostId: string) => void; // 호스트 삭제
+  deleteNetworkFromHost: (hostId: string, networkId: string) => void; // 네트워크 삭제
   getJsonData: () => {
     blueprintId: number;
     name: string;
@@ -94,7 +104,7 @@ export const useBlueprintAllStore = create<State>((set, get) => ({
   hosts: [],
 
   // 호스트 추가
-  addHost: (name, id, isRemote, ip) =>
+  addHost: (name, id, isRemote, ip, themeColor) =>
     set((state) => ({
       hosts: [
         ...state.hosts,
@@ -105,6 +115,7 @@ export const useBlueprintAllStore = create<State>((set, get) => ({
           ip,
           network: [],
           volume: [],
+          themeColor,
         },
       ],
     })),
@@ -151,6 +162,7 @@ export const useBlueprintAllStore = create<State>((set, get) => ({
                           mounts: [],
                           env: [],
                           cmd: [],
+                          imageVolumes: [],
                         },
                       ],
                     }
@@ -179,6 +191,27 @@ export const useBlueprintAllStore = create<State>((set, get) => ({
                       ),
                     }
                   : network
+              ),
+            }
+          : host
+      ),
+    })),
+
+  // 호스트 삭제
+  deleteHost: (hostId) =>
+    set((state) => ({
+      hosts: state.hosts.filter((host) => host.id !== hostId),
+    })),
+
+  // 호스트에서 특정 네트워크 삭제
+  deleteNetworkFromHost: (hostId, networkId) =>
+    set((state) => ({
+      hosts: state.hosts.map((host) =>
+        host.id === hostId
+          ? {
+              ...host,
+              network: host.network.filter(
+                (network) => network.id !== networkId
               ),
             }
           : host
