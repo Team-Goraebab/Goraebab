@@ -155,7 +155,7 @@ When retrieving images from Docker Hub, you can search for the desired image and
 Click the network button in the left sidebar, then press the "+ Custom Bridge" button in the right sidebar to create a network. You can set the network's name, subnet, gateway, and mode. You can also view the network's detailed information by clicking the "Network Info" button or using the toggle button. To link a host to the network, click the desired host and then press the link button to complete the connection. The connected host will be highlighted with a blue border.
 
 ## Create volume
-Click the volume button in the left sidebar, then click the "+ Volume" button in the right sidebar to create a volume. When creating a volume, you can specify the volume's name, mount point, capacity, and type (e.g., Local, NFS, GlusterFS, Ceph). After creating the volume, click the "Volume Info" button or the toggle button to view detailed information about the volume
+Click the volume button in the left sidebar, then click the "+ Volume" button in the right sidebar to create a volume. When creating a volume, you can specify the volume's name, mount point, capacity, and type (e.g., Local, NFS, GlusterFS, Ceph). After creating the volume, click the "Volume Info" button or the toggle button to view detailed information about the volume.
 
 ## Connect Remote Docker
 
