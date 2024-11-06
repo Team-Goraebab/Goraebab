@@ -9,7 +9,6 @@ import { useBlueprintAllStore } from '@/store/blueprintAllStore';
 const Main = () => {
   const [isHandMode, setIsHandMode] = React.useState(false);
 
-  // useBlueprintAllStore에서 hosts 데이터를 가져옵니다.
   const hosts = useBlueprintAllStore((state) => state.hosts);
 
   useHandModeSubscription((newIsHandMode) => {

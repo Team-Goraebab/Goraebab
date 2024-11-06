@@ -11,7 +11,6 @@ export { default as ProgressBar } from './bar/progressBar';
 export { default as Button } from './button/button';
 export { default as ZoomButtons } from './button/zoomButtons';
 export { default as PanButtons } from './button/panButtons';
-export { default as SaveButton } from './button/saveButton';
 export { default as AddImageButton } from './button/addImageButton';
 export { default as AddVolumeButton } from './button/addVolumeButton';
 export { default as AddContainerButton } from './button/addContainerButton';

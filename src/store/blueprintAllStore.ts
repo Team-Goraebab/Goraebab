@@ -51,7 +51,7 @@ export interface NetworkInfo {
   containers: ContainerInfo[];
 }
 
-interface HostInfo {
+export interface HostInfo {
   name: string;
   id: string;
   isRemote: boolean;
