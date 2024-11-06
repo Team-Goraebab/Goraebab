@@ -16,6 +16,12 @@
 - [Execution](#execution)
 
 [How to use Goraebab](#how-to-use-goraebab)
+- [Pull image](#pull-image)
+- [Create network](#create-network)
+- [Create volume](#create-volume)
+- [Create host](#create-host)
+- [Draw blueprint](#draw-blueprint)
+- [Load & Save blueprint](#load-&-save-blueprint)
 
 [API documentation](#api-documentation)
 
@@ -34,7 +40,7 @@
 ## Problem
 With the advancement of AI, the barriers to software development have significantly lowered. As a result, beginner developers can save considerable time in the implementation phase, and most projects now reach the deployment stage. In the deployment process, Docker has become an almost essential tool. However, for novice developers, managing containers, networks, and volumes through the Docker CLI can be quite challenging. In a survey conducted among developers, ??% of respondents expressed difficulties and frustrations related to the complexity of managing containers, networks, and volumes.
 
-[차트 이미지]
+![docker difficulty](docs/image/docker_difficulty.PNG)
 
 ## Solution
 
@@ -144,31 +150,43 @@ chmod +x start.sh
 
 # How to use Goraebab
 
-## Create host
-By clicking the "Home" button in the bottom bar, you can create a host. When creating a host, you can set the host's name, type (local or remote), and the network to be connected. After creating the host, click the "Settings" button to configure the network, ports, mounts, environment variables, and commands. By clicking the "Edit" button, you can set the container name, and in the images tab, you can drag an image from the left sidebar to select the image to use for the container. By clicking the "Plus" button, you can connect a volume, and you can view the connected volumes by pressing the toggle button.
-
 ## Pull image
 To add an image, click the "Image" button in the left sidebar, then click the "+ Image" button in the right sidebar. For image addition, the Docker engine must be connected, indicated by a green connected status icon in the bottom bar if the connection is active. Images can be imported from your local computer or Docker Hub, with options to specify the image name and tag.   
 When retrieving images from Docker Hub, you can search for the desired image and select it; each image shows download counts, providing a measure of reliability. When importing from your local computer, you can either drag and drop the file or select a file path. The right sidebar displays the list of images you’ve added, and by clicking the toggle button, you can view detailed information for each image.   
 
+![CREATE IMAGE](docs/image/pull_image.gif)
+
+
 ## Create network
 Click the "Network" button in the left sidebar, then press the "+ Custom Bridge" button in the right sidebar to create a network. You can set the network's name, subnet, gateway, and mode. You can also view the network's detailed information by clicking the "Network Info" button or using the toggle button. To link a host to the network, click the desired host and then press the link button to complete the connection. The connected host will be highlighted with a blue border.
+
+![CREATE NETWORK](docs/image/create_network.gif)
 
 ## Create volume
 Click the "Volume" button in the left sidebar, then click the "+ Volume" button in the right sidebar to create a volume. When creating a volume, you can specify the volume's name, mount point, capacity, and type (e.g., Local, NFS, GlusterFS, Ceph). After creating the volume, click the "Volume Info" button or the toggle button to view detailed information about the volume.
 
-## Connect Remote Docker
+![CREATE VOLUME](docs/image/create_volume.gif)
 
-## Draw blueprint
+## Create host
+By clicking the "Home" button in the bottom bar, you can create a host. When creating a host, you can set the host's name, type (local or remote), and the network to be connected. After creating the host, click the "Settings" button to configure the network, ports, mounts, environment variables, and commands. By clicking the "Edit" button, you can set the container name, and in the images tab, you can drag an image from the left sidebar to select the image to use for the container. By clicking the "Plus" button, you can connect a volume, and you can view the connected volumes by pressing the toggle button.
+
+![CREATE HOST](docs/image/create_host.gif)
+
 
 ## Load & Save blueprint
 Click the "Blueprint List" button in the bottom bar to view all saved blueprints. The list shows each blueprint's name, creation date, and whether it is local or remote, and you can load or delete blueprints from this view. To save a new blueprint after creating it, click the "Save Blueprint" button in the bottom bar. Once saved, a container will be created and run in the Docker environment based on the blueprint settings. You can view the running container by clicking the "Container" button in the left sidebar.
+
+![SAVE BLUEPRINT](docs/image/save_blueprint.gif)
+![LOAD BLUEPRINT](docs/image/load_blueprint.gif)
+
 
 # API documentation
 
 You can check the API specification through `localhost:2387/swagger`.
 
 # How to contribute
+
+
 
 # Upcoming features
 
