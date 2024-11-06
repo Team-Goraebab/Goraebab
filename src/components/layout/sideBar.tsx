@@ -23,6 +23,7 @@ import NetworkCard from '../card/networkCard';
 import VolumeCard from '../card/volumeCard';
 import ImageCard from '../card/imageCard';
 import ContainerCardGroup from '@/components/card/containerCardGroup';
+import { useRefreshStore } from '@/store/refreshStore';
 
 type DataHandlerType = {
   data: any[];
@@ -63,6 +64,7 @@ const loadData = async (
 
 const Sidebar = () => {
   const { activeId } = useMenuStore();
+  const { refresh } = useRefreshStore();
   const selectedHostIp = selectedHostStore((state) => state.selectedHostIp);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -246,7 +248,7 @@ const Sidebar = () => {
   useEffect(() => {
     setImageData([]);
     refreshData();
-  }, [selectedHostIp]);
+  }, [selectedHostIp, refresh]);
 
   return (
     <Card className="fixed z-[9] top-0 right-0 w-[280px] h-full rounded-none shadow-lg bg-background/70 backdrop-blur-md">
