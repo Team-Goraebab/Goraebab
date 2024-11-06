@@ -33,6 +33,7 @@ import SaveBlueprintModal from '../modal/blueprint/saveBlueprintModal';
 import { useContainerStore } from '@/store/containerStore';
 import { useMenuStore } from '@/store/menuStore';
 import { generateId } from '@/utils/randomId';
+import { useRefreshStore } from '@/store/refreshStore';
 
 const ActionTabs = () => {
   const [isHostModalOpen, setIsHostModalOpen] = useState<boolean>(false);
@@ -52,6 +53,7 @@ const ActionTabs = () => {
 
   const { setSucceededContainers } = useContainerStore.getState();
   const { setActiveId } = useMenuStore();
+  const { setRefresh } = useRefreshStore();
 
   const deleteAllHosts = useHostStore((state) => state.deleteAllHosts);
   const clearConnectedBridges = selectedHostStore(
@@ -191,8 +193,6 @@ const ActionTabs = () => {
       },
     };
 
-    console.log(mappedData);
-
     try {
       if (!mappedData || !Array.isArray(mappedData)) {
         showSnackbar(
@@ -223,6 +223,7 @@ const ActionTabs = () => {
         );
 
         setActiveId(1);
+        setRefresh();
 
         // 성공한 컨테이너
         if (succeededContainers.length > 0) {
